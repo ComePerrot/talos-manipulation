@@ -3,11 +3,28 @@ cmake_minimum_required(VERSION 3.1)
 SET(PROJECT_NAMESPACE ComePerrot)
 SET(PROJECT_NAME talos_manipulation)
 SET(PROJECT_DESCRIPTION "Manipulation for Talos")
-SET(PROJECT_URL https://gitlab.com/${PROJECT_NAMESPACE}/${PROJECT_NAME})
+SET(PROJECT_URL https://github.com/${PROJECT_NAMESPACE}/${PROJECT_NAME})
 
 # Project configuration
 set(DCMAKE_EXPORT_COMPILE_COMMANDS=1)
 
+# Check if the submodule cmake have been initialized
+set(JRL_CMAKE_MODULES "${CMAKE_CURRENT_LIST_DIR}/cmake")
+if(NOT EXISTS "${CMAKE_SOURCE_DIR}/cmake/base.cmake")
+  if(${CMAKE_VERSION} VERSION_LESS "3.14.0")
+    message(
+      FATAL_ERROR
+        "\nPlease run the following command first:\ngit submodule update --init\n"
+    )
+  else()
+    include(FetchContent)
+    FetchContent_Declare(
+      "jrl-cmakemodules"
+      GIT_REPOSITORY "https://github.com/jrl-umi3218/jrl-cmakemodules.git")
+    FetchContent_MakeAvailable("jrl-cmakemodules")
+    FetchContent_GetProperties("jrl-cmakemodules" SOURCE_DIR JRL_CMAKE_MODULES)
+  endif()
+endif()
 
 # JRL-cmakemodule setup
 include("${JRL_CMAKE_MODULES}/base.cmake")
@@ -24,11 +41,20 @@ add_project_dependency(sobec REQUIRED)
 set(CATKIN_COMPONENTS
   roscpp
   realtime_tools
-  message_generation
   eigen_conversions
 )
 
 find_package(catkin REQUIRED COMPONENTS ${CATKIN_COMPONENTS})
+
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES ${PROJECT_NAME}
+  CATKIN_DEPENDS ${CATKIN_COMPONENTS}
+)
+
+include_directories(SYSTEM
+  ${catkin_INCLUDE_DIRS}
+)
 
 SET(${PROJECT_NAME}_SOURCES
     src/main.cpp
