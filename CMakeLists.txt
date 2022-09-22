@@ -36,6 +36,7 @@ project(${PROJECT_NAME} ${PROJECT_ARGS})
 add_compile_options(-Wno-error)
 
 # Project dependencies
+add_project_dependency(Eigen3 REQUIRED)
 add_project_dependency(sobec REQUIRED)
 
 set(CATKIN_COMPONENTS
@@ -58,14 +59,15 @@ include_directories(SYSTEM
 
 SET(${PROJECT_NAME}_SOURCES
     src/main.cpp
+    src/ros-mpc-interface.cpp
 )
 SET(${PROJECT_NAME}_HEADERS
-
+    include/${PROJECT_NAME}/ros-mpc-interface.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
                                    ${${PROJECT_NAME}_HEADERS})
 target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
-target_link_libraries(${PROJECT_NAME} PUBLIC sobec::sobec)
+target_link_libraries(${PROJECT_NAME} PUBLIC sobec::sobec Eigen3::Eigen)
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
