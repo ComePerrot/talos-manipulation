@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.1)
 
 SET(PROJECT_NAMESPACE ComePerrot)
-SET(PROJECT_NAME talos_manipulation)
-SET(PROJECT_DESCRIPTION "Manipulation for Talos")
-SET(PROJECT_URL https://github.com/${PROJECT_NAMESPACE}/${PROJECT_NAME})
+SET(PROJECT_NAME ros-interface)
+SET(PROJECT_DESCRIPTION "Ros interface for Talos manipulation MPC")
+SET(PROJECT_URL https://github.com/${PROJECT_NAMESPACE}/talos-manipulation)
 
 # Project configuration
 set(DCMAKE_EXPORT_COMPILE_COMMANDS=1)

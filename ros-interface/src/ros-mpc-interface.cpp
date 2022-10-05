@@ -4,6 +4,14 @@ ROS_MPC_Interface::ROS_MPC_Interface() {
   tf2_ros::TransformListener tfListener(tfBuffer);
 }
 
+ROS_MPC_Interface::initialize() {
+
+}
+
+ROS_MPC_Interface::update(){
+  
+}
+
 Eigen::Affine3d ROS_MPC_Interface::get_TargetPlacement() {
   try {
     transformStamped = tfBuffer.lookupTransform("target", "tool", ros::Time(0));

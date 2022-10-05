@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>talos_manipulation</name>
+  <name>ros-interface</name>
   <version>0.0.0</version>
   <description>The talos_manipulation package</description>
 
