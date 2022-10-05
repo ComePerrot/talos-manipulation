@@ -64,21 +64,22 @@ class MPC_Point {
   VectorXd x_internal_;
 
  private:
-  void setTarget(SE3 &toolMtarget);
+  void setTarget(const SE3 &toolMtarget);
   void setHolesPlacement();
-  void updateTarget(SE3 &toolMtarget);
+  void updateTarget(const SE3 &toolMtarget);
   void updateOCP();
 
  public:
   MPC_Point(const MPCSettings_Point &settings,
             const OCPSettings_Point &OCPSettings, const RobotWrapper &designer);
 
-  void initialize(const ConstVectorRef &q0, const ConstVectorRef &v0, SE3 &toolMtarget);
+  void initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
+                  const SE3 &toolMtarget);
 
-  void iterate(const VectorXd &x0, SE3 &toolMtarget);
+  void iterate(const VectorXd &x0, const SE3 &toolMtarget);
 
   void iterate(const ConstVectorRef &q_current, const ConstVectorRef &v_current,
-               SE3 &toolMtarget);
+               const SE3 &toolMtarget);
 
   const VectorXd &shapeState(const ConstVectorRef &q, const ConstVectorRef &v);
 

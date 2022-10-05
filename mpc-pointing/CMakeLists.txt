@@ -6,6 +6,9 @@ SET(PROJECT_NAME mpc-pointing)
 SET(PROJECT_DESCRIPTION "Manipulation for Talos")
 SET(PROJECT_URL https://github.com/${PROJECT_NAMESPACE}/talos-manipulation)
 
+# Project options
+option(BUILD_PYTHON_INTERFACE "Build the python binding" ON)
+
 # Project configuration
 set(DCMAKE_EXPORT_COMPILE_COMMANDS=1)
 
@@ -38,6 +41,11 @@ project(${PROJECT_NAME} ${PROJECT_ARGS})
 add_compile_options(-Wno-error)
 
 # Project dependencies
+if(BUILD_PYTHON_INTERFACE)
+  add_project_dependency(eigenpy 2.7.10 REQUIRED)
+  string(REGEX REPLACE "-" "_" PY_NAME ${PROJECT_NAME})
+  set(${PY_NAME}_INSTALL_DIR ${PYTHON_SITELIB}/${PY_NAME})
+endif()
 add_project_dependency(ndcurves REQUIRED)
 add_project_dependency(crocoddyl REQUIRED)
 add_project_dependency(sobec REQUIRED)
@@ -61,3 +69,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
 target_link_libraries(${PROJECT_NAME} PUBLIC crocoddyl::crocoddyl sobec::sobec
                                              yaml-cpp)
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+
+# Python Bindings
+if(BUILD_PYTHON_INTERFACE)
+  add_subdirectory(python)
+endif()

@@ -5,7 +5,8 @@ OCP_Point::OCP_Point(const OCPSettings_Point &OCPSettings,
                      const RobotWrapper &designer)
     : settings_(OCPSettings), designer_(designer) {}
 
-void OCP_Point::initialize(const ConstVectorRef &x0, const pinocchio::SE3 &oMtarget) {
+void OCP_Point::initialize(const ConstVectorRef &x0,
+                           const pinocchio::SE3 &oMtarget) {
   if (!designer_.initialized_) {
     throw std::runtime_error("The designer must be initialized.");
   }
@@ -34,7 +35,7 @@ void OCP_Point::solve(const ConstVectorRef &measured_x) {
 }
 
 ///@todo: add initialization check before returning torque or gain
-Eigen::VectorXd OCP_Point::get_torque() { return (solver_->get_us()[0]); }
-Eigen::MatrixXd OCP_Point::get_gain() { return (solver_->get_K()[0]); }
+const VectorXd OCP_Point::get_torque() { return (solver_->get_us()[0]); }
+const MatrixXd OCP_Point::get_gain() { return (solver_->get_K()[0]); }
 
 }  // namespace mpc_p

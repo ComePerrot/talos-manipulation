@@ -60,8 +60,8 @@ class OCP_Point {
 
   // Setters and Getters
 
-  VectorXd get_torque();
-  MatrixXd get_gain();
+  const VectorXd get_torque();
+  const MatrixXd get_gain();
 
   ModelMaker &get_modelMaker() { return (modelMaker_); };
   size_t get_initialized() { return (initialized_); };
