@@ -8,7 +8,7 @@ void OCP_Point::recede() {
       solver_->get_problem()->get_runningDatas()[0]);
 }
 void OCP_Point::changeTarget(const size_t index,
-                             const Eigen::Ref<const Vector3d> position) {
+                             const Eigen::Ref<const Vector3d> &position) {
   boost::static_pointer_cast<crocoddyl::ResidualModelFrameTranslation>(
       costs(index)->get_costs().at("gripperPosition")->cost->get_residual())
       ->set_reference(position);
@@ -16,13 +16,12 @@ void OCP_Point::changeTarget(const size_t index,
 void OCP_Point::setBalancingTorques() {
   for (size_t modelIndex = 0; modelIndex < settings_.horizon_length;
        modelIndex++) {
-    VectorXd x_ref =
-        boost::static_pointer_cast<crocoddyl::ResidualModelState>(
-            costs(modelIndex)
-                ->get_costs()
-                .at("postureTask")
-                ->cost->get_residual())
-            ->get_reference();
+    VectorXd x_ref = boost::static_pointer_cast<crocoddyl::ResidualModelState>(
+                         costs(modelIndex)
+                             ->get_costs()
+                             .at("postureTask")
+                             ->cost->get_residual())
+                         ->get_reference();
 
     VectorXd balancingTorque;
     balancingTorque.resize((long)iam(modelIndex)->get_nu());
@@ -36,8 +35,7 @@ void OCP_Point::setBalancingTorques() {
         ->set_reference(balancingTorque);
   }
 }
-void OCP_Point::updateGoalPosition(
-    const Eigen::Ref<const Vector3d> position) {
+void OCP_Point::updateGoalPosition(const Eigen::Ref<const Vector3d> &position) {
   for (size_t modelIndex = 0; modelIndex < settings_.horizon_length;
        modelIndex++) {
     boost::static_pointer_cast<crocoddyl::ResidualModelFrameTranslation>(
@@ -48,8 +46,7 @@ void OCP_Point::updateGoalPosition(
         ->set_reference(position);
   }
 }
-void OCP_Point::updateGoalRotation(
-    const Eigen::Ref<const Matrix3d> rotation) {
+void OCP_Point::updateGoalRotation(const Eigen::Ref<const Matrix3d> &rotation) {
   for (size_t modelIndex = 0; modelIndex < settings_.horizon_length;
        modelIndex++) {
     boost::static_pointer_cast<crocoddyl::ResidualModelFrameRotation>(

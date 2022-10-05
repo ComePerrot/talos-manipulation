@@ -1,8 +1,10 @@
 #ifndef MPC_P_FWD
 #define MPC_P_FWD
 
+#include <pinocchio/fwd.hpp>
+// include pinocchio first
 #include <crocoddyl/core/fwd.hpp>
-#include <crocoddyl/multibody/fwd.hpp>
+#include <crocoddyl/core/solvers/fddp.hpp>
 #include <sobec/walk-with-traj/designer.hpp>
 #include <sobec/walk-with-traj/model_factory.hpp>
 
@@ -12,6 +14,7 @@ using Vector3d = Eigen::Vector3d;
 using VectorXd = Eigen::VectorXd;
 using Matrix3d = Eigen::Matrix3d;
 using MatrixXd = Eigen::MatrixXd;
+using ConstVectorRef = Eigen::Ref<const Eigen::VectorXd>;
 
 // Pinocchio
 using SE3 = pinocchio::SE3;

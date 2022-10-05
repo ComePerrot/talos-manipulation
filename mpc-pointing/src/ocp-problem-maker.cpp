@@ -2,7 +2,7 @@
 
 namespace mpc_p {
 void OCP_Point::buildSolver(const VectorXd x0, SE3 oMtarget,
-                            const ModelMakerSettings modelMakerSettings) {
+                            const ModelMakerSettings &modelMakerSettings) {
   modelMaker_ = ModelMaker(modelMakerSettings, designer_);
 
   auto runningModels = std::vector<ActionModel>(settings_.horizon_length);

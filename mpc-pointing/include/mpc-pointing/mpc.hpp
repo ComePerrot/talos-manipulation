@@ -1,9 +1,6 @@
 #ifndef MPC_P
 #define MPC_P
 
-// #include <pinocchio/fwd.hpp>
-// // include pinocchio first
-
 #include "mpc-pointing/fwd.hpp"
 #include "mpc-pointing/ocp.hpp"
 
@@ -52,8 +49,7 @@ class MPC_Point {
   // Target related variables
   size_t number_holes_;
   std::vector<SE3> holes_offsets_;
-  std::vector<SE3>
-      list_oMhole_;  // Holes position in the robot frame
+  std::vector<SE3> list_oMhole_;  // Holes position in the robot frame
   SE3 backwardOffset_ = SE3::Identity();
 
   // Security management
@@ -68,25 +64,23 @@ class MPC_Point {
   VectorXd x_internal_;
 
  private:
-  void setTarget(SE3 toolMtarget);
-  void updateTarget(SE3 toolMtarget);
-  void updateOCP();
+  void setTarget(SE3 &toolMtarget);
   void setHolesPlacement();
+  void updateTarget(SE3 &toolMtarget);
+  void updateOCP();
 
  public:
   MPC_Point(const MPCSettings_Point &settings,
             const OCPSettings_Point &OCPSettings, const RobotWrapper &designer);
 
-  void initialize(const VectorXd &q0, const VectorXd &v0,
-                  SE3 toolMtarget);
+  void initialize(const ConstVectorRef &q0, const ConstVectorRef &v0, SE3 &toolMtarget);
 
-  void iterate(const VectorXd &x0, SE3 toolMtarget);
+  void iterate(const VectorXd &x0, SE3 &toolMtarget);
 
-  void iterate(const VectorXd &q_current,
-               const VectorXd &v_current, SE3 toolMtarget);
+  void iterate(const ConstVectorRef &q_current, const ConstVectorRef &v_current,
+               SE3 &toolMtarget);
 
-  const VectorXd &shapeState(const VectorXd &q,
-                                    const VectorXd &v);
+  const VectorXd &shapeState(const ConstVectorRef &q, const ConstVectorRef &v);
 
   // getters and setters
   MPCSettings_Point &get_settings() { return settings_; }

@@ -5,7 +5,7 @@ OCP_Point::OCP_Point(const OCPSettings_Point &OCPSettings,
                      const RobotWrapper &designer)
     : settings_(OCPSettings), designer_(designer) {}
 
-void OCP_Point::initialize(const Eigen::VectorXd &x0, const pinocchio::SE3 &oMtarget) {
+void OCP_Point::initialize(const ConstVectorRef &x0, const pinocchio::SE3 &oMtarget) {
   if (!designer_.initialized_) {
     throw std::runtime_error("The designer must be initialized.");
   }
@@ -16,7 +16,7 @@ void OCP_Point::initialize(const Eigen::VectorXd &x0, const pinocchio::SE3 &oMta
   initialized_ = true;
 }
 
-void OCP_Point::solve(const Eigen::VectorXd &measured_x) {
+void OCP_Point::solve(const ConstVectorRef &measured_x) {
   warm_xs_ = solver_->get_xs();
   warm_xs_.erase(warm_xs_.begin());
   warm_xs_[0] = measured_x;

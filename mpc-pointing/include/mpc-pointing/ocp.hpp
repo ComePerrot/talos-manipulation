@@ -32,7 +32,7 @@ class OCP_Point {
 
   // OCP Problem Maker private functions
   void buildSolver(const VectorXd x0, SE3 oMtarget,
-                   const ModelMakerSettings modelMakerSettings);
+                   const ModelMakerSettings &modelMakerSettings);
   void solveFirst(const VectorXd x);
 
   // OCP Problem Helper private functions
@@ -45,16 +45,16 @@ class OCP_Point {
  public:
   OCP_Point(const OCPSettings_Point &OCPSettings, const RobotWrapper &designer);
 
-  void initialize(const VectorXd &x0, const SE3 &oMtarget);
-  void solve(const VectorXd &measured_x);
+  void initialize(const ConstVectorRef &x0, const SE3 &oMtarget);
+  void solve(const ConstVectorRef &measured_x);
 
   // OCP Problem Helper public functions
   void recede();
   void setBalancingTorques();
   void changeTarget(const size_t index,
-                    const Eigen::Ref<const Eigen::Vector3d> position);
-  void updateGoalPosition(const Eigen::Ref<const Eigen::Vector3d> position);
-  void updateGoalRotation(const Eigen::Ref<const Eigen::Matrix3d> rotation);
+                    const Eigen::Ref<const Eigen::Vector3d> &position);
+  void updateGoalPosition(const Eigen::Ref<const Eigen::Vector3d> &position);
+  void updateGoalRotation(const Eigen::Ref<const Eigen::Matrix3d> &rotation);
   void changeGoalCostActivation(const size_t index, const bool value);
   void changeGoaleTrackingWeights(double weight);
 

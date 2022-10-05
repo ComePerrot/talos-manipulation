@@ -10,13 +10,12 @@ MPC_Point::MPC_Point(const MPCSettings_Point &settings,
     : settings_(settings), designer_(designer), OCP_(OCPSettings, designer_) {
   backwardOffset_.translation().z() = settings_.backwardOffset;
   for (auto offset : settings_.holes_offsets) {
-    holes_offsets_.push_back(
-        SE3(Matrix3d::Identity(), offset));
+    holes_offsets_.push_back(SE3(Matrix3d::Identity(), offset));
   }
 }
 
-void MPC_Point::initialize(const VectorXd &q0, const VectorXd &v0,
-                           SE3 toolMtarget) {
+void MPC_Point::initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
+                           SE3 &toolMtarget) {
   controlled_joints_id_ = designer_.get_controlledJointsIDs();
   x_internal_.resize(designer_.get_rModel().nq + designer_.get_rModel().nv);
 
@@ -36,9 +35,8 @@ void MPC_Point::initialize(const VectorXd &q0, const VectorXd &v0,
   initialized_ = true;
 }
 
-void MPC_Point::iterate(const VectorXd &q_current,
-                        const VectorXd &v_current,
-                        SE3 toolMtarget) {
+void MPC_Point::iterate(const ConstVectorRef &q_current,
+                        const ConstVectorRef &v_current, SE3 &toolMtarget) {
   x0_ = shapeState(q_current, v_current);
 
   designer_.updateReducedModel(x0_);
@@ -50,7 +48,7 @@ void MPC_Point::iterate(const VectorXd &q_current,
   K0_ = OCP_.get_gain();
 }
 
-void MPC_Point::iterate(const VectorXd &x0, SE3 toolMtarget) {
+void MPC_Point::iterate(const VectorXd &x0, SE3 &toolMtarget) {
   x0_ = x0;
 
   designer_.updateReducedModel(x0_);
@@ -64,7 +62,7 @@ void MPC_Point::iterate(const VectorXd &x0, SE3 toolMtarget) {
   K0_ = OCP_.get_gain();
 }
 
-void MPC_Point::setTarget(SE3 toolMtarget) {
+void MPC_Point::setTarget(SE3 &toolMtarget) {
   // Setup target
   number_holes_ = settings_.holes_offsets.size();
 
@@ -110,7 +108,7 @@ void MPC_Point::setHolesPlacement() {
   }
 }
 
-void MPC_Point::updateTarget(SE3 toolMtarget) {
+void MPC_Point::updateTarget(SE3 &toolMtarget) {
   if (settings_.use_mocap == 0 || settings_.use_mocap == 1) {
     tool_se3_hole_ =
         designer_.get_EndEff_frame().actInv(list_oMhole_[current_hole_]);
@@ -264,8 +262,7 @@ void MPC_Point::updateOCP() {
   }
 }
 
-const VectorXd &MPC_Point::shapeState(const VectorXd &q,
-                                             const VectorXd &v) {
+const VectorXd &MPC_Point::shapeState(const ConstVectorRef &q, const ConstVectorRef &v) {
   if (q.size() == designer_.get_rModelComplete().nq &&
       v.size() == designer_.get_rModelComplete().nv) {
     x_internal_.head<7>() = q.head<7>();
