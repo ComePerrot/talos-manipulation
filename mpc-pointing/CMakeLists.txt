@@ -1,0 +1,66 @@
+cmake_minimum_required(VERSION 3.1)
+
+# Project properties
+SET(PROJECT_NAMESPACE ComePerrot)
+SET(PROJECT_NAME mpc-pointing)
+SET(PROJECT_DESCRIPTION "Manipulation for Talos")
+SET(PROJECT_URL https://github.com/${PROJECT_NAMESPACE}/talos-manipulation)
+
+# Project configuration
+set(DCMAKE_EXPORT_COMPILE_COMMANDS=1)
+
+# Check if the submodule cmake have been initialized
+set(JRL_CMAKE_MODULES "${CMAKE_CURRENT_LIST_DIR}/cmake")
+if(NOT EXISTS "${CMAKE_SOURCE_DIR}/cmake/base.cmake")
+  if(${CMAKE_VERSION} VERSION_LESS "3.14.0")
+    message(
+      FATAL_ERROR
+        "\nPlease run the following command first:\ngit submodule update --init\n"
+    )
+  else()
+    include(FetchContent)
+    FetchContent_Declare(
+      "jrl-cmakemodules"
+      GIT_REPOSITORY "https://github.com/jrl-umi3218/jrl-cmakemodules.git")
+    FetchContent_MakeAvailable("jrl-cmakemodules")
+    FetchContent_GetProperties("jrl-cmakemodules" SOURCE_DIR JRL_CMAKE_MODULES)
+  endif()
+endif()
+
+# JRL-cmakemodule setup
+include("${JRL_CMAKE_MODULES}/base.cmake")
+include("${JRL_CMAKE_MODULES}/boost.cmake")
+
+# Project definition
+compute_project_args(PROJECT_ARGS LANGUAGES CXX)
+project(${PROJECT_NAME} ${PROJECT_ARGS})
+
+add_compile_options(-Wno-error)
+
+# Project dependencies
+add_project_dependency(ndcurves REQUIRED)
+add_project_dependency(crocoddyl REQUIRED)
+add_project_dependency(sobec REQUIRED)
+
+SET(${PROJECT_NAME}_SOURCES
+    src/mpc-pointing.cpp
+)
+SET(${PROJECT_NAME}_HEADERS
+    include/${PROJECT_NAME}/mpc-pointing.h
+)
+
+add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
+                                   ${${PROJECT_NAME}_HEADERS})
+target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
+target_link_libraries(${PROJECT_NAME} PUBLIC crocoddyl::crocoddyl sobec::sobec
+                                             ndcurves::ndcurves yaml-cpp)
+set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(test_MPC src/test_MPC.cpp)
+target_link_libraries(test_MPC ${PROJECT_NAME} pinocchio::pinocchio crocoddyl::crocoddyl sobec::sobec -lrt -lpthread)
+
+add_executable(test_OCP src/test_OCP.cpp)
+target_link_libraries(test_OCP ${PROJECT_NAME} pinocchio::pinocchio crocoddyl::crocoddyl sobec::sobec -lrt -lpthread)
+
+add_executable(test_Sobec src/test_sobec.cpp)
+target_link_libraries(test_Sobec ${PROJECT_NAME} sobec::sobec -lrt -lpthread)
