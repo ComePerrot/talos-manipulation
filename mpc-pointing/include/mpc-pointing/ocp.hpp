@@ -1,16 +1,14 @@
-#ifndef SOBEC_OCP_P
-#define SOBEC_OCP_P
+#ifndef OCP_P
+#define OCP_P
 
 #include <memory.h>
 
 #include <pinocchio/fwd.hpp>
-
 // include pinocchio first
+#include "mpc-pointing/fwd.hpp"
 
-#include "sobec/walk-with-traj/designer.hpp"
-#include "sobec/walk-with-traj/model_factory.hpp"
-
-namespace sobec {
+namespace mpc_p {
+using namespace crocoddyl;
 struct OCPSettings_Point {
   size_t horizon_length;
   ModelMakerSettings modelMakerSettings;
@@ -22,7 +20,7 @@ struct OCPSettings_Point {
 class OCP_Point {
  private:
   OCPSettings_Point settings_;
-  RobotDesigner designer_;
+  RobotWrapper designer_;
   ModelMaker modelMaker_;
   DDP solver_;
 
@@ -38,15 +36,14 @@ class OCP_Point {
   void solveFirst(const Eigen::VectorXd x);
 
   // OCP Problem Helper private functions
-  AMA ama(const unsigned long time);
-  IAM iam(const unsigned long time);
-  DAM dam(const unsigned long time);
-  Cost costs(const unsigned long time);
-  ADA ada(const unsigned long time);
+  ActionModel ama(const unsigned long time);
+  IntegratedActionModel iam(const unsigned long time);
+  DifferentialActionModel dam(const unsigned long time);
+  CostModelSum costs(const unsigned long time);
+  ActionData ada(const unsigned long time);
 
  public:
-  OCP_Point(const OCPSettings_Point &OCPSettings,
-            const RobotDesigner &designer);
+  OCP_Point(const OCPSettings_Point &OCPSettings, const RobotWrapper &designer);
 
   void initialize(const Eigen::VectorXd &x0, const pinocchio::SE3 &oMtarget);
   void solve(const Eigen::VectorXd &measured_x);
@@ -71,6 +68,6 @@ class OCP_Point {
   size_t get_horizonLength() { return (settings_.horizon_length); };
 };
 
-}  // namespace sobec
+}  // namespace mpc_p
 
-#endif  // SOBEC_OCP_P
+#endif  // OCP_P

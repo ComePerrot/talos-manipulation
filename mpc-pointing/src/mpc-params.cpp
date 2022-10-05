@@ -1,8 +1,8 @@
 #include <yaml-cpp/yaml.h>
 
-#include "sobec/pointing/mpc-pointing.hpp"
+#include "mpc-pointing/mpc.hpp"
 
-namespace sobec {
+namespace mpc_p {
 
 void MPCSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
   YAML::Node root = YAML::Load(StringToParse);
@@ -65,8 +65,7 @@ void MPCSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
       for (std::size_t i = 0; i < yn_astdvect_v3d.size(); i++) {
         Eigen::Vector3d buffer;
         for (std::size_t j = 0; j < 3; j++) {
-          buffer[(Eigen::Index)j] =
-              yn_astdvect_v3d[i][j].as<double>();
+          buffer[(Eigen::Index)j] = yn_astdvect_v3d[i][j].as<double>();
         }
         aref_stdvect_v3d.push_back(buffer);
       }
@@ -95,4 +94,4 @@ void MPCSettings_Point::readParamsFromYamlFile(const std::string &Filename) {
   readParamsFromYamlString(StringToParse);
 }
 
-}  // namespace sobec
+}  // namespace mpc_p

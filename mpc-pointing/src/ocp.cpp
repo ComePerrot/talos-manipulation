@@ -1,8 +1,8 @@
-#include "sobec/pointing/ocp-pointing.hpp"
+#include "mpc-pointing/ocp.hpp"
 
-namespace sobec {
+namespace mpc_p {
 OCP_Point::OCP_Point(const OCPSettings_Point &OCPSettings,
-                     const RobotDesigner &designer)
+                     const RobotWrapper &designer)
     : settings_(OCPSettings), designer_(designer) {}
 
 void OCP_Point::initialize(const Eigen::VectorXd &x0, const pinocchio::SE3 &oMtarget) {
@@ -37,4 +37,4 @@ void OCP_Point::solve(const Eigen::VectorXd &measured_x) {
 Eigen::VectorXd OCP_Point::get_torque() { return (solver_->get_us()[0]); }
 Eigen::MatrixXd OCP_Point::get_gain() { return (solver_->get_K()[0]); }
 
-}  // namespace sobec
+}  // namespace mpc_p

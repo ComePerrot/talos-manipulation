@@ -1,6 +1,6 @@
-#include "sobec/pointing/ocp-pointing.hpp"
+#include "mpc-pointing/ocp.hpp"
 
-namespace sobec {
+namespace mpc_p {
 // Functions to interact with ddp
 void OCP_Point::recede() {
   solver_->get_problem()->circularAppend(
@@ -71,7 +71,7 @@ void OCP_Point::changeGoaleTrackingWeights(double weight) {
   }
 }
 
-AMA OCP_Point::ama(const unsigned long time) {
+ActionModel OCP_Point::ama(const unsigned long time) {
   if (time == settings_.horizon_length) {
     return solver_->get_problem()->get_terminalModel();
   } else {
@@ -79,22 +79,22 @@ AMA OCP_Point::ama(const unsigned long time) {
   }
 }
 
-IAM OCP_Point::iam(const unsigned long time) {
+IntegratedActionModel OCP_Point::iam(const unsigned long time) {
   return boost::static_pointer_cast<crocoddyl::IntegratedActionModelEuler>(
       ama(time));
 }
 
-DAM OCP_Point::dam(const unsigned long time) {
+DifferentialActionModel OCP_Point::dam(const unsigned long time) {
   return boost::static_pointer_cast<
       crocoddyl::DifferentialActionModelContactFwdDynamics>(
       iam(time)->get_differential());
 }
 
-Cost OCP_Point::costs(const unsigned long time) {
+CostModelSum OCP_Point::costs(const unsigned long time) {
   return dam(time)->get_costs();
 }
 
-ADA OCP_Point::ada(const unsigned long time) {
+ActionData OCP_Point::ada(const unsigned long time) {
   return solver_->get_problem()->get_runningDatas()[time];
 }
-}  // namespace sobec
+}  // namespace mpc_p

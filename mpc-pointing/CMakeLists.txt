@@ -43,24 +43,21 @@ add_project_dependency(crocoddyl REQUIRED)
 add_project_dependency(sobec REQUIRED)
 
 SET(${PROJECT_NAME}_SOURCES
-    src/mpc-pointing.cpp
+    src/ocp.cpp
+    src/ocp-params.cpp
+    src/ocp-problem-helper.cpp
+    src/ocp-problem-maker.cpp
+    src/mpc.cpp
+    src/mpc-params.cpp
 )
 SET(${PROJECT_NAME}_HEADERS
-    include/${PROJECT_NAME}/mpc-pointing.h
+    include/${PROJECT_NAME}/ocp.hpp
+    include/${PROJECT_NAME}/mpc.hpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
                                    ${${PROJECT_NAME}_HEADERS})
 target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
 target_link_libraries(${PROJECT_NAME} PUBLIC crocoddyl::crocoddyl sobec::sobec
-                                             ndcurves::ndcurves yaml-cpp)
+                                             yaml-cpp)
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(test_MPC src/test_MPC.cpp)
-target_link_libraries(test_MPC ${PROJECT_NAME} pinocchio::pinocchio crocoddyl::crocoddyl sobec::sobec -lrt -lpthread)
-
-add_executable(test_OCP src/test_OCP.cpp)
-target_link_libraries(test_OCP ${PROJECT_NAME} pinocchio::pinocchio crocoddyl::crocoddyl sobec::sobec -lrt -lpthread)
-
-add_executable(test_Sobec src/test_sobec.cpp)
-target_link_libraries(test_Sobec ${PROJECT_NAME} sobec::sobec -lrt -lpthread)

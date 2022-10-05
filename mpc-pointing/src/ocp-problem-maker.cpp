@@ -1,11 +1,11 @@
-#include "sobec/pointing/ocp-pointing.hpp"
+#include "mpc-pointing/ocp.hpp"
 
-namespace sobec {
+namespace mpc_p {
 void OCP_Point::buildSolver(const Eigen::VectorXd x0, pinocchio::SE3 oMtarget,
                             const ModelMakerSettings modelMakerSettings) {
   modelMaker_ = ModelMaker(modelMakerSettings, designer_);
 
-  auto runningModels = std::vector<AMA>(settings_.horizon_length);
+  auto runningModels = std::vector<ActionModel>(settings_.horizon_length);
 
   for (size_t i = 0; i < settings_.horizon_length; i++) {
     runningModels[i] = modelMaker_.formulatePointingTask();
@@ -42,4 +42,4 @@ void OCP_Point::solveFirst(const Eigen::VectorXd x) {
 
   solver_->solve(xs_init, us_init, 500, false);
 }
-}  // namespace sobec
+}  // namespace mpc_p

@@ -1,13 +1,13 @@
-#include "sobec/pointing/mpc-pointing.hpp"
+#include "mpc-pointing/mpc.hpp"
 
-namespace sobec {
+namespace mpc_p {
 
 #define PI 3.14159265
 
 MPC_Point::MPC_Point(const MPCSettings_Point &settings,
                      const OCPSettings_Point &OCPSettings,
-                     const RobotDesigner &design)
-    : settings_(settings), designer_(design), OCP_(OCPSettings, designer_) {
+                     const RobotWrapper &designer)
+    : settings_(settings), designer_(designer), OCP_(OCPSettings, designer_) {
   backwardOffset_.translation().z() = settings_.backwardOffset;
   for (auto offset : settings_.holes_offsets) {
     holes_offsets_.push_back(
@@ -287,4 +287,4 @@ const Eigen::VectorXd &MPC_Point::shapeState(const Eigen::VectorXd &q,
     throw std::runtime_error(
         "q and v must have the dimentions of the reduced or complete model.");
 }
-}  // namespace sobec
+}  // namespace mpc_p

@@ -1,14 +1,13 @@
-#ifndef SOBEC_MPC_P
-#define SOBEC_MPC_P
+#ifndef MPC_P
+#define MPC_P
 
 #include <pinocchio/fwd.hpp>
-
 // include pinocchio first
 
-#include "sobec/pointing/ocp-pointing.hpp"
-#include "sobec/walk-with-traj/designer.hpp"
+#include "mpc-pointing/fwd.hpp"
+#include "mpc-pointing/ocp.hpp"
 
-namespace sobec {
+namespace mpc_p {
 
 struct MPCSettings_Point {
   // Timing parameters
@@ -30,14 +29,14 @@ struct MPCSettings_Point {
   double backwardOffset;
   double tolerance;
 
-  void readParamsFromYamlString(std::string& StringToParse);
-  void readParamsFromYamlFile(const std::string& Filename);
+  void readParamsFromYamlString(std::string &StringToParse);
+  void readParamsFromYamlFile(const std::string &Filename);
 };
 
 class MPC_Point {
  private:
   MPCSettings_Point settings_;
-  RobotDesigner designer_;
+  RobotWrapper designer_;
   OCP_Point OCP_;
 
   Eigen::VectorXd x0_;
@@ -76,7 +75,7 @@ class MPC_Point {
 
  public:
   MPC_Point(const MPCSettings_Point &settings,
-            const OCPSettings_Point &OCPSettings, const RobotDesigner &design);
+            const OCPSettings_Point &OCPSettings, const RobotWrapper &designer);
 
   void initialize(const Eigen::VectorXd &q0, const Eigen::VectorXd &v0,
                   pinocchio::SE3 toolMtarget);
@@ -84,8 +83,7 @@ class MPC_Point {
   void iterate(const Eigen::VectorXd &x0, pinocchio::SE3 toolMtarget);
 
   void iterate(const Eigen::VectorXd &q_current,
-               const Eigen::VectorXd &v_current,
-               pinocchio::SE3 toolMtarget);
+               const Eigen::VectorXd &v_current, pinocchio::SE3 toolMtarget);
 
   const Eigen::VectorXd &shapeState(const Eigen::VectorXd &q,
                                     const Eigen::VectorXd &v);
@@ -102,9 +100,9 @@ class MPC_Point {
   OCP_Point &get_OCP() { return OCP_; }
   void set_OCP(const OCP_Point &OCP) { OCP_ = OCP; }
 
-  RobotDesigner &get_designer() { return designer_; }
-  void set_designer(const RobotDesigner &designer) { designer_ = designer; }
+  RobotWrapper &get_designer() { return designer_; }
+  void set_designer(const RobotWrapper &designer) { designer_ = designer; }
 };
-}  // namespace sobec
+}  // namespace mpc_p
 
-#endif  // SOBEC_MPC_P
+#endif  // MPC_P

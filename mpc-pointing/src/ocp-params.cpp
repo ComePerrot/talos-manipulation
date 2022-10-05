@@ -1,8 +1,8 @@
 #include <yaml-cpp/yaml.h>
 
-#include "sobec/pointing/ocp-pointing.hpp"
+#include "mpc-pointing/ocp.hpp"
 
-namespace sobec {
+namespace mpc_p {
 
 void OCPSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
   YAML::Node root = YAML::Load(StringToParse);
@@ -70,4 +70,4 @@ void OCPSettings_Point::readParamsFromYamlFile(const std::string &Filename) {
   readParamsFromYamlString(StringToParse);
 }
 
-}  // namespace sobec
+}  // namespace mpc_p
