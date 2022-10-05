@@ -23,6 +23,12 @@ void OCP_Point::buildSolver(const VectorXd x0, SE3 oMtarget,
   // Change Target placmenet
   updateGoalPosition(oMtarget.translation());
   updateGoalRotation(oMtarget.rotation());
+
+  // Deactivate Target cost at the beginning
+  for (size_t modelIndex = 0; modelIndex < settings_.horizon_length;
+       modelIndex++) {
+    changeGoalCostActivation(modelIndex, false);
+  }
 }
 
 void OCP_Point::solveFirst(const VectorXd x) {
