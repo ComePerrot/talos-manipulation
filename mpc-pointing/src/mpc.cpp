@@ -11,12 +11,12 @@ MPC_Point::MPC_Point(const MPCSettings_Point &settings,
   backwardOffset_.translation().z() = settings_.backwardOffset;
   for (auto offset : settings_.holes_offsets) {
     holes_offsets_.push_back(
-        pinocchio::SE3(Eigen::Matrix3d::Identity(), offset));
+        SE3(Matrix3d::Identity(), offset));
   }
 }
 
-void MPC_Point::initialize(const Eigen::VectorXd &q0, const Eigen::VectorXd &v0,
-                           pinocchio::SE3 toolMtarget) {
+void MPC_Point::initialize(const VectorXd &q0, const VectorXd &v0,
+                           SE3 toolMtarget) {
   controlled_joints_id_ = designer_.get_controlledJointsIDs();
   x_internal_.resize(designer_.get_rModel().nq + designer_.get_rModel().nv);
 
@@ -36,9 +36,9 @@ void MPC_Point::initialize(const Eigen::VectorXd &q0, const Eigen::VectorXd &v0,
   initialized_ = true;
 }
 
-void MPC_Point::iterate(const Eigen::VectorXd &q_current,
-                        const Eigen::VectorXd &v_current,
-                        pinocchio::SE3 toolMtarget) {
+void MPC_Point::iterate(const VectorXd &q_current,
+                        const VectorXd &v_current,
+                        SE3 toolMtarget) {
   x0_ = shapeState(q_current, v_current);
 
   designer_.updateReducedModel(x0_);
@@ -50,7 +50,7 @@ void MPC_Point::iterate(const Eigen::VectorXd &q_current,
   K0_ = OCP_.get_gain();
 }
 
-void MPC_Point::iterate(const Eigen::VectorXd &x0, pinocchio::SE3 toolMtarget) {
+void MPC_Point::iterate(const VectorXd &x0, SE3 toolMtarget) {
   x0_ = x0;
 
   designer_.updateReducedModel(x0_);
@@ -64,7 +64,7 @@ void MPC_Point::iterate(const Eigen::VectorXd &x0, pinocchio::SE3 toolMtarget) {
   K0_ = OCP_.get_gain();
 }
 
-void MPC_Point::setTarget(pinocchio::SE3 toolMtarget) {
+void MPC_Point::setTarget(SE3 toolMtarget) {
   // Setup target
   number_holes_ = settings_.holes_offsets.size();
 
@@ -82,11 +82,11 @@ void MPC_Point::setTarget(pinocchio::SE3 toolMtarget) {
     double beta = -PI * 0.5;
     double gamma = PI;
 
-    Eigen::Matrix3d rotationY;
+    Matrix3d rotationY;
     rotationY.row(0) << cos(beta), 0, -sin(beta);
     rotationY.row(1) << 0, 1, 0;
     rotationY.row(2) << sin(beta), 0, cos(beta);
-    Eigen::Matrix3d rotationZ;
+    Matrix3d rotationZ;
     rotationZ.row(0) << cos(gamma), sin(gamma), 0;
     rotationZ.row(1) << -sin(gamma), cos(gamma), 0;
     rotationZ.row(2) << 0, 0, 1;
@@ -110,7 +110,7 @@ void MPC_Point::setHolesPlacement() {
   }
 }
 
-void MPC_Point::updateTarget(pinocchio::SE3 toolMtarget) {
+void MPC_Point::updateTarget(SE3 toolMtarget) {
   if (settings_.use_mocap == 0 || settings_.use_mocap == 1) {
     tool_se3_hole_ =
         designer_.get_EndEff_frame().actInv(list_oMhole_[current_hole_]);
@@ -264,8 +264,8 @@ void MPC_Point::updateOCP() {
   }
 }
 
-const Eigen::VectorXd &MPC_Point::shapeState(const Eigen::VectorXd &q,
-                                             const Eigen::VectorXd &v) {
+const VectorXd &MPC_Point::shapeState(const VectorXd &q,
+                                             const VectorXd &v) {
   if (q.size() == designer_.get_rModelComplete().nq &&
       v.size() == designer_.get_rModelComplete().nv) {
     x_internal_.head<7>() = q.head<7>();

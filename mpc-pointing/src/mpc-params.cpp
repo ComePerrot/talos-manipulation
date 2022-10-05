@@ -44,7 +44,7 @@ void MPCSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
   };
 
   // Local lambda function to read vector3
-  auto read_v3d = [&config](Eigen::Vector3d &aref_v3d, std::string fieldname) {
+  auto read_v3d = [&config](Vector3d &aref_v3d, std::string fieldname) {
     YAML::Node yn_av3d = config[fieldname];
     if (yn_av3d) {
       aref_v3d.resize(3);
@@ -58,12 +58,12 @@ void MPCSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
 
   // Local lambda function to read std::vector<Eigen::Vector3d>
   auto read_stdvect_v3d = [&config](
-                              std::vector<Eigen::Vector3d> &aref_stdvect_v3d,
+                              std::vector<Vector3d> &aref_stdvect_v3d,
                               std::string fieldname) {
     YAML::Node yn_astdvect_v3d = config[fieldname];
     if (yn_astdvect_v3d) {
       for (std::size_t i = 0; i < yn_astdvect_v3d.size(); i++) {
-        Eigen::Vector3d buffer;
+        Vector3d buffer;
         for (std::size_t j = 0; j < 3; j++) {
           buffer[(Eigen::Index)j] = yn_astdvect_v3d[i][j].as<double>();
         }

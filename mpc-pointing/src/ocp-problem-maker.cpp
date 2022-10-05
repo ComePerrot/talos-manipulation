@@ -1,7 +1,7 @@
 #include "mpc-pointing/ocp.hpp"
 
 namespace mpc_p {
-void OCP_Point::buildSolver(const Eigen::VectorXd x0, pinocchio::SE3 oMtarget,
+void OCP_Point::buildSolver(const VectorXd x0, SE3 oMtarget,
                             const ModelMakerSettings modelMakerSettings) {
   modelMaker_ = ModelMaker(modelMakerSettings, designer_);
 
@@ -25,10 +25,10 @@ void OCP_Point::buildSolver(const Eigen::VectorXd x0, pinocchio::SE3 oMtarget,
   updateGoalRotation(oMtarget.rotation());
 }
 
-void OCP_Point::solveFirst(const Eigen::VectorXd x) {
+void OCP_Point::solveFirst(const VectorXd x) {
   // horizon settings
-  std::vector<Eigen::VectorXd> xs_init;
-  std::vector<Eigen::VectorXd> us_init;
+  std::vector<VectorXd> xs_init;
+  std::vector<VectorXd> us_init;
 
   for (std::size_t i = 0; i < settings_.horizon_length; i++) {
     xs_init.push_back(x);

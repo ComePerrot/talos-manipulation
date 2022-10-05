@@ -8,6 +8,13 @@
 
 namespace mpc_p {
 // Eigen
+using Vector3d = Eigen::Vector3d;
+using VectorXd = Eigen::VectorXd;
+using Matrix3d = Eigen::Matrix3d;
+using MatrixXd = Eigen::MatrixXd;
+
+// Pinocchio
+using SE3 = pinocchio::SE3;
 
 // Crocoddyl
 using DDP = boost::shared_ptr<crocoddyl::SolverFDDP>;

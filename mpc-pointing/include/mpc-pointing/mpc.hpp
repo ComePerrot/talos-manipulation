@@ -1,8 +1,8 @@
 #ifndef MPC_P
 #define MPC_P
 
-#include <pinocchio/fwd.hpp>
-// include pinocchio first
+// #include <pinocchio/fwd.hpp>
+// // include pinocchio first
 
 #include "mpc-pointing/fwd.hpp"
 #include "mpc-pointing/ocp.hpp"
@@ -24,8 +24,8 @@ struct MPCSettings_Point {
   double maxGoalWeight;
 
   // Target
-  Eigen::Vector3d targetPos;
-  std::vector<Eigen::Vector3d> holes_offsets;
+  Vector3d targetPos;
+  std::vector<Vector3d> holes_offsets;
   double backwardOffset;
   double tolerance;
 
@@ -39,9 +39,9 @@ class MPC_Point {
   RobotWrapper designer_;
   OCP_Point OCP_;
 
-  Eigen::VectorXd x0_;
-  Eigen::VectorXd u0_;
-  Eigen::MatrixXd K0_;
+  VectorXd x0_;
+  VectorXd u0_;
+  MatrixXd K0_;
 
   // MPC State
   size_t current_hole_ = 0;
@@ -51,25 +51,25 @@ class MPC_Point {
 
   // Target related variables
   size_t number_holes_;
-  std::vector<pinocchio::SE3> holes_offsets_;
-  std::vector<pinocchio::SE3>
+  std::vector<SE3> holes_offsets_;
+  std::vector<SE3>
       list_oMhole_;  // Holes position in the robot frame
-  pinocchio::SE3 backwardOffset_ = pinocchio::SE3::Identity();
+  SE3 backwardOffset_ = SE3::Identity();
 
   // Security management
   bool initialized_ = false;
 
   // Memory preallocations:
-  pinocchio::SE3 oMtarget_;
-  pinocchio::SE3 oMbackwardHole_;
-  pinocchio::SE3 tool_se3_hole_;
+  SE3 oMtarget_;
+  SE3 oMbackwardHole_;
+  SE3 tool_se3_hole_;
   double position_error_ = 0;
   std::vector<unsigned long> controlled_joints_id_;
-  Eigen::VectorXd x_internal_;
+  VectorXd x_internal_;
 
  private:
-  void setTarget(pinocchio::SE3 toolMtarget);
-  void updateTarget(pinocchio::SE3 toolMtarget);
+  void setTarget(SE3 toolMtarget);
+  void updateTarget(SE3 toolMtarget);
   void updateOCP();
   void setHolesPlacement();
 
@@ -77,25 +77,25 @@ class MPC_Point {
   MPC_Point(const MPCSettings_Point &settings,
             const OCPSettings_Point &OCPSettings, const RobotWrapper &designer);
 
-  void initialize(const Eigen::VectorXd &q0, const Eigen::VectorXd &v0,
-                  pinocchio::SE3 toolMtarget);
+  void initialize(const VectorXd &q0, const VectorXd &v0,
+                  SE3 toolMtarget);
 
-  void iterate(const Eigen::VectorXd &x0, pinocchio::SE3 toolMtarget);
+  void iterate(const VectorXd &x0, SE3 toolMtarget);
 
-  void iterate(const Eigen::VectorXd &q_current,
-               const Eigen::VectorXd &v_current, pinocchio::SE3 toolMtarget);
+  void iterate(const VectorXd &q_current,
+               const VectorXd &v_current, SE3 toolMtarget);
 
-  const Eigen::VectorXd &shapeState(const Eigen::VectorXd &q,
-                                    const Eigen::VectorXd &v);
+  const VectorXd &shapeState(const VectorXd &q,
+                                    const VectorXd &v);
 
   // getters and setters
   MPCSettings_Point &get_settings() { return settings_; }
 
-  const Eigen::VectorXd &get_x0() const { return x0_; }
+  const VectorXd &get_x0() const { return x0_; }
 
-  const Eigen::VectorXd &get_u0() const { return u0_; }
+  const VectorXd &get_u0() const { return u0_; }
 
-  const Eigen::MatrixXd &get_K0() const { return K0_; }
+  const MatrixXd &get_K0() const { return K0_; }
 
   OCP_Point &get_OCP() { return OCP_; }
   void set_OCP(const OCP_Point &OCP) { OCP_ = OCP; }

@@ -33,8 +33,8 @@ void OCPSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
     }
   };
 
-  // Local lambda function to read vectorX
-  auto read_vxd = [&config](Eigen::VectorXd &aref_vxd, std::string fieldname) {
+  // Local lambda function to read VectorXd
+  auto read_vxd = [&config](VectorXd &aref_vxd, std::string fieldname) {
     YAML::Node yn_avxd = config[fieldname];
     if (yn_avxd) {
       aref_vxd.resize((Eigen::Index)yn_avxd.size());

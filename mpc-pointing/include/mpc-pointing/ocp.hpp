@@ -27,13 +27,13 @@ class OCP_Point {
   bool initialized_ = false;
 
   // prealocated memory:
-  std::vector<Eigen::VectorXd> warm_xs_;
-  std::vector<Eigen::VectorXd> warm_us_;
+  std::vector<VectorXd> warm_xs_;
+  std::vector<VectorXd> warm_us_;
 
   // OCP Problem Maker private functions
-  void buildSolver(const Eigen::VectorXd x0, pinocchio::SE3 oMtarget,
+  void buildSolver(const VectorXd x0, SE3 oMtarget,
                    const ModelMakerSettings modelMakerSettings);
-  void solveFirst(const Eigen::VectorXd x);
+  void solveFirst(const VectorXd x);
 
   // OCP Problem Helper private functions
   ActionModel ama(const unsigned long time);
@@ -45,8 +45,8 @@ class OCP_Point {
  public:
   OCP_Point(const OCPSettings_Point &OCPSettings, const RobotWrapper &designer);
 
-  void initialize(const Eigen::VectorXd &x0, const pinocchio::SE3 &oMtarget);
-  void solve(const Eigen::VectorXd &measured_x);
+  void initialize(const VectorXd &x0, const SE3 &oMtarget);
+  void solve(const VectorXd &measured_x);
 
   // OCP Problem Helper public functions
   void recede();
@@ -60,8 +60,8 @@ class OCP_Point {
 
   // Setters and Getters
 
-  Eigen::VectorXd get_torque();
-  Eigen::MatrixXd get_gain();
+  VectorXd get_torque();
+  MatrixXd get_gain();
 
   ModelMaker &get_modelMaker() { return (modelMaker_); };
   size_t get_initialized() { return (initialized_); };
