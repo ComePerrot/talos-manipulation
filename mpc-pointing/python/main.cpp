@@ -2,7 +2,7 @@
 
 #include "mpc-pointing/python-fwd.hpp"
 
-BOOST_PYTHON_MODULE(sobec_pywrap) {
+BOOST_PYTHON_MODULE(mpc_pointing_pywrap) {
   boost::python::import("pinocchio");
   boost::python::import("crocoddyl");
   // Enabling eigenpy support, i.e. numpy/eigen compatibility.

@@ -5,12 +5,8 @@
 import numpy as np
 import pinocchio as pin
 
-from sobec import (
-    RobotDesigner,
-    MPC_Point,
-    MPCSettings_Point,
-    OCPSettings_Point,
-)
+from sobec import RobotDesigner
+from mpc_pointing import MPC_Point, MPCSettings_Point, OCPSettings_Point
 
 from TalosDeburringSimulation import TalosDeburringSimulator
 

@@ -50,6 +50,13 @@ add_project_dependency(ndcurves REQUIRED)
 add_project_dependency(crocoddyl REQUIRED)
 add_project_dependency(sobec REQUIRED)
 
+SET(${PROJECT_NAME}_HEADERS
+    include/${PROJECT_NAME}/fwd.hpp
+    include/${PROJECT_NAME}/python-fwd.hpp
+    include/${PROJECT_NAME}/ocp.hpp
+    include/${PROJECT_NAME}/mpc.hpp
+)
+
 SET(${PROJECT_NAME}_SOURCES
     src/ocp.cpp
     src/ocp-params.cpp
@@ -57,10 +64,6 @@ SET(${PROJECT_NAME}_SOURCES
     src/ocp-problem-maker.cpp
     src/mpc.cpp
     src/mpc-params.cpp
-)
-SET(${PROJECT_NAME}_HEADERS
-    include/${PROJECT_NAME}/ocp.hpp
-    include/${PROJECT_NAME}/mpc.hpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
@@ -74,3 +77,10 @@ set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 if(BUILD_PYTHON_INTERFACE)
   add_subdirectory(python)
 endif()
+
+# Installation
+install(
+  TARGETS ${PROJECT_NAME}
+  EXPORT ${TARGETS_EXPORT_NAME}
+  DESTINATION lib)
+install(FILES package.xml DESTINATION share/${PROJECT_NAME})
