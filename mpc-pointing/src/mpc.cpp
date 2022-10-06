@@ -38,15 +38,7 @@ void MPC_Point::initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
 void MPC_Point::iterate(const ConstVectorRef &q_current,
                         const ConstVectorRef &v_current,
                         const SE3 &toolMtarget) {
-  x0_ = shapeState(q_current, v_current);
-
-  designer_.updateReducedModel(x0_);
-
-  updateTarget(toolMtarget);
-  updateOCP();
-  OCP_.solve(x0_);
-  u0_ = OCP_.get_torque();
-  K0_ = OCP_.get_gain();
+  iterate(shapeState(q_current, v_current), toolMtarget);
 }
 
 void MPC_Point::iterate(const VectorXd &x0, const SE3 &toolMtarget) {

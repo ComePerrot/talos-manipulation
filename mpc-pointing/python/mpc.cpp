@@ -9,7 +9,6 @@
 #include "mpc-pointing/fwd.hpp"
 #include "mpc-pointing/mpc.hpp"
 
-
 namespace mpc_p {
 namespace python {
 
@@ -68,18 +67,20 @@ void exposeMPCPointClass() {
   bp::register_ptr_to_python<boost::shared_ptr<MPC_Point> >();
 
   bp::class_<MPC_Point>(
-      "MPC_Point", bp::init<const MPCSettings_Point&, const OCPSettings_Point&,
-                            const RobotWrapper&>(
+      "MPC_Point", bp::init<const MPCSettings_Point &,
+                            const OCPSettings_Point &, const RobotWrapper &>(
                        bp::args("self", "settings", "OCPSettings", "designer"),
                        "Initialize the MPC (empty init)"))
-      .def<void (MPC_Point::*)(const ConstVectorRef&, const ConstVectorRef&,
-                               const SE3&)>(
+      .def<void (MPC_Point::*)(const ConstVectorRef &, const ConstVectorRef &,
+                               const SE3 &)>(
           "initialize", &MPC_Point::initialize,
           bp::args("self", "q0", "v0", "toolMtarget"))
-      .def<void (MPC_Point::*)(const ConstVectorRef&, const ConstVectorRef&,
-                               const SE3&)>(
+      .def<void (MPC_Point::*)(const ConstVectorRef &, const ConstVectorRef &,
+                               const SE3 &)>(
           "iterate", &MPC_Point::iterate,
           bp::args("self", "q_current", "v_current", "toolMtarget"))
+      .def<void (MPC_Point::*)(const VectorXd &, const SE3 &)>(
+          "iterate", &MPC_Point::iterate, bp::args("self", "x0", "toolMtarget"))
       .add_property(
           "designer_",
           bp::make_function(
@@ -92,7 +93,7 @@ void exposeMPCPointClass() {
               &MPC_Point::get_OCP,
               bp::return_value_policy<bp::reference_existing_object>()),
           "crocoddyl wrapper used by the MPC")
-          .add_property(
+      .add_property(
           "x0",
           bp::make_function(
               &MPC_Point::get_x0,
@@ -118,4 +119,4 @@ void exposeMPCPoint() {
 }
 
 }  // namespace python
-}  // namespace sobec
+}  // namespace mpc_p
