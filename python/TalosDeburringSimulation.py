@@ -1,136 +1,123 @@
-import example_robot_data
 import numpy as np
-import pinocchio as pin
 import pybullet as p  # PyBullet simulator
 import pybullet_data
-import queue
-
-
-def a2m(a):
-    return np.matrix(a).T
-
-
-def m2a(m):
-    return np.array(m.flat)
 
 
 class TalosDeburringSimulator:
     def __init__(
         self,
-        URDF_File,
-        URDF_Path,
+        URDF,
         targetPos,
-        rmodel,
-        ControlledJoints,
-        initialConfiguration,
+        rmodelComplete,
+        controlledJointsIDs,
         enableGUI=False,
         enableGravity=True,
         dt=1e-3,
     ):
 
+        self._setupBullet(enableGUI, enableGravity, dt)
+
+        self._setupRobot(URDF, rmodelComplete, controlledJointsIDs)
+
+        # Create visuals
+        self._createTargetVisual(targetPos)
+
+    def _setupBullet(self, enableGUI, enableGravity, dt):
         # Start the client for PyBullet
-        self.enableGUI = enableGUI
-        if self.enableGUI:
+        if enableGUI:
             self.physicsClient = p.connect(p.GUI)
             p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
         else:
             self.physicsClient = p.connect(p.DIRECT)
 
         # Set gravity (enabled by default)
-        self.enableGravity = enableGravity
         if enableGravity:
             p.setGravity(0, 0, -9.81)
         else:
             p.setGravity(0, 0, 0)
 
         # Set time step of the simulation
-        self.dt = dt
-        p.setTimeStep(self.dt)
+        p.setTimeStep(dt)
 
         # Load horizontal plane for PyBullet
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
         p.loadURDF("plane.urdf")
 
-        # Load the robot for PyBullet
-        modelPath = example_robot_data.getModelPath(URDF_Path)
-        p.setAdditionalSearchPath(modelPath + URDF_Path)
+    def _setupRobot(self, URDF, rmodelComplete, controlledJointsIDs):
+        rmodelComplete.armature = (
+            rmodelComplete.rotorInertia * rmodelComplete.rotorGearRatio**2
+        )
+        rmodelComplete.q0 = rmodelComplete.referenceConfigurations["half_sitting"]
 
-        robotStartPosition = [0.0, 0.0, 1.01927]
-        robotStartOrientation = p.getQuaternionFromEuler([0, 0, 0])
+        # Load robot
         self.robotId = p.loadURDF(
-            URDF_File,
-            robotStartPosition,
-            robotStartOrientation,
+            URDF,
+            list(rmodelComplete.q0[:3]),
+            list(rmodelComplete.q0[3:7]),
             useFixedBase=False,
         )
 
-        self.createTargetVisual(targetPos)
-        self.setControlledJoints(rmodel, ControlledJoints)
-        self.setInitialConfig(initialConfiguration)
-        self.createToolVisual()
+        # Magic translation from bullet where the basis center is shifted
+        self.localInertiaPos = p.getDynamicsInfo(self.robotId, -1)[3]
 
-        # Define usefull attributes for the simulation
-        self.localInertiaPos = np.matrix(
-            p.getDynamicsInfo(self.robotId, -1)[3]
-        ).T
+        self.names2bulletIndices = {
+            p.getJointInfo(1, i)[1].decode(): i for i in range(p.getNumJoints(1))
+        }
 
-        self.bulletFrameId = 20  # 23-left fingertip 20-gripper_left_joint
+        self.bulletJointsIdInPinOrder = [
+            self.names2bulletIndices[n] for n in rmodelComplete.names[2:]
+        ]
 
-        # Variables to simulate delay in the measures
-        self.valueDelay = 10
-        self.queueDelay = queue.Queue()
+        # Joints controlled with crocoddyl
+        self.bullet_controlledJoints = [
+            self.names2bulletIndices[rmodelComplete.names[i]]
+            for i in controlledJointsIDs[1:]
+        ]
 
-    def setInitialConfig(self, q0):
+        self._setInitialConfig(rmodelComplete)
+        self._changeFriction(["leg_left_6_joint", "leg_right_6_joint"], 100, 30)
+        self._setControlledJoints()
+
+    def _setInitialConfig(self, rmodelComplete):
         """Initialize robot configuration in pyBullet
 
         :param q0 Intial robot configuration
         """
-        initial_joint_positions = np.array(q0[7:].flat).tolist()
+        initial_joint_positions = np.array(rmodelComplete.q0[7:].flat).tolist()
         for i in range(len(initial_joint_positions)):
-            p.enableJointForceTorqueSensor(1, i, True)
+            p.enableJointForceTorqueSensor(self.robotId, i, True)
             p.resetJointState(
                 self.robotId,
-                self.JointIndicesComplete[i],
+                self.bulletJointsIdInPinOrder[i],
                 initial_joint_positions[i],
             )
 
-    def setControlledJoints(self, rmodelComplete, ControlledJoints):
+    def _changeFriction(self, names, lateralFriction=100, spinningFriction=30):
+        for n in names:
+            idx = self.names2bulletIndices[n]
+            p.changeDynamics(
+                self.robotId,
+                idx,
+                lateralFriction=lateralFriction,
+                spinningFriction=spinningFriction,
+            )
+
+    def _setControlledJoints(self):
         """Define joints controlled by pyBullet
 
         :param rmodelComplete Complete model of the robot
         :param ControlledJoints List of ControlledJoints
         """
-        bulletJointNames = [
-            p.getJointInfo(self.robotId, i)[1].decode()
-            for i in range(p.getNumJoints(self.robotId))
-        ]
-        self.JointIndicesComplete = [
-            bulletJointNames.index(rmodelComplete.names[i])
-            for i in range(2, rmodelComplete.njoints)
-        ]
-
-        # Joints controlled with crocoddyl
-        self.bulletControlledJoints = [
-            i
-            for i in self.JointIndicesComplete
-            if p.getJointInfo(self.robotId, i)[1].decode()
-            in ControlledJoints
-        ]
-
         # Disable default position controler in torque controlled joints
         # Default controller will take care of other joints
         p.setJointMotorControlArray(
             self.robotId,
-            jointIndices=self.bulletControlledJoints,
+            jointIndices=self.bullet_controlledJoints,
             controlMode=p.VELOCITY_CONTROL,
-            forces=[0.0 for m in self.bulletControlledJoints],
+            forces=[0.0 for m in self.bullet_controlledJoints],
         )
 
-        # Augment friction to forbid feet sliding
-        p.changeDynamics(1, 50, lateralFriction=100, spinningFriction=30)
-        p.changeDynamics(1, 57, lateralFriction=100, spinningFriction=30)
-
-    def createTargetVisual(self, target):
+    def _createTargetVisual(self, target):
         """Create visual representation of the target to track
 
         The visual will not appear unless the physics client is set to
@@ -156,205 +143,38 @@ class TalosDeburringSimulator:
             useMaximalCoordinates=True,
         )
 
-        greenBox = p.createVisualShape(
-            shapeType=p.GEOM_CAPSULE,
-            rgbaColor=[0, 1, 0, 1.0],
-            visualFramePosition=[0.0, 0.0, 0.0],
-            radius=RADIUS,
-            length=LENGTH,
-            halfExtents=[0.0, 0.0, 0.0],
-        )
-
-        self.target_bullet = p.createMultiBody(
-            baseMass=0.0,
-            baseInertialFramePosition=[0, 0, 0],
-            baseVisualShapeIndex=greenBox,
-            basePosition=[target[0], target[1], target[2]],
-            baseOrientation=[0, -0.707107, 0, 0.707107],
-            useMaximalCoordinates=True,
-        )
-
-    def createToolVisual(self):
-        """Create visual representation of the robot end effector"""
-        RADIUS = 0.01
-        LENGTH = 0.02
-        blueCapsule = p.createVisualShape(
-            shapeType=p.GEOM_CAPSULE,
-            rgbaColor=[0, 0, 1, 0.5],
-            visualFramePosition=[0.0, 0.0, 0.0],
-            radius=RADIUS,
-            length=LENGTH,
-            halfExtents=[0.0, 0.0, 0.0],
-        )
-        self.tool_pin = p.createMultiBody(
-            baseMass=0.0,
-            baseInertialFramePosition=[0, 0, 0],
-            baseVisualShapeIndex=blueCapsule,
-            basePosition=[0.0, 0.0, 0.0],
-            useMaximalCoordinates=True,
-        )
-        greenCapsule = p.createVisualShape(
-            shapeType=p.GEOM_CAPSULE,
-            rgbaColor=[0, 1, 0, 0.5],
-            visualFramePosition=[0.0, 0.0, 0.0],
-            radius=RADIUS,
-            length=LENGTH,
-            halfExtents=[0.0, 0.0, 0.0],
-        )
-        self.tool_bullet = p.createMultiBody(
-            baseMass=0.0,
-            baseInertialFramePosition=[0, 0, 0],
-            baseVisualShapeIndex=greenCapsule,
-            basePosition=[0.0, 0.0, 0.0],
-            useMaximalCoordinates=True,
-        )
-
-    def setToolPosition(self, placementTool_pin):
-        """Move the robot's capsule according to current robot's position"""
-        # @TODO Cleanup the conversion between different types of rotations
-
-        placementTool_bullet = placementTool_pin
-
-        toolTranslation_pin = m2a(placementTool_pin.translation)
-        toolQuaternion_pin = pin.Quaternion(placementTool_pin.rotation)
-        p.resetBasePositionAndOrientation(
-            self.tool_pin,
-            toolTranslation_pin,
-            np.array(
-                [
-                    toolQuaternion_pin.x,
-                    toolQuaternion_pin.y,
-                    toolQuaternion_pin.z,
-                    toolQuaternion_pin.w,
-                ]
-            ),
-        )
-
-        toolTranslation_bullet = m2a(placementTool_bullet.translation)
-        toolQuaternion_bullet = pin.Quaternion(placementTool_bullet.rotation)
-        p.resetBasePositionAndOrientation(
-            self.tool_bullet,
-            toolTranslation_bullet,
-            np.array(
-                [
-                    toolQuaternion_bullet.x,
-                    toolQuaternion_bullet.y,
-                    toolQuaternion_bullet.z,
-                    toolQuaternion_bullet.w,
-                ]
-            ),
-        )
-
-    def getToolMTarget(self, oMtool_pin):
-        self.setToolPosition(oMtool_pin)
-
-        # target state as seen by the simulator (represents MOCAP measure)
-        posTarget, rotTarget = p.getBasePositionAndOrientation(
-            self.target_bullet
-        )
-        oMtarget = pin.SE3(
-            pin.Quaternion(a2m(np.array(rotTarget))), a2m(np.array(posTarget))
-        )
-
-        # tool state as seen by the simulator (represents MOCAP measure)
-        posTool, rotTool = p.getBasePositionAndOrientation(self.tool_bullet)
-        oMtool = pin.SE3(
-            pin.Quaternion(a2m(np.array(rotTool))), a2m(np.array(posTool))
-        )
-
-        toolMtarget = oMtool.actInv(oMtarget)
-
-        # add Gaussian noise to the measure
-        translationNoise = np.random.normal(0, 0.0003, 3)
-        toolMtarget.translation += np.matrix(
-            [
-                [translationNoise[0]],
-                [translationNoise[1]],
-                [translationNoise[2]],
-            ]
-        )
-
-        if self.queueDelay.empty():
-            for i in range(self.valueDelay):
-                self.queueDelay.put(toolMtarget)
-        else:
-            self.queueDelay.put(toolMtarget)
-
-        return self.queueDelay.get()
-
-    def getCurrenRobotState(self):
+    def getRobotState(self):
         """Get current state of the robot from pyBullet"""
-        jointStates = p.getJointStates(
-            self.robotId, self.JointIndicesComplete
-        )  # State of all joints
-        baseState = p.getBasePositionAndOrientation(self.robotId)
-        baseVel = p.getBaseVelocity(self.robotId)
+        # Get articulated joint pos and vel
+        xbullet = p.getJointStates(self.robotId, self.bullet_controlledJoints)
+        q = [x[0] for x in xbullet]
+        vq = [x[1] for x in xbullet]
 
-        # Joint vector for Pinocchio
-        q = np.vstack(
-            (
-                np.array([baseState[0]]).transpose(),
-                np.array([baseState[1]]).transpose(),
-                np.array(
-                    [
-                        [
-                            jointStates[i_joint][0]
-                            for i_joint in range(len(jointStates))
-                        ]
-                    ]
-                ).transpose(),
-            )
-        )
-        v = np.vstack(
-            (
-                np.array([baseVel[0]]).transpose(),
-                np.array([baseVel[1]]).transpose(),
-                np.array(
-                    [
-                        [
-                            jointStates[i_joint][1]
-                            for i_joint in range(len(jointStates))
-                        ]
-                    ]
-                ).transpose(),
-            )
-        )
+        # Get basis pose
+        pos, quat = p.getBasePositionAndOrientation(self.robotId)
+        # Get basis vel
+        v, w = p.getBaseVelocity(self.robotId)
 
-        return (q, v)
+        # Concatenate into a single x vector
+        x = np.concatenate([pos, quat, q, v, w, vq])
 
-    def applyTorques(self, torques):
+        # Magic transformation of the basis translation, as classical in Bullet.
+        x[:3] -= self.localInertiaPos
+
+        return x
+
+    def step(self, torques):
+        """Do one step of simulation"""
+        self._applyTorques(torques)
+        p.stepSimulation()
+
+    def _applyTorques(self, torques):
         """Apply computed torques to the robot"""
         p.setJointMotorControlArray(
             self.robotId,
-            self.bulletControlledJoints,
+            self.bullet_controlledJoints,
             controlMode=p.TORQUE_CONTROL,
             forces=torques,
-        )
-
-    def step(self):
-        """Do one step of simulation"""
-        p.stepSimulation()
-
-    def setTargetPosition(self, reference):
-        translation = m2a(reference.translation)
-        rotation = pin.Quaternion(reference.rotation)
-
-        p.resetBasePositionAndOrientation(
-            self.target_MPC,
-            posObj=translation,
-            ornObj=np.array([rotation.x, rotation.y, rotation.z, rotation.w]),
-        )
-
-    def translateTarget(self, translation):
-        posTarget, rotTarget = p.getBasePositionAndOrientation(
-            self.target_bullet
-        )
-        x, y, z = posTarget
-
-        p.resetBasePositionAndOrientation(
-            self.target_bullet,
-            posObj=(x + translation, y, z),
-            ornObj=rotTarget,
         )
 
     def end(self):

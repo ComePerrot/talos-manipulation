@@ -2,7 +2,6 @@
 #  LOADING MODULES  #
 #####################
 
-import numpy as np
 import pinocchio as pin
 
 from sobec import RobotDesigner
@@ -72,13 +71,13 @@ pinWrapper.addEndEffectorFrame(
 
 # Simulator
 
+q0 = pinWrapper.get_rModelComplete().referenceConfigurations["half_sitting"]
+
 simulator = TalosDeburringSimulator(
-    URDF_File=URDF,
-    URDF_Path="/talos_data/robots/",
+    URDF=URDF,
     targetPos=[0.6, 0.4, 1.1],
-    rmodel=pinWrapper.get_rModelComplete(),
-    ControlledJoints=controlledJoints,
-    initialConfiguration=pinWrapper.get_q0(),
+    rmodelComplete=pinWrapper.get_rModelComplete(),
+    controlledJointsIDs=pinWrapper.get_controlledJointsIDs(),
     enableGUI=True,
 )
 
@@ -108,27 +107,14 @@ NcontrolKnots = 10
 while True:
     # Controller works faster than trajectory generation
     for i_control in range(NcontrolKnots):
-        q_current, v_current = simulator.getCurrenRobotState()
-
-        # Compute current position and velocity of all crocoddyl joints
-        qc = np.vstack(
-            (q_current[[i + 5 for i in pinWrapper.get_controlledJointsIDs()[1:]]])
-        )
-        vc = np.vstack(
-            (v_current[[i + 4 for i in pinWrapper.get_controlledJointsIDs()[1:]]])
-        )
-
-        xinit0 = np.vstack((q_current[:7], qc, v_current[:6], vc))
-        xinit0[:3] -= simulator.localInertiaPos
+        x_measured = simulator.getRobotState()
 
         # Compute torque to be applied by adding Riccati term
-        torques = MPC.u0 + MPC.K0 @ state.diff(xinit0, MPC.x0)
+        torques = MPC.u0 + MPC.K0 @ state.diff(x_measured, MPC.x0)
 
         # Apply torque on complete model
-        simulator.applyTorques(torques)
-        # Compute one step of simulation
-        simulator.step()
+        simulator.step(torques)
 
-    MPC.iterate(pinWrapper.get_q0(), pinWrapper.get_v0(), pin.SE3.Identity())
+    MPC.iterate(x_measured, pin.SE3.Identity())
 
 simulator.end()
