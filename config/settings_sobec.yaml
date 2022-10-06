@@ -25,7 +25,7 @@ mpc-point:
   T_initialization: 100
   T_stabilization: 200
   T_drilling: 100
-  targetPos: [0.6,0.4,1.1]
+  targetPos: [0.6,-0.4,1.1]
   holes_offsets: [
     [0,0,0]]
   #   [-0.078,0,0],

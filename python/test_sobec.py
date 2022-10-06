@@ -7,7 +7,7 @@ import pinocchio as pin
 from sobec import RobotDesigner
 from mpc_pointing import MPC_Point, MPCSettings_Point, OCPSettings_Point
 
-from TalosDeburringSimulation import TalosDeburringSimulator
+from bullet_Talos import TalosDeburringSimulator
 
 ################
 #  PARAMETERS  #
@@ -69,40 +69,37 @@ pinWrapper.addEndEffectorFrame(
     "deburring_tool", "gripper_left_fingertip_3_link", gripper_SE3_tool
 )
 
-# Simulator
-
-q0 = pinWrapper.get_rModelComplete().referenceConfigurations["half_sitting"]
-
-simulator = TalosDeburringSimulator(
-    URDF=URDF,
-    targetPos=[0.6, 0.4, 1.1],
-    rmodelComplete=pinWrapper.get_rModelComplete(),
-    controlledJointsIDs=pinWrapper.get_controlledJointsIDs(),
-    enableGUI=True,
-)
-
 # MPC
 #   Loading parameters from file
-filename = "/local/users/cperrot/pointing_controller/config/Settings_sobec.yaml"
+filename = "/local/users/cperrot/talos-manipulation/config/settings_sobec.yaml"
 
 MPCparams = MPCSettings_Point()
 OCPparams = OCPSettings_Point()
 
+print("Loading data from file: \n" + filename)
 OCPparams.readFromYaml(filename)
 MPCparams.readFromYaml(filename)
-
-print("Parameters loaded from file: " + filename)
 
 #   MPC
 MPC = MPC_Point(MPCparams, OCPparams, pinWrapper)
 MPC.initialize(pinWrapper.get_q0(), pinWrapper.get_v0(), pin.SE3.Identity())
 
-state = MPC.OCP.modelMaker.getState()
+print("Robot successfully loaded")
+
+# Simulator
+simulator = TalosDeburringSimulator(
+    URDF=URDF,
+    targetPos=MPCparams.targetPos,
+    rmodelComplete=pinWrapper.get_rModelComplete(),
+    controlledJointsIDs=pinWrapper.get_controlledJointsIDs(),
+    enableGUI=True,
+)
 
 ###############
 #  MAIN LOOP  #
 ###############
 NcontrolKnots = 10
+state = MPC.OCP.modelMaker.getState()
 
 while True:
     # Controller works faster than trajectory generation
