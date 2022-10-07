@@ -1,14 +1,7 @@
-#include "talos_manipulation/ros-mpc-interface.h"
+#include "ros-interface/ros-mpc-interface.h"
 
 ROS_MPC_Interface::ROS_MPC_Interface() {
   tf2_ros::TransformListener tfListener(tfBuffer);
-}
-
-ROS_MPC_Interface::initialize() {
-
-}
-
-ROS_MPC_Interface::update(){
   
 }
 

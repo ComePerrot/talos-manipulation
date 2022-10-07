@@ -1,9 +1,12 @@
+#include <realtime_tools/realtime_publisher.h>
 #include <ros/ros.h>
 
-#include <sobec/pointing/mpc-pointing.hpp>
+#include <mpc-pointing/mpc.hpp>
 #include <sobec/walk-with-traj/designer.hpp>
 
-#include "talos_manipulation/ros-mpc-interface.h"
+#include "ros-interface/ros-mpc-interface.h"
+
+ros_wbmpc_msgs::SensorDataConstPtr sensor_measurments;
 
 sobec::RobotDesigner buildRobotDesigner() {
   // Settings
@@ -62,30 +65,86 @@ sobec::RobotDesigner buildRobotDesigner() {
   return (designer);
 }
 
-sobec::MPC_Point buildMPC(const sobec::RobotDesigner& pinWrapper,
+mpc_p::MPC_Point buildMPC(const sobec::RobotDesigner& pinWrapper,
                           std::string parameterFile) {
-  sobec::OCPSettings_Point ocpSettings = sobec::OCPSettings_Point();
-  sobec::MPCSettings_Point mpcSettings = sobec::MPCSettings_Point();
+  mpc_p::OCPSettings_Point ocpSettings = mpc_p::OCPSettings_Point();
+  mpc_p::MPCSettings_Point mpcSettings = mpc_p::MPCSettings_Point();
 
   ocpSettings.readParamsFromYamlFile(parameterFile);
   mpcSettings.readParamsFromYamlFile(parameterFile);
 
-  sobec::MPC_Point mpc = sobec::MPC_Point(mpcSettings, ocpSettings, pinWrapper);
+  mpc_p::MPC_Point mpc = mpc_p::MPC_Point(mpcSettings, ocpSettings, pinWrapper);
 
   return (mpc);
 }
 
+void SensorCb(const ros_wbmpc_msgs::SensorDataConstPtr& msg) {
+  // ROS_INFO_STREAM("Received joint state from subscriber");
+  sensor_measurments = msg;
+}
+
 int main(int argc, char** argv) {
   ros::init(argc, argv, "talos_manipulation");
-  ros::NodeHandle nh("~");
+  ros::NodeHandle nh;
 
-  
-  
+  // Define ROS Communication elements
+  ros::TransportHints hints;
+  hints.tcpNoDelay(true);
+  //  tf2 listener
+  pinocchio::SE3 toolMtarget;
+  geometry_msgs::TransformStamped transformStamped;
+  tf2_ros::Buffer tfBuffer;
+  tf2_ros::TransformListener tfListener(tfBuffer);
+
+  //  sensor subscriber
+  ros::Subscriber sensor_sub =
+      nh.subscribe("sensor_robot", 1, &SensorCb, hints);
+
+  //  command publisher
+  ros_wbmpc_msgs::ControlDataConstPtr control_data;
+  Eigen::Affine3d eigenTransform;
+  boost::shared_ptr<
+      realtime_tools::RealtimePublisher<ros_wbmpc_msgs::ControlData>>
+      command_pub;
+  command_pub.reset(
+      new realtime_tools::RealtimePublisher<ros_wbmpc_msgs::ControlData>(
+          nh, "command", 1));
+
+  // Define MPC
+  sobec::RobotDesigner pinWrapper = buildRobotDesigner();
+  mpc_p::MPC_Point MPC = buildMPC(pinWrapper, "test");
+
   // Initialize MPC
-  MPC.initialize(pinWrapper.get_q0Complete(), pinWrapper.get_v0Complete(),
-                 pinocchio::SE3::Identity());
+  try {
+    transformStamped = tfBuffer.lookupTransform("target", "tool", ros::Time(0));
+  } catch (tf2::TransformException& ex) {
+    ROS_WARN("%s", ex.what());
+  }
+  tf::transformMsgToEigen(transformStamped.transform, eigenTransform);
+  toolMtarget =
+      pinocchio::SE3(eigenTransform.rotation(), eigenTransform.translation());
+  MPC.initialize(sensor_measurments["q"], sensor_measurments["v"], toolMtarget);
 
   while (ros::ok()) {
+    try {
+      transformStamped =
+          tfBuffer.lookupTransform("target", "tool", ros::Time(0));
+    } catch (tf2::TransformException& ex) {
+      ROS_WARN("%s", ex.what());
+    }
+
+    tf::transformMsgToEigen(transformStamped.transform, eigenTransform);
+    toolMtarget =
+        pinocchio::SE3(eigenTransform.rotation(), eigenTransform.translation());
+
+    MPC.iterate(sensor_measurments["q"], sensor_measurments["v"], toolMtarget);
+
+    // ROS_Interface.send_Command(MPC.get_x0(), MPC.get_u0(), MPC.get_K0());
+    if (command_pub->trylock()) {
+      command_pub->msg_ = control_data;
+      command_pub->unlockAndPublish();
+    }
+
     ros::spinOnce();
   }
 
