@@ -15,15 +15,15 @@ from plotter import TalosPlotter
 #  PARAMETERS  #
 ################
 
-enableGUI = False
-T_total = 300
+enableGUI = True
+T_total = 1000
 
 modelPath = "/opt/openrobots/share/example-robot-data/robots/talos_data/"
 URDF = modelPath + "robots/talos_reduced.urdf"
 SRDF = modelPath + "srdf/talos.srdf"
 
 # Parameters filename
-filename = "/local/users/cperrot/talos-manipulation/config/settings_sobec.yaml"
+filename = "../config/settings_sobec.yaml"
 
 ####################
 #  INITIALIZATION  #
@@ -65,7 +65,11 @@ pinWrapper.addEndEffectorFrame(
 
 # MPC
 MPC = MPC_Point(MPCparams, OCPparams, pinWrapper)
-MPC.initialize(pinWrapper.get_q0(), pinWrapper.get_v0(), pin.SE3.Identity())
+MPC.initialize(
+    pinWrapper.get_rModel().referenceConfigurations["half_sitting"],
+    pinWrapper.get_v0(),
+    pin.SE3.Identity(),
+)
 
 print("Robot successfully loaded")
 
