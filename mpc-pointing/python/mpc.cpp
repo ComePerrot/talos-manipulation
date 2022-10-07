@@ -82,7 +82,7 @@ void exposeMPCPointClass() {
       .def<void (MPC_Point::*)(const VectorXd &, const SE3 &)>(
           "iterate", &MPC_Point::iterate, bp::args("self", "x0", "toolMtarget"))
       .add_property(
-          "designer_",
+          "designer",
           bp::make_function(
               &MPC_Point::get_designer,
               bp::return_value_policy<bp::reference_existing_object>()),

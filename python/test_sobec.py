@@ -3,51 +3,45 @@
 #####################
 
 import pinocchio as pin
+import yaml
 
 from sobec import RobotDesigner
 from mpc_pointing import MPC_Point, MPCSettings_Point, OCPSettings_Point
 
 from bullet_Talos import TalosDeburringSimulator
+from plotter import TalosPlotter
 
 ################
 #  PARAMETERS  #
 ################
 
+enableGUI = False
+T_total = 300
+
 modelPath = "/opt/openrobots/share/example-robot-data/robots/talos_data/"
 URDF = modelPath + "robots/talos_reduced.urdf"
 SRDF = modelPath + "srdf/talos.srdf"
-controlledJoints = [
-    "root_joint",
-    "leg_left_1_joint",
-    "leg_left_2_joint",
-    "leg_left_3_joint",
-    "leg_left_4_joint",
-    "leg_left_5_joint",
-    "leg_left_6_joint",
-    "leg_right_1_joint",
-    "leg_right_2_joint",
-    "leg_right_3_joint",
-    "leg_right_4_joint",
-    "leg_right_5_joint",
-    "leg_right_6_joint",
-    "torso_1_joint",
-    "torso_2_joint",
-    "arm_left_1_joint",
-    "arm_left_2_joint",
-    "arm_left_3_joint",
-    "arm_left_4_joint",
-    "arm_left_5_joint",
-    "arm_left_6_joint",
-    "arm_left_7_joint",
-    "arm_right_1_joint",
-    "arm_right_2_joint",
-    "arm_right_3_joint",
-    "arm_right_4_joint",
-]
+
+# Parameters filename
+filename = "/local/users/cperrot/talos-manipulation/config/settings_sobec.yaml"
 
 ####################
 #  INITIALIZATION  #
 ####################
+
+# Loading extra parameters from file
+with open(filename, "r") as paramFile:
+    params = yaml.safe_load(paramFile)
+
+controlledJoints = params["robot"]["controlledJoints"]
+toolFramePos = params["robot"]["toolFramePos"]
+
+MPCparams = MPCSettings_Point()
+OCPparams = OCPSettings_Point()
+
+print("Loading data from file: \n" + filename)
+OCPparams.readFromYaml(filename)
+MPCparams.readFromYaml(filename)
 
 # Robot model
 design_conf = dict(
@@ -62,25 +56,14 @@ pinWrapper = RobotDesigner()
 pinWrapper.initialize(design_conf)
 
 gripper_SE3_tool = pin.SE3.Identity()
-gripper_SE3_tool.translation[0] = 0
-gripper_SE3_tool.translation[1] = -0.02
-gripper_SE3_tool.translation[2] = -0.0825
+gripper_SE3_tool.translation[0] = toolFramePos[0]
+gripper_SE3_tool.translation[1] = toolFramePos[1]
+gripper_SE3_tool.translation[2] = toolFramePos[2]
 pinWrapper.addEndEffectorFrame(
     "deburring_tool", "gripper_left_fingertip_3_link", gripper_SE3_tool
 )
 
 # MPC
-#   Loading parameters from file
-filename = "/local/users/cperrot/talos-manipulation/config/settings_sobec.yaml"
-
-MPCparams = MPCSettings_Point()
-OCPparams = OCPSettings_Point()
-
-print("Loading data from file: \n" + filename)
-OCPparams.readFromYaml(filename)
-MPCparams.readFromYaml(filename)
-
-#   MPC
 MPC = MPC_Point(MPCparams, OCPparams, pinWrapper)
 MPC.initialize(pinWrapper.get_q0(), pinWrapper.get_v0(), pin.SE3.Identity())
 
@@ -92,16 +75,20 @@ simulator = TalosDeburringSimulator(
     targetPos=MPCparams.targetPos,
     rmodelComplete=pinWrapper.get_rModelComplete(),
     controlledJointsIDs=pinWrapper.get_controlledJointsIDs(),
-    enableGUI=True,
+    enableGUI=enableGUI,
 )
+
+# Plotter
+plotter = TalosPlotter(pinWrapper.get_rModel(), T_total)
 
 ###############
 #  MAIN LOOP  #
 ###############
 NcontrolKnots = 10
 state = MPC.OCP.modelMaker.getState()
+T = 0
 
-while True:
+while T < T_total:
     # Controller works faster than trajectory generation
     for i_control in range(NcontrolKnots):
         x_measured = simulator.getRobotState()
@@ -113,5 +100,14 @@ while True:
         simulator.step(torques)
 
     MPC.iterate(x_measured, pin.SE3.Identity())
+    plotter.logState(T, x_measured)
+    plotter.logTorques(T, torques)
+    plotter.logEndEffectorPos(
+        T, MPC.designer.get_EndEff_frame().translation, MPCparams.targetPos
+    )
+
+    T += 1
 
 simulator.end()
+print("Simulation ended")
+plotter.plotResults()

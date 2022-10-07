@@ -1,3 +1,33 @@
+robot:
+  toolFramePos: [0, -0.02, -0.0825]
+  controlledJoints: [
+    root_joint, 
+    leg_left_1_joint,
+    leg_left_2_joint,
+    leg_left_3_joint,
+    leg_left_4_joint,
+    leg_left_5_joint,
+    leg_left_6_joint,
+    leg_right_1_joint,
+    leg_right_2_joint,
+    leg_right_3_joint,
+    leg_right_4_joint,
+    leg_right_5_joint,
+    leg_right_6_joint,
+    torso_1_joint,
+    torso_2_joint,
+    arm_left_1_joint,
+    arm_left_2_joint,
+    arm_left_3_joint,
+    arm_left_4_joint,
+    arm_left_5_joint,
+    arm_left_6_joint,
+    arm_left_7_joint,
+    arm_right_1_joint,
+    arm_right_2_joint,
+    arm_right_3_joint,
+    arm_right_4_joint,
+  ]
 
 ocp-point:
   horizon_length: 100
@@ -19,23 +49,21 @@ ocp-point:
   controlWeights: [
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   ]
-  
 
 mpc-point:
   T_initialization: 100
   T_stabilization: 200
   T_drilling: 100
-  targetPos: [0.6,-0.4,1.1]
+  targetPos: [0.6,0.4,1.1]
   holes_offsets: [
-    [0,0,0]]
-  #   [-0.078,0,0],
-  #   [-0.078,-0.045,0],
-  #   [0,-0.045,0]
-  # ]
+    [0,0,0],
+    [-0.078,0,0],
+    [-0.078,-0.045,0],
+    [0,-0.045,0]
+  ]
   backwardOffset: 0.05
   tolerance: 0.005
   maxGoalWeight: 100
-  toolFramePos: [0, -0.02, -0.0825]
   use_mocap: 0
   use_gainScheduling: 1
   gainSchedulig_slope: 0.5
