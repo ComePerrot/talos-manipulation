@@ -3,10 +3,9 @@
 
 #include <mpc-pointing/mpc.hpp>
 #include <sobec/walk-with-traj/designer.hpp>
+#include <ros_wbmpc_msgs/SensorData.h> // Fix this import
 
 #include "ros-interface/ros-mpc-interface.h"
-
-ros_wbmpc_msgs::SensorDataConstPtr sensor_measurments;
 
 sobec::RobotDesigner buildRobotDesigner() {
   // Settings
@@ -78,7 +77,8 @@ mpc_p::MPC_Point buildMPC(const sobec::RobotDesigner& pinWrapper,
   return (mpc);
 }
 
-void SensorCb(const ros_wbmpc_msgs::SensorDataConstPtr& msg) {
+void SensorCb(const ros_wbmpc_msgs::SensorDataConstPtr& msg,
+              ros_wbmpc_msgs::SensorDataConstPtr sensor_measurments) {
   // ROS_INFO_STREAM("Received joint state from subscriber");
   sensor_measurments = msg;
 }
@@ -97,8 +97,9 @@ int main(int argc, char** argv) {
   tf2_ros::TransformListener tfListener(tfBuffer);
 
   //  sensor subscriber
-  ros::Subscriber sensor_sub =
-      nh.subscribe("sensor_robot", 1, &SensorCb, hints);
+  ros_wbmpc_msgs::SensorDataConstPtr sensor_measurments;
+  ros::Subscriber sensor_sub = nh.subscribe(
+      "sensor_robot", 1, boost::bind(&SensorCb, _1, sensor_measurments), hints);
 
   //  command publisher
   ros_wbmpc_msgs::ControlDataConstPtr control_data;
