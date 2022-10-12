@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>mpc-pointing</name>
+  <version>0.0.0</version>
   <description>MPC for manipulation tasks with Talos</description>
   <maintainer email="come.perrot@laas.fr">Côme Perrot</maintainer>
   <license>BSD</license>

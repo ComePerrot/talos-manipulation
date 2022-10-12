@@ -6,7 +6,7 @@ SET(PROJECT_DESCRIPTION "Ros interface for Talos manipulation MPC")
 SET(PROJECT_URL https://github.com/${PROJECT_NAMESPACE}/talos-manipulation)
 
 # Project configuration
-set(DCMAKE_EXPORT_COMPILE_COMMANDS=1)
+set(DCMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 # Check if the submodule cmake have been initialized
 set(JRL_CMAKE_MODULES "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -43,6 +43,7 @@ set(CATKIN_COMPONENTS
   roscpp
   realtime_tools
   eigen_conversions
+  ros_wbmpc_msgs
 )
 
 find_package(catkin REQUIRED COMPONENTS ${CATKIN_COMPONENTS})
