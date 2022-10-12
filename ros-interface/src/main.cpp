@@ -1,9 +1,10 @@
 #include <realtime_tools/realtime_publisher.h>
 #include <ros/ros.h>
+#include <ros_wbmpc_msgs/Control.h>
+#include <ros_wbmpc_msgs/Sensor.h>
 
 #include <mpc-pointing/mpc.hpp>
 #include <sobec/walk-with-traj/designer.hpp>
-#include <ros_wbmpc_msgs/SensorData.h> // Fix this import
 
 #include "ros-interface/ros-mpc-interface.h"
 
@@ -77,10 +78,43 @@ mpc_p::MPC_Point buildMPC(const sobec::RobotDesigner& pinWrapper,
   return (mpc);
 }
 
-void SensorCb(const ros_wbmpc_msgs::SensorDataConstPtr& msg,
-              ros_wbmpc_msgs::SensorDataConstPtr sensor_measurments) {
+void SensorCb(const ros_wbmpc_msgs::SensorConstPtr& msg,
+              Eigen::VectorXd& jointPos, Eigen::VectorXd& jointVel) {
   // ROS_INFO_STREAM("Received joint state from subscriber");
-  sensor_measurments = msg;
+  Eigen::Vector3d base_position, base_linear_vel, base_angular_vel;
+  Eigen::Quaterniond base_quaternion;
+
+  // Base State
+  tf::pointMsgToEigen(msg->base_state.pose.pose.position, base_position);
+  tf::quaternionMsgToEigen(msg->base_state.pose.pose.orientation,
+                           base_quaternion);
+  base_quaternion.normalize();
+
+  tf::vectorMsgToEigen(msg->base_state.twist.twist.linear, base_linear_vel);
+  tf::vectorMsgToEigen(msg->base_state.twist.twist.angular, base_angular_vel);
+
+  for (int i = 0; i < 3; i++) {
+    jointPos[i] = base_position[i];
+    jointVel[i] = base_linear_vel[i];
+    jointVel[i + 3] = base_angular_vel[i];
+  }
+
+  jointPos[3] = base_quaternion.x();
+  jointPos[4] = base_quaternion.y();
+  jointPos[5] = base_quaternion.z();
+  jointPos[6] = base_quaternion.w();
+
+  // Joint States
+  for (size_t i = 0; i < msg->joint_state.position.size(); i++) {
+    jointPos[(Eigen::Index)i] = msg->joint_state.position[i];
+    jointVel[(Eigen::Index)i] = msg->joint_state.velocity[i];
+  }
+}
+
+void mapToTF(const Eigen::VectorXd& u0, const Eigen::MatrixXd& K0,
+             ros_wbmpc_msgs::Control& control) {
+  tf::matrixEigenToMsg(u0, control.feedforward);
+  tf::matrixEigenToMsg(K0, control.feedback_gain);
 }
 
 int main(int argc, char** argv) {
@@ -97,18 +131,18 @@ int main(int argc, char** argv) {
   tf2_ros::TransformListener tfListener(tfBuffer);
 
   //  sensor subscriber
-  ros_wbmpc_msgs::SensorDataConstPtr sensor_measurments;
-  ros::Subscriber sensor_sub = nh.subscribe(
-      "sensor_robot", 1, boost::bind(&SensorCb, _1, sensor_measurments), hints);
+  Eigen::VectorXd jointPos;
+  Eigen::VectorXd jointVel;
+  ros::Subscriber sensor_sub = nh.subscribe<ros_wbmpc_msgs::Sensor>(
+      "sensor_robot", 1, boost::bind(&SensorCb, _1, jointPos, jointVel));
 
   //  command publisher
-  ros_wbmpc_msgs::ControlDataConstPtr control_data;
+  ros_wbmpc_msgs::Control control_data;
   Eigen::Affine3d eigenTransform;
-  boost::shared_ptr<
-      realtime_tools::RealtimePublisher<ros_wbmpc_msgs::ControlData>>
+  boost::shared_ptr<realtime_tools::RealtimePublisher<ros_wbmpc_msgs::Control>>
       command_pub;
   command_pub.reset(
-      new realtime_tools::RealtimePublisher<ros_wbmpc_msgs::ControlData>(
+      new realtime_tools::RealtimePublisher<ros_wbmpc_msgs::Control>(
           nh, "command", 1));
 
   // Define MPC
@@ -124,7 +158,7 @@ int main(int argc, char** argv) {
   tf::transformMsgToEigen(transformStamped.transform, eigenTransform);
   toolMtarget =
       pinocchio::SE3(eigenTransform.rotation(), eigenTransform.translation());
-  MPC.initialize(sensor_measurments["q"], sensor_measurments["v"], toolMtarget);
+  MPC.initialize(jointPos, jointVel, toolMtarget);
 
   while (ros::ok()) {
     try {
@@ -138,8 +172,8 @@ int main(int argc, char** argv) {
     toolMtarget =
         pinocchio::SE3(eigenTransform.rotation(), eigenTransform.translation());
 
-    MPC.iterate(sensor_measurments["q"], sensor_measurments["v"], toolMtarget);
-
+    MPC.iterate(jointPos, jointVel, toolMtarget);
+    mapToTF(MPC.get_u0(), MPC.get_K0(), control_data);
     // ROS_Interface.send_Command(MPC.get_x0(), MPC.get_u0(), MPC.get_K0());
     if (command_pub->trylock()) {
       command_pub->msg_ = control_data;
