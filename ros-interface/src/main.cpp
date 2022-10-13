@@ -1,4 +1,3 @@
-
 #include <mpc-pointing/mpc.hpp>
 #include <sobec/walk-with-traj/designer.hpp>
 // Must be included first
@@ -136,7 +135,7 @@ int main(int argc, char** argv) {
   Eigen::VectorXd jointPos;
   Eigen::VectorXd jointVel;
   ros::Subscriber sensor_sub = nh.subscribe<ros_wbmpc_msgs::Sensor>(
-      "sensor_robot", 1, boost::bind(&SensorCb, _1, jointPos, jointVel));
+      "sensor_state", 1, boost::bind(&SensorCb, _1, jointPos, jointVel));
 
   //  command publisher
   ros_wbmpc_msgs::Control control_data;
