@@ -2,7 +2,7 @@
 <package format="2">
   <name>ros-interface</name>
   <version>0.0.0</version>
-  <description>The talos_manipulation package</description>
+  <description>Ros interface for Talos manipulation MPC</description>
 
   <maintainer email="cperrot@laas.fr">Côme Perrot</maintainer>
   <license>BSD 2</license>
@@ -12,6 +12,7 @@
   <depend>roscpp</depend>
   <depend>realtime_tools</depend>
   <depend>eigen_conversions</depend>
+  <depend>tf2_ros</depend>
   <depend>ros_wbmpc_msgs</depend>
 
   <export>

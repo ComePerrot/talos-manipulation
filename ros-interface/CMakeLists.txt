@@ -44,6 +44,7 @@ set(CATKIN_COMPONENTS
   realtime_tools
   eigen_conversions
   ros_wbmpc_msgs
+  tf2_ros
 )
 
 find_package(catkin REQUIRED COMPONENTS ${CATKIN_COMPONENTS})
@@ -59,7 +60,7 @@ include_directories(SYSTEM
 )
 
 SET(${PROJECT_NAME}_SOURCES
-    src/main.cpp
+    # src/main.cpp
     src/ros-mpc-interface.cpp
 )
 SET(${PROJECT_NAME}_HEADERS
@@ -71,4 +72,18 @@ add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
 target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
 target_link_libraries(${PROJECT_NAME} PUBLIC sobec::sobec Eigen3::Eigen)
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(main src/main.cpp)
+target_link_libraries(main mpc-pointing sobec::sobec Eigen3::Eigen ${catkin_LIBRARIES})
+
+# Installation
+install(
+  TARGETS ${PROJECT_NAME}
+  EXPORT ${TARGETS_EXPORT_NAME}
+  DESTINATION lib)
+install(TARGETS main RUNTIME DESTINATION lib/${PROJECT_NAME})
+install(FILES package.xml DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
+  
+  
 
