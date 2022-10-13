@@ -1,10 +1,12 @@
+
+#include <mpc-pointing/mpc.hpp>
+#include <sobec/walk-with-traj/designer.hpp>
+// Must be included first
+
 #include <realtime_tools/realtime_publisher.h>
 #include <ros/ros.h>
 #include <ros_wbmpc_msgs/Control.h>
 #include <ros_wbmpc_msgs/Sensor.h>
-
-#include <mpc-pointing/mpc.hpp>
-#include <sobec/walk-with-traj/designer.hpp>
 
 #include "ros-interface/ros-mpc-interface.h"
 
