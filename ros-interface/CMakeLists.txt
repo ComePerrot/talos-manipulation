@@ -41,6 +41,7 @@ add_project_dependency(sobec REQUIRED)
 
 set(CATKIN_COMPONENTS
   roscpp
+  roslib
   realtime_tools
   eigen_conversions
   ros_wbmpc_msgs
@@ -60,7 +61,6 @@ include_directories(SYSTEM
 )
 
 SET(${PROJECT_NAME}_SOURCES
-    # src/main.cpp
     src/ros-mpc-interface.cpp
 )
 SET(${PROJECT_NAME}_HEADERS
@@ -73,16 +73,17 @@ target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
 target_link_libraries(${PROJECT_NAME} PUBLIC sobec::sobec Eigen3::Eigen)
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
-add_executable(main src/main.cpp)
-target_link_libraries(main mpc-pointing sobec::sobec Eigen3::Eigen ${catkin_LIBRARIES})
+add_executable(ros_mpc_pointing src/ros-mpc-pointing.cpp)
+target_link_libraries(ros_mpc_pointing mpc-pointing sobec::sobec Eigen3::Eigen ${catkin_LIBRARIES})
 
 # Installation
 install(
   TARGETS ${PROJECT_NAME}
   EXPORT ${TARGETS_EXPORT_NAME}
   DESTINATION lib)
-install(TARGETS main RUNTIME DESTINATION lib/${PROJECT_NAME})
+install(TARGETS ros_mpc_pointing RUNTIME DESTINATION lib/${PROJECT_NAME})
 install(FILES package.xml DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY ../config DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
   
   

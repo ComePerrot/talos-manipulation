@@ -4,6 +4,7 @@
 
 #include <realtime_tools/realtime_publisher.h>
 #include <ros/ros.h>
+#include <ros/package.h>
 #include <ros_wbmpc_msgs/Control.h>
 #include <ros_wbmpc_msgs/Sensor.h>
 
@@ -147,31 +148,45 @@ int main(int argc, char** argv) {
           nh, "command", 1));
 
   // Define MPC
+  std::string paramFile = ros::package::getPath("ros-interface") + "/config/settings_sobec.yaml";
   sobec::RobotDesigner pinWrapper = buildRobotDesigner();
-  mpc_p::MPC_Point MPC = buildMPC(pinWrapper, "test");
+  mpc_p::MPC_Point MPC = buildMPC(pinWrapper, paramFile);
 
   // Initialize MPC
-  try {
-    transformStamped = tfBuffer.lookupTransform("target", "tool", ros::Time(0));
-  } catch (tf2::TransformException& ex) {
-    ROS_WARN("%s", ex.what());
+  while ((jointPos.norm() == 0) || (jointPos.norm() == 0)) {
+    ROS_INFO_THROTTLE(0.5, "Receiving joint state from the robot");
+    ros::spinOnce();
   }
-  tf::transformMsgToEigen(transformStamped.transform, eigenTransform);
-  toolMtarget =
-      pinocchio::SE3(eigenTransform.rotation(), eigenTransform.translation());
-  MPC.initialize(jointPos, jointVel, toolMtarget);
 
-  while (ros::ok()) {
+  if (MPC.get_settings().use_mocap > 0) {
     try {
       transformStamped =
           tfBuffer.lookupTransform("target", "tool", ros::Time(0));
     } catch (tf2::TransformException& ex) {
       ROS_WARN("%s", ex.what());
     }
-
     tf::transformMsgToEigen(transformStamped.transform, eigenTransform);
     toolMtarget =
         pinocchio::SE3(eigenTransform.rotation(), eigenTransform.translation());
+  } else {
+    toolMtarget = pinocchio::SE3::Identity();
+  }
+
+  MPC.initialize(jointPos, jointVel, toolMtarget);
+
+  while (ros::ok()) {
+    if (MPC.get_settings().use_mocap > 0) {
+      try {
+        transformStamped =
+            tfBuffer.lookupTransform("target", "tool", ros::Time(0));
+      } catch (tf2::TransformException& ex) {
+        ROS_WARN("%s", ex.what());
+      }
+
+      tf::transformMsgToEigen(transformStamped.transform, eigenTransform);
+      toolMtarget = pinocchio::SE3(eigenTransform.rotation(),
+                                   eigenTransform.translation());
+    }
 
     MPC.iterate(jointPos, jointVel, toolMtarget);
     mapToTF(MPC.get_u0(), MPC.get_K0(), control_data);

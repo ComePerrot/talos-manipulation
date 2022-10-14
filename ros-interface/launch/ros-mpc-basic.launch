@@ -1,3 +1,3 @@
 <launch>
-    <node pkg="ros-interface" type="main" name="main"/>
+    <node pkg="ros-interface" type="ros_mpc_pointing" name="ros_mpc_pointing" output="screen"/>
 </launch>
