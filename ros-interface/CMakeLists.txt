@@ -74,7 +74,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC sobec::sobec Eigen3::Eigen)
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
 add_executable(ros_mpc_pointing src/ros-mpc-pointing.cpp)
-target_link_libraries(ros_mpc_pointing mpc-pointing sobec::sobec Eigen3::Eigen ${catkin_LIBRARIES})
+target_link_libraries(ros_mpc_pointing ${PROJECT_NAME} mpc-pointing sobec::sobec Eigen3::Eigen ${catkin_LIBRARIES})
 
 # Installation
 install(
