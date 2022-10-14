@@ -37,8 +37,14 @@ sobec::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   return (designer);
 }
 
-mpc_p::MPC_Point buildMPC(const sobec::RobotDesigner& pinWrapper,
-                          std::string parameterFile) {
+mpc_p::MPC_Point buildMPC(ros::NodeHandle nh,
+                          const sobec::RobotDesigner& pinWrapper) {
+  std::string parameterFileName;
+  nh.getParam("settings_file", parameterFileName);
+  std::string parameterFilePath =
+      ros::package::getPath("ros-interface") + "/config/";
+  std::string parameterFile = parameterFilePath + parameterFileName;
+
   mpc_p::OCPSettings_Point ocpSettings = mpc_p::OCPSettings_Point();
   mpc_p::MPCSettings_Point mpcSettings = mpc_p::MPCSettings_Point();
 
@@ -90,7 +96,7 @@ void mapToTF(const Eigen::VectorXd& u0, const Eigen::MatrixXd& K0,
 }
 
 int main(int argc, char** argv) {
-  ros::init(argc, argv, "talos_manipulation");
+  ros::init(argc, argv, "ros_mpc_pointing");
   ros::NodeHandle nh;
 
   // Define ROS Communication elements
@@ -117,13 +123,9 @@ int main(int argc, char** argv) {
       new realtime_tools::RealtimePublisher<ros_wbmpc_msgs::Control>(
           nh, "command", 1));
 
-  // Define MPC
-  std::string paramFile;
-  nh.getParam("settings_file", paramFile);
-  paramFile = ros::package::getPath("ros-interface") + "/config/" + paramFile;
-
+  // Define Robot Desginer & MPC
   sobec::RobotDesigner pinWrapper = buildRobotDesigner(nh);
-  mpc_p::MPC_Point MPC = buildMPC(pinWrapper, paramFile);
+  mpc_p::MPC_Point MPC = buildMPC(nh, pinWrapper);
 
   // Initialize MPC
   while ((jointPos.norm() == 0) || (jointPos.norm() == 0)) {
