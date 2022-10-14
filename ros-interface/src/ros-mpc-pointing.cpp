@@ -3,66 +3,36 @@
 // Must be included first
 
 #include <realtime_tools/realtime_publisher.h>
-#include <ros/ros.h>
 #include <ros/package.h>
+#include <ros/ros.h>
 #include <ros_wbmpc_msgs/Control.h>
 #include <ros_wbmpc_msgs/Sensor.h>
 
 #include "ros-interface/ros-mpc-interface.h"
 
-sobec::RobotDesigner buildRobotDesigner() {
+sobec::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   // Settings
   sobec::RobotDesignerSettings designerSettings =
       sobec::RobotDesignerSettings();
-  designerSettings.leftFootName = "right_sole_link";
-  designerSettings.rightFootName = "left_sole_link";
-  designerSettings.urdfPath =
-      "/opt/openrobots/share/example-robot-data/robots/talos_data/robots/"
-      "talos_reduced.urdf";
-  designerSettings.srdfPath =
-      "/opt/openrobots/share/example-robot-data/robots/talos_data/srdf/"
-      "talos.srdf";
+  nh.getParam("left_foot_name", designerSettings.leftFootName);
+  nh.getParam("right_foot_name", designerSettings.rightFootName);
+  nh.getParam("urdf", designerSettings.urdfPath);
+  nh.getParam("srdf", designerSettings.srdfPath);
+  nh.getParam("controlled_joints", designerSettings.controlledJointsNames);
 
-  designerSettings.controlledJointsNames.push_back("root_joint");
-  designerSettings.controlledJointsNames.push_back("leg_left_1_joint");
-  designerSettings.controlledJointsNames.push_back("leg_left_2_joint");
-  designerSettings.controlledJointsNames.push_back("leg_left_3_joint");
-  designerSettings.controlledJointsNames.push_back("leg_left_4_joint");
-  designerSettings.controlledJointsNames.push_back("leg_left_5_joint");
-  designerSettings.controlledJointsNames.push_back("leg_left_6_joint");
-  designerSettings.controlledJointsNames.push_back("leg_right_1_joint");
-  designerSettings.controlledJointsNames.push_back("leg_right_2_joint");
-  designerSettings.controlledJointsNames.push_back("leg_right_3_joint");
-  designerSettings.controlledJointsNames.push_back("leg_right_4_joint");
-  designerSettings.controlledJointsNames.push_back("leg_right_5_joint");
-  designerSettings.controlledJointsNames.push_back("leg_right_6_joint");
-  designerSettings.controlledJointsNames.push_back("torso_1_joint");
-  designerSettings.controlledJointsNames.push_back("torso_2_joint");
-  designerSettings.controlledJointsNames.push_back("arm_left_1_joint");
-  designerSettings.controlledJointsNames.push_back("arm_left_2_joint");
-  designerSettings.controlledJointsNames.push_back("arm_left_3_joint");
-  designerSettings.controlledJointsNames.push_back("arm_left_4_joint");
-  designerSettings.controlledJointsNames.push_back("arm_left_5_joint");
-  designerSettings.controlledJointsNames.push_back("arm_left_6_joint");
-  designerSettings.controlledJointsNames.push_back("arm_left_7_joint");
-  designerSettings.controlledJointsNames.push_back("arm_right_1_joint");
-  designerSettings.controlledJointsNames.push_back("arm_right_2_joint");
-  designerSettings.controlledJointsNames.push_back("arm_right_3_joint");
-  designerSettings.controlledJointsNames.push_back("arm_right_4_joint");
+  std::vector<double> gripperTtool;
+  nh.getParam("tool_frame_pos", gripperTtool);
+  pinocchio::SE3 gripperMtool = pinocchio::SE3();
+  gripperMtool.translation().x() = gripperTtool[0];
+  gripperMtool.translation().y() = gripperTtool[1];
+  gripperMtool.translation().z() = gripperTtool[2];
 
-  std::cout << "Building designer:" << std::endl;
+  ROS_INFO_STREAM("Building robot designer");
   sobec::RobotDesigner designer = sobec::RobotDesigner(designerSettings);
-  std::cout << "  Done" << std::endl;
 
-  pinocchio::SE3 gripper_SE3_tool = pinocchio::SE3::Identity();
-  gripper_SE3_tool.translation().x() = 0;
-  gripper_SE3_tool.translation().y() = -0.02;
-  gripper_SE3_tool.translation().z() = -0.0825;
-
-  std::cout << "Adding end effector frame:" << std::endl;
-  designer.addEndEffectorFrame(
-      "deburring_tool", "gripper_left_fingertip_3_link", gripper_SE3_tool);
-  std::cout << "  Done" << std::endl;
+  ROS_INFO_STREAM("Adding end effector frame to the robot model");
+  designer.addEndEffectorFrame("deburring_tool",
+                               "gripper_left_fingertip_3_link", gripperMtool);
 
   return (designer);
 }
@@ -148,8 +118,11 @@ int main(int argc, char** argv) {
           nh, "command", 1));
 
   // Define MPC
-  std::string paramFile = ros::package::getPath("ros-interface") + "/config/settings_sobec.yaml";
-  sobec::RobotDesigner pinWrapper = buildRobotDesigner();
+  std::string paramFile;
+  nh.getParam("settings_file", paramFile);
+  paramFile = ros::package::getPath("ros-interface") + "/config/" + paramFile;
+
+  sobec::RobotDesigner pinWrapper = buildRobotDesigner(nh);
   mpc_p::MPC_Point MPC = buildMPC(pinWrapper, paramFile);
 
   // Initialize MPC
