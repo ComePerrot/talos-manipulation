@@ -2,8 +2,10 @@
 #  LOADING MODULES  #
 #####################
 
+import numpy as np
 import pinocchio as pin
 import yaml
+import time
 
 from sobec import RobotDesigner
 from mpc_pointing import MPC_Point, MPCSettings_Point, OCPSettings_Point
@@ -92,6 +94,10 @@ NcontrolKnots = 10
 state = MPC.OCP.modelMaker.getState()
 T = 0
 
+# Timer arrays
+time_MPC = np.zeros(T_total)
+time_simulator = np.zeros(NcontrolKnots * T_total)
+
 while T < T_total:
     # Controller works faster than trajectory generation
     for i_control in range(NcontrolKnots):
@@ -101,9 +107,15 @@ while T < T_total:
         torques = MPC.u0 + MPC.K0 @ state.diff(x_measured, MPC.x0)
 
         # Apply torque on complete model
+        tic_Simu = time.perf_counter()
         simulator.step(torques)
+        toc_Simu = time.perf_counter()
+        time_simulator[NcontrolKnots * T + i_control] = toc_Simu - tic_Simu
 
+    tic_MPC = time.perf_counter()
     MPC.iterate(x_measured, pin.SE3.Identity())
+    toc_MPC = time.perf_counter()
+    time_MPC[T] = toc_MPC - tic_MPC
     plotter.logState(T, x_measured)
     plotter.logTorques(T, torques)
     plotter.logEndEffectorPos(
@@ -114,4 +126,8 @@ while T < T_total:
 
 simulator.end()
 print("Simulation ended")
+
+print("Average MPC solve time:" + str(np.mean(time_MPC)))
+print("Average Simulator execution time:" + str(np.mean(time_simulator)))
+
 plotter.plotResults()
