@@ -94,6 +94,12 @@ void exposeMPCPointClass() {
               bp::return_value_policy<bp::reference_existing_object>()),
           "crocoddyl wrapper used by the MPC")
       .add_property(
+          "oMtarget",
+          bp::make_function(
+              &MPC_Point::get_Target_frame,
+              bp::return_value_policy<bp::reference_existing_object>()),
+          "placement of the target in the robot frame")
+      .add_property(
           "x0",
           bp::make_function(
               &MPC_Point::get_x0,

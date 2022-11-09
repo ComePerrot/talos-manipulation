@@ -92,6 +92,8 @@ class MPC_Point {
 
   const MatrixXd &get_K0() const { return K0_; }
 
+  const pinocchio::SE3 &get_Target_frame() const { return oMtarget_; }
+
   OCP_Point &get_OCP() { return OCP_; }
   void set_OCP(const OCP_Point &OCP) { OCP_ = OCP; }
 
