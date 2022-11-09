@@ -73,12 +73,16 @@ MPC.initialize(
     pin.SE3.Identity(),
 )
 
+toolPlacement = MPC.designer.get_EndEff_frame()
+targetPlacement = MPC.oMtarget
+
 print("Robot successfully loaded")
 
 # Simulator
 simulator = TalosDeburringSimulator(
     URDF=URDF,
-    targetPos=MPCparams.targetPos,
+    targetPlacement=targetPlacement,
+    toolPlacement=toolPlacement,
     rmodelComplete=pinWrapper.get_rModelComplete(),
     controlledJointsIDs=pinWrapper.get_controlledJointsIDs(),
     enableGUI=enableGUI,
@@ -108,19 +112,24 @@ while T < T_total:
 
         # Apply torque on complete model
         tic_Simu = time.perf_counter()
-        simulator.step(torques)
+        simulator.step(torques, toolPlacement)
         toc_Simu = time.perf_counter()
         time_simulator[NcontrolKnots * T + i_control] = toc_Simu - tic_Simu
 
+    # Solve MPC iteration
     tic_MPC = time.perf_counter()
     MPC.iterate(x_measured, pin.SE3.Identity())
     toc_MPC = time.perf_counter()
     time_MPC[T] = toc_MPC - tic_MPC
+
+    # Update tool and target placement
+    toolPlacement = MPC.designer.get_EndEff_frame()
+    targetPlacement = MPC.oMtarget
+
+    # Log robot data
     plotter.logState(T, x_measured)
     plotter.logTorques(T, torques)
-    plotter.logEndEffectorPos(
-        T, MPC.designer.get_EndEff_frame().translation, MPCparams.targetPos
-    )
+    plotter.logEndEffectorPos(T, toolPlacement.translation, targetPlacement.translation)
 
     T += 1
 

@@ -1,4 +1,5 @@
 import numpy as np
+import pinocchio as pin
 import pybullet as p  # PyBullet simulator
 import pybullet_data
 
@@ -7,7 +8,8 @@ class TalosDeburringSimulator:
     def __init__(
         self,
         URDF,
-        targetPos,
+        targetPlacement,
+        toolPlacement,
         rmodelComplete,
         controlledJointsIDs,
         enableGUI=False,
@@ -20,7 +22,8 @@ class TalosDeburringSimulator:
         self._setupRobot(URDF, rmodelComplete, controlledJointsIDs)
 
         # Create visuals
-        self._createTargetVisual(targetPos)
+        self._createTargetVisual(targetPlacement)
+        self._createToolVisual(toolPlacement)
 
     def _setupBullet(self, enableGUI, enableGravity, dt):
         # Start the client for PyBullet
@@ -44,21 +47,31 @@ class TalosDeburringSimulator:
         p.loadURDF("plane.urdf")
 
     def _setupRobot(self, URDF, rmodelComplete, controlledJointsIDs):
+        rmodelComplete.q0 = rmodelComplete.referenceConfigurations["half_sitting"]
+        self.q0 = rmodelComplete.q0
+        self.initial_base_position = list(self.q0[:3])
+        self.initial_base_orientation = list(self.q0[3:7])
+        self.initial_joint_positions = list(self.q0[7:])
+
         rmodelComplete.armature = (
             rmodelComplete.rotorInertia * rmodelComplete.rotorGearRatio**2
         )
-        rmodelComplete.q0 = rmodelComplete.referenceConfigurations["half_sitting"]
 
         # Load robot
         self.robotId = p.loadURDF(
             URDF,
-            list(rmodelComplete.q0[:3]),
-            list(rmodelComplete.q0[3:7]),
+            self.initial_base_position,
+            self.initial_base_orientation,
             useFixedBase=False,
         )
 
-        # Magic translation from bullet where the basis center is shifted
+        # Fetching the position of the center of mass
+        # (which is different from the origin of the root link)
         self.localInertiaPos = p.getDynamicsInfo(self.robotId, -1)[3]
+
+        # Expressing initial position wrt the CoM
+        for i in range(3):
+            self.initial_base_position[i] += self.localInertiaPos[i]
 
         self.names2bulletIndices = {
             p.getJointInfo(1, i)[1].decode(): i for i in range(p.getNumJoints(1))
@@ -74,22 +87,21 @@ class TalosDeburringSimulator:
             for i in controlledJointsIDs[1:]
         ]
 
-        self._setInitialConfig(rmodelComplete)
+        self._setInitialConfig()
         self._changeFriction(["leg_left_6_joint", "leg_right_6_joint"], 100, 30)
         self._setControlledJoints()
 
-    def _setInitialConfig(self, rmodelComplete):
+    def _setInitialConfig(self):
         """Initialize robot configuration in pyBullet
 
         :param q0 Intial robot configuration
         """
-        initial_joint_positions = np.array(rmodelComplete.q0[7:].flat).tolist()
-        for i in range(len(initial_joint_positions)):
+        for i in range(len(self.initial_joint_positions)):
             p.enableJointForceTorqueSensor(self.robotId, i, True)
             p.resetJointState(
                 self.robotId,
                 self.bulletJointsIdInPinOrder[i],
-                initial_joint_positions[i],
+                self.initial_joint_positions[i],
             )
 
     def _changeFriction(self, names, lateralFriction=100, spinningFriction=30):
@@ -117,7 +129,7 @@ class TalosDeburringSimulator:
             forces=[0.0 for m in self.bullet_controlledJoints],
         )
 
-    def _createTargetVisual(self, target):
+    def _createTargetVisual(self, oMtarget):
         """Create visual representation of the target to track
 
         The visual will not appear unless the physics client is set to
@@ -139,8 +151,40 @@ class TalosDeburringSimulator:
             baseMass=0.0,
             baseInertialFramePosition=[0, 0, 0],
             baseVisualShapeIndex=blueBox,
-            basePosition=[target[0], target[1], target[2]],
+            basePosition=oMtarget.translation,
+            baseOrientation=pin.Quaternion(oMtarget.rotation).coeffs(),
             useMaximalCoordinates=True,
+        )
+
+    def _createToolVisual(self, oMtool):
+        """Create visual representation of the robot end effector"""
+        RADIUS = 0.01
+        LENGTH = 0.02
+        blueCapsule = p.createVisualShape(
+            shapeType=p.GEOM_CAPSULE,
+            rgbaColor=[0, 0, 1, 0.5],
+            visualFramePosition=[0.0, 0.0, 0.0],
+            radius=RADIUS,
+            length=LENGTH,
+            halfExtents=[0.0, 0.0, 0.0],
+        )
+        self.tool_pin = p.createMultiBody(
+            baseMass=0.0,
+            baseInertialFramePosition=[0, 0, 0],
+            baseVisualShapeIndex=blueCapsule,
+            basePosition=[0.0, 0.0, 0.0],
+            useMaximalCoordinates=True,
+        )
+
+        self._setToolPosition(oMtool)
+
+    def _setToolPosition(self, oMtool):
+        """Move the robot's capsule according to current robot's position"""
+
+        p.resetBasePositionAndOrientation(
+            self.tool_pin,
+            oMtool.translation,
+            pin.Quaternion(oMtool.rotation).coeffs(),
         )
 
     def getRobotState(self):
@@ -163,8 +207,9 @@ class TalosDeburringSimulator:
 
         return x
 
-    def step(self, torques):
+    def step(self, torques, oMtool):
         """Do one step of simulation"""
+        self._setToolPosition(oMtool)
         self._applyTorques(torques)
         p.stepSimulation()
 
@@ -176,6 +221,25 @@ class TalosDeburringSimulator:
             controlMode=p.TORQUE_CONTROL,
             forces=torques,
         )
+
+    def reset(self):
+        # Reset base
+        p.resetBasePositionAndOrientation(
+            self.robotId,
+            self.initial_base_position,
+            self.initial_base_orientation,
+            self.physicsClient,
+        )
+        p.resetBaseVelocity(
+            self.robotId, [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], self.physicsClient
+        )
+        # Reset joints
+        for i in range(len(self.initial_joint_positions)):
+            p.resetJointState(
+                self.robotId,
+                self.bulletJointsIdInPinOrder[i],
+                self.initial_joint_positions[i],
+            )
 
     def end(self):
         """Ends connection with pybullet."""
