@@ -34,8 +34,9 @@ void OCPSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
   };
 
   // Local lambda function to read VectorXd
-  auto read_vxd = [&config](VectorXd &aref_vxd, std::string fieldname) {
-    YAML::Node yn_avxd = config[fieldname];
+  auto read_vxd = [](VectorXd &aref_vxd, YAML::Node node,
+                     std::string fieldname) {
+    YAML::Node yn_avxd = node[fieldname];
     if (yn_avxd) {
       aref_vxd.resize((Eigen::Index)yn_avxd.size());
       for (std::size_t id = 0; id < yn_avxd.size(); id++) {
@@ -44,6 +45,55 @@ void OCPSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
     } else {
       std::cout << "No " << fieldname << std::endl;
     }
+  };
+
+  auto read_stateWeights = [&config, &read_vxd](VectorXd &aref_stateWeights) {
+    std::array<std::string, 2> nodeNames{"statePosWeights", "stateVelWeights"};
+    std::array<std::string, 6> limbs{"base",  "leftLeg", "rightLeg",
+                                     "torso", "leftArm", "rightArm"};
+    VectorXd stateWeights(36 * 2); // Maximum size for the state with Talos
+
+    int sizeWeight = 0;
+    for (auto nodeName : nodeNames) {
+      YAML::Node node = config[nodeName];
+      if (node) {
+        for (auto limb : limbs) {
+          VectorXd buffer;
+          read_vxd(buffer, node, limb);
+
+          stateWeights.segment(sizeWeight, sizeWeight + buffer.size()) = buffer;
+          sizeWeight += (int) buffer.size();
+        }
+      } else {
+        std::cout << "No " << nodeName << std::endl;
+      }
+    }
+    aref_stateWeights.resize(sizeWeight);
+    aref_stateWeights = stateWeights.head(sizeWeight);
+  };
+
+  auto read_controlWeights = [&config,
+                              &read_vxd](VectorXd &aref_controlWeights) {
+    std::array<std::string, 5> limbs{"leftLeg", "rightLeg", "torso", "leftArm",
+                                     "rightArm"};
+    VectorXd controlWeights(36);
+
+    int sizeWeight = 0;
+    YAML::Node node = config["controlWeights"];
+    if (node) {
+      for (auto limb : limbs) {
+        VectorXd buffer;
+        read_vxd(buffer, node, limb);
+
+        controlWeights.segment(sizeWeight, sizeWeight + buffer.size()) = buffer;
+        sizeWeight += (int) buffer.size();
+      }
+    } else {
+      std::cout << "No controlWeights" << std::endl;
+    }
+    std::cout << sizeWeight << std::endl;
+    aref_controlWeights.resize(sizeWeight);
+    aref_controlWeights = controlWeights.head(sizeWeight);
   };
 
   read_size_t(horizon_length, "horizon_length");
@@ -58,8 +108,8 @@ void OCPSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
   read_double(modelMakerSettings.wGripperRot, "wGripperRot");
   read_double(modelMakerSettings.wGripperVel, "wGripperVel");
 
-  read_vxd(modelMakerSettings.stateWeights, "stateWeights");
-  read_vxd(modelMakerSettings.controlWeights, "controlWeights");
+  read_stateWeights(modelMakerSettings.stateWeights);
+  read_controlWeights(modelMakerSettings.controlWeights);
 }
 
 void OCPSettings_Point::readParamsFromYamlFile(const std::string &Filename) {
