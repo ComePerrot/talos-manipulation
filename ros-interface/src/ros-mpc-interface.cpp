@@ -7,13 +7,13 @@ void ROS_MPC_Interface::load(ros::NodeHandle nh) {
   hints.tcpNoDelay(true);
 
   // Robot sensor subscriber
-  sensor_sub_ = nh.subscribe<ros_wbmpc_msgs::Sensor>(
+  sensor_sub_ = nh.subscribe<linear_feedback_controller_msgs::Sensor>(
       "sensor_state", 1, &ROS_MPC_Interface::SensorCb, this, hints);
 
   // Control publisher
   command_pub_.reset(
-      new realtime_tools::RealtimePublisher<ros_wbmpc_msgs::Control>(
-          nh, "command", 1));
+      new realtime_tools::RealtimePublisher<
+          linear_feedback_controller_msgs::Control>(nh, "command", 1));
 
   while ((jointPos_.norm() == 0) || (jointPos_.norm() == 0)) {
     ROS_INFO_THROTTLE(0.5, "Receiving joint state from the robot");
@@ -32,34 +32,22 @@ void ROS_MPC_Interface::update(const Eigen::VectorXd& u0,
   }
 }
 
-void ROS_MPC_Interface::SensorCb(const ros_wbmpc_msgs::SensorConstPtr& msg) {
-  control_msg_.initial_state = *msg;
+Eigen::VectorXd& ROS_MPC_Interface::get_robotState() {
+  // Copying message to keep track of the initial state that is used to compute
+  // control
+  control_msg_.initial_state = sensor_msg_;
 
-  // Base State
-  tf::pointMsgToEigen(msg->base_state.pose.pose.position, base_position_);
-  tf::quaternionMsgToEigen(msg->base_state.pose.pose.orientation,
-                           base_quaternion_);
-  base_quaternion_.normalize();
+  // Converting from ros message to Eigen only when its necessary
+  linear_feedback_controller_msgs::sensorMsgToEigen(sensor_msg_, sensor_eigen_);
+  jointStates_ << sensor_eigen_.base_pose, sensor_eigen_.joint_state.position,
+      sensor_eigen_.base_twist, sensor_eigen_.joint_state.velocity;
 
-  tf::vectorMsgToEigen(msg->base_state.twist.twist.linear, base_linear_vel_);
-  tf::vectorMsgToEigen(msg->base_state.twist.twist.angular, base_angular_vel_);
+  return (jointStates_);
+}
 
-  for (int i = 0; i < 3; i++) {
-    jointPos_[i] = base_position_[i];
-    jointVel_[i] = base_linear_vel_[i];
-    jointVel_[i + 3] = base_angular_vel_[i];
-  }
-
-  jointPos_[3] = base_quaternion_.x();
-  jointPos_[4] = base_quaternion_.y();
-  jointPos_[5] = base_quaternion_.z();
-  jointPos_[6] = base_quaternion_.w();
-
-  // Joint States
-  for (size_t i = 0; i < msg->joint_state.position.size(); i++) {
-    jointPos_[(Eigen::Index)i] = msg->joint_state.position[i];
-    jointVel_[(Eigen::Index)i] = msg->joint_state.velocity[i];
-  }
+void ROS_MPC_Interface::SensorCb(
+    const linear_feedback_controller_msgs::SensorConstPtr& msg) {
+  sensor_msg_ = *msg;
 }
 
 void ROS_MPC_Interface::mapEigenToTF(const Eigen::VectorXd& u0,

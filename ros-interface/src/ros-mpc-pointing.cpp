@@ -116,7 +116,9 @@ int main(int argc, char** argv) {
     toolMtarget = pinocchio::SE3::Identity();
   }
 
-  MPC.initialize(Robot.get_jointPos(), Robot.get_jointVel(), toolMtarget);
+  Eigen::VectorXd x0 = Robot.get_robotState();
+  MPC.initialize(x0.head(MPC.get_designer().get_rModel().nq),
+                 x0.tail(MPC.get_designer().get_rModel().nv), toolMtarget);
 
   while (ros::ok()) {
     if (use_mocap > 0) {
@@ -124,7 +126,7 @@ int main(int argc, char** argv) {
     }
 
     // Solving MPC iteration
-    MPC.iterate(Robot.get_jointPos(), Robot.get_jointVel(), toolMtarget);
+    MPC.iterate(Robot.get_robotState(), toolMtarget);
 
     // Sending command to robot
     Robot.update(MPC.get_u0(), MPC.get_K0());

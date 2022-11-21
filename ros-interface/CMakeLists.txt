@@ -44,7 +44,7 @@ set(CATKIN_COMPONENTS
   roslib
   realtime_tools
   eigen_conversions
-  ros_wbmpc_msgs
+  linear_feedback_controller_msgs
   tf2_ros
 )
 
