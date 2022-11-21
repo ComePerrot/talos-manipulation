@@ -51,7 +51,7 @@ void OCPSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
     std::array<std::string, 2> nodeNames{"statePosWeights", "stateVelWeights"};
     std::array<std::string, 6> limbs{"base",  "leftLeg", "rightLeg",
                                      "torso", "leftArm", "rightArm"};
-    VectorXd stateWeights(36 * 2); // Maximum size for the state with Talos
+    VectorXd stateWeights(36 * 2);  // Maximum size for the state with Talos
 
     int sizeWeight = 0;
     for (auto nodeName : nodeNames) {
@@ -61,14 +61,15 @@ void OCPSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
           VectorXd buffer;
           read_vxd(buffer, node, limb);
 
-          stateWeights.segment(sizeWeight, sizeWeight + buffer.size()) = buffer;
-          sizeWeight += (int) buffer.size();
+          stateWeights.segment(sizeWeight, buffer.size()) = buffer;
+          sizeWeight += (int)buffer.size();
         }
       } else {
         std::cout << "No " << nodeName << std::endl;
       }
     }
-    aref_stateWeights.resize(sizeWeight);
+    std::cout << sizeWeight << std::endl;
+    aref_stateWeights.resize((Eigen::Index)sizeWeight);
     aref_stateWeights = stateWeights.head(sizeWeight);
   };
 
@@ -85,14 +86,13 @@ void OCPSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
         VectorXd buffer;
         read_vxd(buffer, node, limb);
 
-        controlWeights.segment(sizeWeight, sizeWeight + buffer.size()) = buffer;
-        sizeWeight += (int) buffer.size();
+        controlWeights.segment(sizeWeight, buffer.size()) = buffer;
+        sizeWeight += (int)buffer.size();
       }
     } else {
       std::cout << "No controlWeights" << std::endl;
     }
-    std::cout << sizeWeight << std::endl;
-    aref_controlWeights.resize(sizeWeight);
+    aref_controlWeights.resize((Eigen::Index)sizeWeight);
     aref_controlWeights = controlWeights.head(sizeWeight);
   };
 
