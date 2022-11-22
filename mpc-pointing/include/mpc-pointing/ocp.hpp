@@ -57,6 +57,8 @@ class OCP_Point {
   void updateGoalRotation(const Eigen::Ref<const Eigen::Matrix3d> &rotation);
   void changeGoalCostActivation(const size_t index, const bool value);
   void changeGoaleTrackingWeights(double weight);
+  void changePostureReference(const size_t index, const Eigen::Ref<const VectorXd>);
+  const VectorXd& getFinalPosture();
 
   // Setters and Getters
 

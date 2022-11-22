@@ -67,6 +67,16 @@ void OCP_Point::changeGoaleTrackingWeights(double weight) {
     costs(modelIndex)->get_costs().at("gripperPosition")->weight = weight;
   }
 }
+void OCP_Point::changePostureReference(
+    const size_t index, const Eigen::Ref<const VectorXd> reference) {
+  boost::static_pointer_cast<crocoddyl::ResidualModelState>(
+      costs(index)->get_costs().at("postureTask")->cost->get_residual())
+      ->set_reference(reference);
+}
+
+const VectorXd& OCP_Point::getFinalPosture(){
+  return (solver_->get_xs().back());
+}
 
 ActionModel OCP_Point::ama(const unsigned long time) {
   if (time == settings_.horizon_length) {
