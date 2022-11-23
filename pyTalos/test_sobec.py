@@ -112,7 +112,7 @@ while T < T_total:
 
         # Apply torque on complete model
         tic_Simu = time.perf_counter()
-        simulator.step(torques, toolPlacement)
+        simulator.step(torques, toolPlacement, targetPlacement)
         toc_Simu = time.perf_counter()
         time_simulator[NcontrolKnots * T + i_control] = toc_Simu - tic_Simu
 
@@ -127,6 +127,7 @@ while T < T_total:
     targetPlacement = MPC.oMtarget
 
     # Log robot data
+    plotter.logDrillingState(T, MPC.drillingState)
     plotter.logState(T, x_measured)
     plotter.logTorques(T, torques)
     plotter.logEndEffectorPos(T, toolPlacement.translation, targetPlacement.translation)

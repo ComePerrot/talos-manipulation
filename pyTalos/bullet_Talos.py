@@ -176,15 +176,15 @@ class TalosDeburringSimulator:
             useMaximalCoordinates=True,
         )
 
-        self._setToolPosition(oMtool)
+        self._setObjectPosition(self.tool_pin, oMtool)
 
-    def _setToolPosition(self, oMtool):
+    def _setObjectPosition(self, objectName, oMobject):
         """Move the robot's capsule according to current robot's position"""
 
         p.resetBasePositionAndOrientation(
-            self.tool_pin,
-            oMtool.translation,
-            pin.Quaternion(oMtool.rotation).coeffs(),
+            objectName,
+            oMobject.translation,
+            pin.Quaternion(oMobject.rotation).coeffs(),
         )
 
     def getRobotState(self):
@@ -207,9 +207,10 @@ class TalosDeburringSimulator:
 
         return x
 
-    def step(self, torques, oMtool):
+    def step(self, torques, oMtool, oMtarget):
         """Do one step of simulation"""
-        self._setToolPosition(oMtool)
+        self._setObjectPosition(self.tool_pin, oMtool)
+        self._setObjectPosition(self.target_MPC, oMtarget)
         self._applyTorques(torques)
         p.stepSimulation()
 
