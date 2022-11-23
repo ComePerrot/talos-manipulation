@@ -86,13 +86,17 @@ class MPC_Point {
   // getters and setters
   MPCSettings_Point &get_settings() { return settings_; }
 
+  int get_drillingState() { return drilling_state_; }
+
   const VectorXd &get_x0() const { return x0_; }
 
   const VectorXd &get_u0() const { return u0_; }
 
   const MatrixXd &get_K0() const { return K0_; }
 
-  const pinocchio::SE3 &get_Target_frame() const { return list_oMhole_[current_hole_]; }
+  const pinocchio::SE3 &get_Target_frame() const {
+    return list_oMhole_[current_hole_];
+  }
 
   OCP_Point &get_OCP() { return OCP_; }
   void set_OCP(const OCP_Point &OCP) { OCP_ = OCP; }

@@ -116,7 +116,9 @@ void exposeMPCPointClass() {
           bp::make_function(
               &MPC_Point::get_K0,
               bp::return_value_policy<bp::reference_existing_object>()),
-          "Riccati gains");
+          "Riccati gains")
+      .add_property("drillingState", &MPC_Point::get_drillingState,
+                    "Riccati gains");
 }
 
 void exposeMPCPoint() {
