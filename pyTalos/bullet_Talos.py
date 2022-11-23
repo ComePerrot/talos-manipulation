@@ -18,7 +18,6 @@ class TalosDeburringSimulator:
     ):
 
         self._setupBullet(enableGUI, enableGravity, dt)
-
         self._setupRobot(URDF, rmodelComplete, controlledJointsIDs)
 
         # Create visuals
@@ -26,20 +25,24 @@ class TalosDeburringSimulator:
         self._createToolVisual(toolPlacement)
 
     def _setupBullet(self, enableGUI, enableGravity, dt):
-        # Start the client for PyBullet
+        """Setup the bullet environment
+
+        :param enableGUI Parameter to enable Graphical User Interface
+        :param enableGravity Parameter to enable Gravity
+        :param dt Integration time step for the simulator
+        """
+        # Start the PyBullet client
         if enableGUI:
             self.physicsClient = p.connect(p.GUI)
             p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
         else:
             self.physicsClient = p.connect(p.DIRECT)
 
-        # Set gravity (enabled by default)
         if enableGravity:
             p.setGravity(0, 0, -9.81)
         else:
             p.setGravity(0, 0, 0)
 
-        # Set time step of the simulation
         p.setTimeStep(dt)
 
         # Load horizontal plane for PyBullet
@@ -47,17 +50,20 @@ class TalosDeburringSimulator:
         p.loadURDF("plane.urdf")
 
     def _setupRobot(self, URDF, rmodelComplete, controlledJointsIDs):
+        """Setup the robot inside the simulator
+
+        :param URDF Complete path to the URDF of the robot
+        :param rmodelComplete Pinocchio model of the robot containing all the joints
+        :param controlledJointsIDs ID of the torque controlled joints (the other joints will stay fixed)
+        """
+        # Loading initial configuration from pinocchio
         rmodelComplete.q0 = rmodelComplete.referenceConfigurations["half_sitting"]
         self.q0 = rmodelComplete.q0
         self.initial_base_position = list(self.q0[:3])
         self.initial_base_orientation = list(self.q0[3:7])
         self.initial_joint_positions = list(self.q0[7:])
 
-        rmodelComplete.armature = (
-            rmodelComplete.rotorInertia * rmodelComplete.rotorGearRatio**2
-        )
-
-        # Load robot
+        # Loading robot
         self.robotId = p.loadURDF(
             URDF,
             self.initial_base_position,
@@ -73,15 +79,15 @@ class TalosDeburringSimulator:
         for i in range(3):
             self.initial_base_position[i] += self.localInertiaPos[i]
 
+        # Helpers to switch from pinocchio to bullet joint indexes
         self.names2bulletIndices = {
             p.getJointInfo(1, i)[1].decode(): i for i in range(p.getNumJoints(1))
         }
-
         self.bulletJointsIdInPinOrder = [
             self.names2bulletIndices[n] for n in rmodelComplete.names[2:]
         ]
 
-        # Joints controlled with crocoddyl
+        # Indexes of the torque-controlled joints in bullet
         self.bullet_controlledJoints = [
             self.names2bulletIndices[rmodelComplete.names[i]]
             for i in controlledJointsIDs[1:]
@@ -92,10 +98,7 @@ class TalosDeburringSimulator:
         self._setControlledJoints()
 
     def _setInitialConfig(self):
-        """Initialize robot configuration in pyBullet
-
-        :param q0 Intial robot configuration
-        """
+        """Set initial robot configuration in pyBullet"""
         for i in range(len(self.initial_joint_positions)):
             p.enableJointForceTorqueSensor(self.robotId, i, True)
             p.resetJointState(
@@ -115,11 +118,7 @@ class TalosDeburringSimulator:
             )
 
     def _setControlledJoints(self):
-        """Define joints controlled by pyBullet
-
-        :param rmodelComplete Complete model of the robot
-        :param ControlledJoints List of ControlledJoints
-        """
+        """Set robot joints controlled by pyBullet"""
         # Disable default position controler in torque controlled joints
         # Default controller will take care of other joints
         p.setJointMotorControlArray(
@@ -134,7 +133,7 @@ class TalosDeburringSimulator:
 
         The visual will not appear unless the physics client is set to
         SHARED_MEMMORY
-        :param target Position of the target in the world
+        :param oMtarget Position of the target in the world
         """
         RADIUS = 0.01
         LENGTH = 0.02
@@ -157,7 +156,12 @@ class TalosDeburringSimulator:
         )
 
     def _createToolVisual(self, oMtool):
-        """Create visual representation of the robot end effector"""
+        """Create visual representation of the robot end effector
+
+        The visual will not appear unless the physics client is set to
+        SHARED_MEMMORY
+        :param oMtool Position of the tool in the world
+        """
         RADIUS = 0.01
         LENGTH = 0.02
         blueCapsule = p.createVisualShape(
@@ -179,7 +183,11 @@ class TalosDeburringSimulator:
         self._setObjectPosition(self.tool_pin, oMtool)
 
     def _setObjectPosition(self, objectName, oMobject):
-        """Move the robot's capsule according to current robot's position"""
+        """Move an object to the given position
+
+        :param objectName Name of the object to move
+        :param oMobject Position of the object in the world
+        """
 
         p.resetBasePositionAndOrientation(
             objectName,
@@ -188,7 +196,9 @@ class TalosDeburringSimulator:
         )
 
     def getRobotState(self):
-        """Get current state of the robot from pyBullet"""
+        """Get current state of the robot
+
+        Takes the measurments of pyBullet and rearrange them in the order of pinocchio"""
         # Get articulated joint pos and vel
         xbullet = p.getJointStates(self.robotId, self.bullet_controlledJoints)
         q = [x[0] for x in xbullet]
@@ -202,20 +212,27 @@ class TalosDeburringSimulator:
         # Concatenate into a single x vector
         x = np.concatenate([pos, quat, q, v, w, vq])
 
-        # Magic transformation of the basis translation, as classical in Bullet.
+        # Transformation of the basis position because the reference is not the same in bullet and in pinocchio
         x[:3] -= self.localInertiaPos
 
         return x
 
     def step(self, torques, oMtool, oMtarget):
-        """Do one step of simulation"""
+        """One step of the simulator
+
+        :param torques Torques to apply to the robot
+        :param oMtool Position of the tool (only used to update GUI)
+        :param oMtool Position of the target (only used to update GUI)
+        """
         self._setObjectPosition(self.tool_pin, oMtool)
         self._setObjectPosition(self.target_MPC, oMtarget)
         self._applyTorques(torques)
         p.stepSimulation()
 
     def _applyTorques(self, torques):
-        """Apply computed torques to the robot"""
+        """Apply computed torques to the robot
+
+        :param torques Torques to apply to the robot"""
         p.setJointMotorControlArray(
             self.robotId,
             self.bullet_controlledJoints,
@@ -224,6 +241,8 @@ class TalosDeburringSimulator:
         )
 
     def reset(self):
+        """Reset simulation to initial state"""
+
         # Reset base
         p.resetBasePositionAndOrientation(
             self.robotId,
@@ -234,6 +253,7 @@ class TalosDeburringSimulator:
         p.resetBaseVelocity(
             self.robotId, [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], self.physicsClient
         )
+
         # Reset joints
         for i in range(len(self.initial_joint_positions)):
             p.resetJointState(
