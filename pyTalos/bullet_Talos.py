@@ -5,20 +5,40 @@ import pybullet_data
 
 
 class TalosDeburringSimulator:
+    """Pybullet based simulator for manipulation tasks with Talos"""
+
     def __init__(
         self,
         URDF,
-        targetPlacement,
-        toolPlacement,
-        rmodelComplete,
+        initialConfiguration,
+        robotJointNames,
         controlledJointsIDs,
+        toolPlacement,
+        targetPlacement,
         enableGUI=False,
         enableGravity=True,
         dt=1e-3,
     ):
+        """Constructor of the simulator
+
+        Arguments:
+            URDF -- Path to the URDF of the robot
+            initialConfiguration -- Initial configuration of the robot
+            robotJointNames -- Full list of the joint names of the robot
+            controlledJointsIDs -- ID list of the torque controlled joints
+            toolPlacement -- Position of the tool
+            targetPlacement -- Position of the target
+
+        Keyword Arguments:
+            enableGUI -- _description_ (default: {False})
+            enableGravity -- Parameter to enable Gravity (default: {True})
+            dt -- Integration time step for the simulator (default: {1e-3})
+        """
 
         self._setupBullet(enableGUI, enableGravity, dt)
-        self._setupRobot(URDF, rmodelComplete, controlledJointsIDs)
+        self._setupRobot(
+            URDF, initialConfiguration, robotJointNames, controlledJointsIDs
+        )
 
         # Create visuals
         self._createTargetVisual(targetPlacement)
@@ -27,9 +47,10 @@ class TalosDeburringSimulator:
     def _setupBullet(self, enableGUI, enableGravity, dt):
         """Setup the bullet environment
 
-        :param enableGUI Parameter to enable Graphical User Interface
-        :param enableGravity Parameter to enable Gravity
-        :param dt Integration time step for the simulator
+        Arguments:
+            enableGUI -- Parameter to enable Graphical User Interface
+            enableGravity -- Parameter to enable Gravity
+            dt -- Integration time step for the simulator
         """
         # Start the PyBullet client
         if enableGUI:
@@ -49,16 +70,19 @@ class TalosDeburringSimulator:
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
         p.loadURDF("plane.urdf")
 
-    def _setupRobot(self, URDF, rmodelComplete, controlledJointsIDs):
+    def _setupRobot(
+        self, URDF, initialConfiguration, robotJointNames, controlledJointsIDs
+    ):
         """Setup the robot inside the simulator
 
-        :param URDF Complete path to the URDF of the robot
-        :param rmodelComplete Pinocchio model of the robot containing all the joints
-        :param controlledJointsIDs ID of the torque controlled joints (the other joints will stay fixed)
+        Arguments:
+            URDF -- Complete path to the URDF of the robot
+            initialConfiguration -- Pinocchio model of the robot containing all the joints
+            robotJointNames -- Names of all the joint of the robot
+            controlledJointsIDs --  ID of the torque controlled joints (the other joints will stay fixed)
         """
         # Loading initial configuration from pinocchio
-        rmodelComplete.q0 = rmodelComplete.referenceConfigurations["half_sitting"]
-        self.q0 = rmodelComplete.q0
+        self.q0 = initialConfiguration
         self.initial_base_position = list(self.q0[:3])
         self.initial_base_orientation = list(self.q0[3:7])
         self.initial_joint_positions = list(self.q0[7:])
@@ -84,12 +108,12 @@ class TalosDeburringSimulator:
             p.getJointInfo(1, i)[1].decode(): i for i in range(p.getNumJoints(1))
         }
         self.bulletJointsIdInPinOrder = [
-            self.names2bulletIndices[n] for n in rmodelComplete.names[2:]
+            self.names2bulletIndices[n] for n in robotJointNames[2:]
         ]
 
         # Indexes of the torque-controlled joints in bullet
         self.bullet_controlledJoints = [
-            self.names2bulletIndices[rmodelComplete.names[i]]
+            self.names2bulletIndices[robotJointNames[i]]
             for i in controlledJointsIDs[1:]
         ]
 
@@ -133,7 +157,9 @@ class TalosDeburringSimulator:
 
         The visual will not appear unless the physics client is set to
         SHARED_MEMMORY
-        :param oMtarget Position of the target in the world
+
+        Arguments:
+            oMtarget -- Position of the target in the world
         """
         RADIUS = 0.01
         LENGTH = 0.02
@@ -160,7 +186,9 @@ class TalosDeburringSimulator:
 
         The visual will not appear unless the physics client is set to
         SHARED_MEMMORY
-        :param oMtool Position of the tool in the world
+
+        Arguments:
+            oMtool -- Position of the tool in the world
         """
         RADIUS = 0.01
         LENGTH = 0.02
@@ -185,8 +213,9 @@ class TalosDeburringSimulator:
     def _setObjectPosition(self, objectName, oMobject):
         """Move an object to the given position
 
-        :param objectName Name of the object to move
-        :param oMobject Position of the object in the world
+        Arguments:
+            objectName -- Name of the object to move
+            oMobject -- Position of the object in the world
         """
 
         p.resetBasePositionAndOrientation(
@@ -220,9 +249,10 @@ class TalosDeburringSimulator:
     def step(self, torques, oMtool, oMtarget):
         """One step of the simulator
 
-        :param torques Torques to apply to the robot
-        :param oMtool Position of the tool (only used to update GUI)
-        :param oMtool Position of the target (only used to update GUI)
+        Arguments:
+            torques -- Torques to apply to the robot
+            oMtool -- Position of the tool (only used to update GUI)
+            oMtool -- Position of the target (only used to update GUI)
         """
         self._setObjectPosition(self.tool_pin, oMtool)
         self._setObjectPosition(self.target_MPC, oMtarget)
@@ -232,7 +262,8 @@ class TalosDeburringSimulator:
     def _applyTorques(self, torques):
         """Apply computed torques to the robot
 
-        :param torques Torques to apply to the robot"""
+        Arguments:
+            torques -- Torques to apply to the robot"""
         p.setJointMotorControlArray(
             self.robotId,
             self.bullet_controlledJoints,
