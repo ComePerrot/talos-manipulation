@@ -11,12 +11,21 @@ from mpc_pointing import MPC_Point, MPCSettings_Point, OCPSettings_Point
 from bullet_Talos import TalosDeburringSimulator
 from plotter import TalosPlotter
 
+from debug_ocp import (
+    plot_costs_from_dic,
+    return_cost_vectors,
+    plot_command,
+    return_command_vector,
+    plot_state_from_dic,
+    return_state_vector,
+)
+
 ################
 #  PARAMETERS  #
 ################
 
 enableGUI = True
-T_total = 1000
+T_total = 3000
 
 modelPath = "/opt/openrobots/share/example-robot-data/robots/talos_data/"
 URDF = modelPath + "robots/talos_reduced.urdf"
@@ -72,6 +81,12 @@ MPC.initialize(
 )
 
 print("Robot successfully loaded")
+
+ddp = MPC.OCP.solver
+
+plot_state_from_dic(return_state_vector(ddp))
+plot_command(return_command_vector(ddp))
+plot_costs_from_dic(return_cost_vectors(MPC.OCP.solver, weighted=True))
 
 # Simulator
 simulator = TalosDeburringSimulator(
