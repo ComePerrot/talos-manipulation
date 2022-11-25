@@ -57,14 +57,19 @@ class OCP_Point {
   void updateGoalRotation(const Eigen::Ref<const Eigen::Matrix3d> &rotation);
   void changeGoalCostActivation(const size_t index, const bool value);
   void changeGoaleTrackingWeights(double weight);
-  void changePostureReference(const size_t index, const Eigen::Ref<const VectorXd>);
-  const VectorXd& getFinalPosture();
+  void changePostureReference(const size_t index,
+                              const Eigen::Ref<const VectorXd>);
+  const VectorXd &getFinalPosture();
+
+  // Debug
+  void printCosts();
 
   // Setters and Getters
 
   const VectorXd get_torque();
   const MatrixXd get_gain();
 
+  DDP get_solver() { return (solver_); };
   ModelMaker &get_modelMaker() { return (modelMaker_); };
   size_t get_initialized() { return (initialized_); };
   size_t get_horizonLength() { return (settings_.horizon_length); };

@@ -1,4 +1,4 @@
-#include <pinocchio/fwd.hpp>
+#include <pinocchio/multibody/fwd.hpp>
 // #include <pinocchio/multibody/fwd.hpp>
 
 #include <boost/python.hpp>
@@ -42,8 +42,7 @@ void exposeOCPPointClass() {
       bp::init<const OCPSettings_Point &, const RobotWrapper &>(
           bp::args("self", "OCPSettings", "designer"),
           "Initialize the OCP from parameter list and a robot designer"))
-      .def<void (OCP_Point::*)(const ConstVectorRef &,
-                               const SE3 &)>(
+      .def<void (OCP_Point::*)(const ConstVectorRef &, const SE3 &)>(
           "initialize", &OCP_Point::initialize,
           bp::args("self", "x0", "oMtarget"))
       .def<void (OCP_Point::*)(const ConstVectorRef &)>(
@@ -53,6 +52,7 @@ void exposeOCPPointClass() {
           bp::make_function(
               &OCP_Point::get_modelMaker,
               bp::return_value_policy<bp::reference_existing_object>()))
+      .add_property("solver", &OCP_Point::get_solver)
       .add_property("torque", &OCP_Point::get_torque,
                     "Torque command computed by the OCP")
       .add_property("gain", &OCP_Point::get_gain, "Gains computed by the OCP");
