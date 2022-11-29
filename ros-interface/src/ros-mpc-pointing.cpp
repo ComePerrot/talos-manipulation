@@ -20,7 +20,7 @@ sobec::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
 
   std::vector<double> gripperTtool;
   nh.getParam("tool_frame_pos", gripperTtool);
-  pinocchio::SE3 gripperMtool = pinocchio::SE3();
+  pinocchio::SE3 gripperMtool = pinocchio::SE3::Identity();
   gripperMtool.translation().x() = gripperTtool[0];
   gripperMtool.translation().y() = gripperTtool[1];
   gripperMtool.translation().z() = gripperTtool[2];
