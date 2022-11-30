@@ -76,6 +76,11 @@ set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 add_executable(ros_mpc_pointing src/ros-mpc-pointing.cpp)
 target_link_libraries(ros_mpc_pointing ${PROJECT_NAME} mpc-pointing sobec::sobec Eigen3::Eigen ${catkin_LIBRARIES})
 
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  add_rostest(test/ros-mpc-test.test)
+endif()
+
 # Installation
 install(
   TARGETS ${PROJECT_NAME}
@@ -85,6 +90,7 @@ install(TARGETS ros_mpc_pointing RUNTIME DESTINATION lib/${PROJECT_NAME})
 install(FILES package.xml DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY ../config DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY test DESTINATION share/${PROJECT_NAME})
   
   
 

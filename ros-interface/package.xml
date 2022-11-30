@@ -17,6 +17,7 @@
   <depend>linear_feedback_controller_msgs</depend>
   <depend>mpc-pointing</depend>
 
+  <build_depend>rostest</build_depend>
 
   <export>
 
