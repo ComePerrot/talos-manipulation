@@ -1,0 +1,7 @@
+<launch>
+    <!-- <include file="$(find ros-interface)/launch/ros-mpc-basic.launch"/>
+    <test test-name="controlled_joints_nonempty" pkg="rostest" type="paramtest" name="paramtest_nonempty">
+        <param name="param_name_target" value="/controlled_joints" />
+    </test> -->
+    <test test-name="test_mpc_interface" pkg="ros-interface" type="$(find ros-interface)/test/test_mpc_interface.py"/>
+</launch>
