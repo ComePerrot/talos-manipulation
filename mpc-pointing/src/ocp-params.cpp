@@ -65,10 +65,9 @@ void OCPSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
           sizeWeight += (int)buffer.size();
         }
       } else {
-        std::cout << "No " << nodeName << std::endl;
+        std::cout << "No stateWeights" << std::endl;
       }
     }
-    std::cout << sizeWeight << std::endl;
     aref_stateWeights.resize((Eigen::Index)sizeWeight);
     aref_stateWeights = stateWeights.head(sizeWeight);
   };
