@@ -15,32 +15,30 @@
 
 class ROS_MPC_Interface {
  public:
-  ROS_MPC_Interface();
-  void load(ros::NodeHandle nh);
+  ROS_MPC_Interface(ros::NodeHandle nh);
   void update(const Eigen::VectorXd& u0, const Eigen::MatrixXd& K0);
 
   Eigen::VectorXd& get_robotState();
 
  private:
   void SensorCb(const linear_feedback_controller_msgs::SensorConstPtr& msg);
-  void mapEigenToTF(const Eigen::VectorXd& u0, const Eigen::MatrixXd& K0);
+  void mapMsgToJointSates();
+  void mapControlToMsg(const Eigen::VectorXd& u0, const Eigen::MatrixXd& K0);
 
   ros::Subscriber sensor_sub_;
   boost::shared_ptr<realtime_tools::RealtimePublisher<
       linear_feedback_controller_msgs::Control>>
       command_pub_;
 
+  // Ros messages
   linear_feedback_controller_msgs::Sensor sensor_msg_;
   linear_feedback_controller_msgs::Control control_msg_;
 
-  linear_feedback_controller_msgs::Eigen::Sensor sensor_eigen_;
+  // Robot state (with joints)
   Eigen::VectorXd jointStates_;
 
   // prealocated memory
-
-  Eigen::VectorXd jointPos_, jointVel_;
-  Eigen::Vector3d base_position_, base_linear_vel_, base_angular_vel_;
-  Eigen::Quaterniond base_quaternion_;
+  linear_feedback_controller_msgs::Eigen::Sensor sensor_eigen_;
 };
 
 #endif  // ROS_MPC_INTERFACE

@@ -1,8 +1,6 @@
 #include "ros-interface/ros-mpc-interface.h"
 
-ROS_MPC_Interface::ROS_MPC_Interface() {}
-
-void ROS_MPC_Interface::load(ros::NodeHandle nh) {
+ROS_MPC_Interface::ROS_MPC_Interface(ros::NodeHandle nh) {
   ros::TransportHints hints;
   hints.tcpNoDelay(true);
 
@@ -15,15 +13,26 @@ void ROS_MPC_Interface::load(ros::NodeHandle nh) {
       new realtime_tools::RealtimePublisher<
           linear_feedback_controller_msgs::Control>(nh, "command", 1));
 
-  while ((jointPos_.norm() == 0) || (jointPos_.norm() == 0)) {
-    ROS_INFO_THROTTLE(0.5, "Receiving joint state from the robot");
+  ros::Rate r(1);  // Rate for reading inital state from the robot
+  while (sensor_msg_.header.stamp.toNSec() == 0) {
+    // No measurments have been received if message time stamp is zero
+    ROS_INFO_STREAM("Waiting for sensor measurments from the robot");
     ros::spinOnce();
+
+    r.sleep();
   }
+
+  jointStates_.resize(
+      7                                                // Base pose
+      + 6                                              // Base twist
+      + (long)sensor_msg_.joint_state.position.size()  // Joint positions
+      + (long)sensor_msg_.joint_state.velocity.size()  // Joint velocity
+  );
 }
 
 void ROS_MPC_Interface::update(const Eigen::VectorXd& u0,
                                const Eigen::MatrixXd& K0) {
-  mapEigenToTF(u0, K0);
+  mapControlToMsg(u0, K0);
 
   if (command_pub_->trylock()) {
     control_msg_.header.stamp = ros::Time::now();
@@ -33,15 +42,7 @@ void ROS_MPC_Interface::update(const Eigen::VectorXd& u0,
 }
 
 Eigen::VectorXd& ROS_MPC_Interface::get_robotState() {
-  // Copying message to keep track of the initial state that is used to compute
-  // control
-  control_msg_.initial_state = sensor_msg_;
-
-  // Converting from ros message to Eigen only when its necessary
-  linear_feedback_controller_msgs::sensorMsgToEigen(sensor_msg_, sensor_eigen_);
-  jointStates_ << sensor_eigen_.base_pose, sensor_eigen_.joint_state.position,
-      sensor_eigen_.base_twist, sensor_eigen_.joint_state.velocity;
-
+  mapMsgToJointSates();
   return (jointStates_);
 }
 
@@ -50,8 +51,19 @@ void ROS_MPC_Interface::SensorCb(
   sensor_msg_ = *msg;
 }
 
-void ROS_MPC_Interface::mapEigenToTF(const Eigen::VectorXd& u0,
-                                     const Eigen::MatrixXd& K0) {
+void ROS_MPC_Interface::mapMsgToJointSates() {
+  // Copying message to keep track of the initial state that is used to compute
+  // control
+  control_msg_.initial_state = sensor_msg_;
+
+  // Converting from ros message to Eigen only when its necessary
+  linear_feedback_controller_msgs::sensorMsgToEigen(sensor_msg_, sensor_eigen_);
+  jointStates_ << sensor_eigen_.base_pose, sensor_eigen_.joint_state.position,
+      sensor_eigen_.base_twist, sensor_eigen_.joint_state.velocity;
+}
+
+void ROS_MPC_Interface::mapControlToMsg(const Eigen::VectorXd& u0,
+                                        const Eigen::MatrixXd& K0) {
   tf::matrixEigenToMsg(u0, control_msg_.feedforward);
   tf::matrixEigenToMsg(K0, control_msg_.feedback_gain);
 }
