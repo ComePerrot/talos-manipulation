@@ -75,8 +75,8 @@ pinWrapper.addEndEffectorFrame(
 # MPC
 MPC = MPC_Point(MPCparams, OCPparams, pinWrapper)
 MPC.initialize(
-    pinWrapper.get_rModel().referenceConfigurations["half_sitting"],
-    pinWrapper.get_v0(),
+    pinWrapper.get_rModelComplete().referenceConfigurations["half_sitting"],
+    pinWrapper.get_v0Complete(),
     pin.SE3.Identity(),
 )
 
