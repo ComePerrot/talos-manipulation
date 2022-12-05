@@ -22,7 +22,7 @@ void MPC_Point::initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
   x0_.resize(designer_.get_rModel().nq + designer_.get_rModel().nv);
   x0_ << shapeState(q0, v0);
   designer_.updateReducedModel(x0_);
-  designer_.updateCompleteModel(q0);
+  // designer_.updateCompleteModel(q0);
 
   // Setup target
   setTarget(toolMtarget);
@@ -34,6 +34,21 @@ void MPC_Point::initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
 
   initialized_ = true;
 }
+
+// void MPC_Point::initialize(const VectorXd &x0, const SE3 &toolMtarget) {
+//   x0_ = x0;
+//   designer_.updateReducedModel(x0_);
+
+//   // Setup target
+//   setTarget(toolMtarget);
+
+//   // Init OCP
+//   OCP_.initialize(x0_, oMtarget_);
+//   u0_ = OCP_.get_torque();
+//   K0_ = OCP_.get_gain();
+
+//   initialized_ = true;
+// }
 
 void MPC_Point::iterate(const ConstVectorRef &q_current,
                         const ConstVectorRef &v_current,

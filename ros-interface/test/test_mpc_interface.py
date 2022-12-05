@@ -15,35 +15,35 @@ NAME = "MPC_Interface_test"
 
 
 class TestMPCInterface(unittest.TestCase):
-    # def __init__(self, *args):
-    #     super(TestMPCInterface, self).__init__(*args)
-
-    # test 1 == 1
-    def test_one_equals_one(self):
-        rospy.loginfo("-D- test_one_equals_one")
-        self.assertEquals(1, 1, "1!=1")
-
     def test_message_reception(self):
         rospy.init_node(NAME, anonymous=True)
 
-        self.sensorData = self._define_sensor_msg()
+        self.sensorMsg = self._define_sensor_msg()
 
-        pub = rospy.Publisher("sensor_state", Sensor)
-        pub.publish(self.sensorData)
+        pub = rospy.Publisher("sensor_state", Sensor, queue_size=10)
+        for _ in range(5):
+            pub.publish(self.sensorMsg)
+            sleep(1)
 
-        msg = rospy.wait_for_message("command", Control, timeout=10)
+        msg = rospy.wait_for_message("command", Control, timeout=30)
         self.assertEquals(
-            msg.InitialState,
-            self.sensorData,
-            "Received initial state should be equal to the one sent",
+            msg.initial_state.base_pose,
+            self.sensorMsg.base_pose,
+            "Base pose in received initial state does not match the one sent to the robot",
+        )
+        self.assertEquals(
+            msg.initial_state.base_twist,
+            self.sensorMsg.base_twist,
+            "Base twist in received initial state does not match the one sent to the robot",
         )
 
     def _define_sensor_msg(self):
         controlled_joints = rospy.get_param("controlled_joints")
 
         sensorData = Sensor(
+            header=Header(stamp=rospy.get_rostime()),
             base_pose=Pose(
-                position=Point(x=0, y=0, z=0),
+                position=Point(x=0, y=0, z=1.01927),
                 orientation=Quaternion(x=0, y=0, z=0, w=1),
             ),
             base_twist=Twist(
@@ -51,8 +51,8 @@ class TestMPCInterface(unittest.TestCase):
             ),
             joint_state=JointState(
                 name=controlled_joints,
-                position=np.zeros(len(controlled_joints)),
-                velocity=np.zeros(len(controlled_joints)),
+                position=np.ones(len(controlled_joints) - 1),
+                velocity=np.zeros(len(controlled_joints) - 1),
             ),
         )
 
@@ -60,29 +60,7 @@ class TestMPCInterface(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # import rostest
-    # rostest.rosrun(PKG, NAME, TestMPCInterface)
+    import rostest
+    rostest.rosrun(PKG, NAME, TestMPCInterface)
 
     rospy.init_node(NAME, anonymous=True)
-
-    controlled_joints = rospy.get_param("controlled_joints")
-
-    sensorData = Sensor(
-        header=Header(stamp=rospy.get_rostime()),
-        base_pose=Pose(
-            position=Point(x=0, y=0, z=0),
-            orientation=Quaternion(x=0, y=0, z=0, w=1),
-        ),
-        base_twist=Twist(linear=Vector3(x=0, y=0, z=0), angular=Vector3(x=0, y=0, z=0)),
-        joint_state=JointState(
-            name=controlled_joints,
-            position=np.ones(len(controlled_joints)),
-            velocity=np.zeros(len(controlled_joints)),
-        ),
-    )
-
-    pub = rospy.Publisher("sensor_state", Sensor, queue_size=10)
-    for _ in range(10):
-        print("Publishing empty sensor state")
-        pub.publish(sensorData)
-        sleep(1)

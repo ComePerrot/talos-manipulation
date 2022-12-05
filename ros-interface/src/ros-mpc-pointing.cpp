@@ -103,8 +103,7 @@ int main(int argc, char** argv) {
   MOCAP_Interface Mocap = MOCAP_Interface();
 
   // Robot Interface
-  ROS_MPC_Interface Robot = ROS_MPC_Interface();
-  Robot.load(nh);
+  ROS_MPC_Interface Robot = ROS_MPC_Interface(nh);
 
   // Initialize MPC
   int use_mocap = MPC.get_settings().use_mocap;
