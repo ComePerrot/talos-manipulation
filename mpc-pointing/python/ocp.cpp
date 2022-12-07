@@ -47,6 +47,7 @@ void exposeOCPPointClass() {
           bp::args("self", "x0", "oMtarget"))
       .def<void (OCP_Point::*)(const ConstVectorRef &)>(
           "solve", &OCP_Point::solve, bp::args("self", "x_measured"))
+      .def("changeGoalCostActivation",&OCP_Point::changeGoalCostActivation, bp::args("index","value"))
       .add_property(
           "modelMaker",
           bp::make_function(
