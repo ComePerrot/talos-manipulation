@@ -27,8 +27,13 @@ from debug_ocp import (
 #  PARAMETERS  #
 ################
 
-enableGUI = True
-T_total = 500
+enableGUI = False
+T_total = 1000
+
+gainScheduling = False
+variablePosture = True
+
+goalTrackingWeight = 5
 
 modelPath = "/opt/openrobots/share/example-robot-data/robots/talos_data/"
 URDF = modelPath + "robots/talos_reduced.urdf"
@@ -82,23 +87,23 @@ oMtarget.translation[0] = 0.6
 oMtarget.translation[1] = 0.4
 oMtarget.translation[2] = 1.1
 
-beta = -np.pi * 0.5
-gamma = np.pi
-
-rotationY = np.array(
-    [[np.cos(beta), 0, -np.sin(beta)], [0, 1, 0], [np.sin(beta), 0, np.cos(beta)]]
-)
-rotationZ = np.array(
-    [[np.cos(gamma), np.sin(gamma), 0], [-np.sin(gamma), np.cos(gamma), 0], [0, 0, 1]]
-)
-
 oMtarget.rotation = np.array([[0, 0, -1], [0, -1, 0], [-1, 0, 0]])
-
-print(oMtarget.rotation)
 
 OCP = OCP_Point(OCPparams, pinWrapper)
 OCP.initialize(pinWrapper.get_x0(), oMtarget)
 print("OCP successfully loaded")
+
+x_ref = pinWrapper.get_x0().copy()
+x_ref[7 + 14 : 7 + 21] = [
+    -0.08419471,
+    0.425144,
+    0.00556666,
+    -1.50516856,
+    0.68574977,
+    0.18184998,
+    -0.07185897,
+]
+
 
 # Simulator
 simulator = TalosDeburringSimulator(
@@ -122,6 +127,7 @@ NcontrolKnots = 10
 state = OCP.modelMaker.getState()
 T = 0
 toolPlacement = pinWrapper.get_EndEff_frame()
+drillingState = 0
 
 while T < T_total:
     # Controller works faster than trajectory generation
@@ -146,13 +152,32 @@ while T < T_total:
 
     if T <= horizonLength:
         OCP.changeGoalCostActivation(horizonLength - T, True)
+        drillingState = 1
+        pass
+    elif T <= 2 * horizonLength:
+        drillingState = 2
+        pass
+    elif T <= 3 * horizonLength +1:
+        drillingState = 3
+        if gainScheduling:
+            goalTrackingWeight += 1
+            OCP.changeGoalTrackingWeights(goalTrackingWeight)
+        elif variablePosture:
+            OCP.changePostureReference(3 * horizonLength + 1 - T, x_ref)
 
     # Log robot data
+    plotter.logDrillingState(T, drillingState)
     plotter.logState(T, x_measured)
     plotter.logTorques(T, torques)
     plotter.logEndEffectorPos(T, toolPlacement.translation, oMtarget.translation)
 
     T += 1
+
+ddp = OCP.solver
+
+plot_state_from_dic(return_state_vector(ddp))
+plot_command(return_command_vector(ddp))
+plot_costs_from_dic(return_cost_vectors(ddp, weighted=True))
 
 simulator.end()
 print("Simulation ended")
