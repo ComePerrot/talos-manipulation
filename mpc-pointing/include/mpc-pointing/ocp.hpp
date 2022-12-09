@@ -58,7 +58,7 @@ class OCP_Point {
   void changeGoalCostActivation(const size_t index, const bool value);
   void changeGoaleTrackingWeights(double weight);
   void changePostureReference(const size_t index,
-                              const Eigen::Ref<const VectorXd>);
+                              const Eigen::Ref<const VectorXd> reference);
   const VectorXd &getFinalPosture();
 
   // Debug
