@@ -6,12 +6,12 @@ ROS_MPC_Interface::ROS_MPC_Interface(ros::NodeHandle nh) {
 
   // Robot sensor subscriber
   sensor_sub_ = nh.subscribe<linear_feedback_controller_msgs::Sensor>(
-      "sensor_state", 1, &ROS_MPC_Interface::SensorCb, this, hints);
+      "/linear_feedback_controller/sensor_state", 1, &ROS_MPC_Interface::SensorCb, this, hints);
 
   // Control publisher
   command_pub_.reset(
       new realtime_tools::RealtimePublisher<
-          linear_feedback_controller_msgs::Control>(nh, "command", 1));
+          linear_feedback_controller_msgs::Control>(nh, "/linear_feedback_controller/desired_control", 1));
 
   ros::Rate r(1);  // Rate for reading inital state from the robot
   while (sensor_msg_.header.stamp.toNSec() == 0) {
