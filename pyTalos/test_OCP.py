@@ -27,13 +27,34 @@ from debug_ocp import (
 #  PARAMETERS  #
 ################
 
-enableGUI = False
-T_total = 1000
+# Running cost
+# state
+# command
+# DCM
+# CoM
+# Wrench
+# Limit
+# Position
+# Orientation
+
+# Terminal cost
+# state
+# DCM
+# End-effector Velocity
+
+enableGUI = True
+plotResults = True
+plotCosts = False
+
+# Timing settings
+T_total = 500
+T_init = 50
+T_GainScheduling = 10
 
 gainScheduling = False
-variablePosture = True
+goalTrackingSlope = 0.5
 
-goalTrackingWeight = 5
+targetTolerance = 0.007
 
 modelPath = "/opt/openrobots/share/example-robot-data/robots/talos_data/"
 URDF = modelPath + "robots/talos_reduced.urdf"
@@ -93,17 +114,7 @@ OCP = OCP_Point(OCPparams, pinWrapper)
 OCP.initialize(pinWrapper.get_x0(), oMtarget)
 print("OCP successfully loaded")
 
-x_ref = pinWrapper.get_x0().copy()
-x_ref[7 + 14 : 7 + 21] = [
-    -0.08419471,
-    0.425144,
-    0.00556666,
-    -1.50516856,
-    0.68574977,
-    0.18184998,
-    -0.07185897,
-]
-
+ddp = OCP.solver
 
 # Simulator
 simulator = TalosDeburringSimulator(
@@ -127,9 +138,14 @@ NcontrolKnots = 10
 state = OCP.modelMaker.getState()
 T = 0
 toolPlacement = pinWrapper.get_EndEff_frame()
-drillingState = 0
 
-while T < T_total:
+goalTrackingWeight = 10
+drillingState = 0
+targetReached = 0
+reachTime = 0
+ddp = OCP.solver
+
+for T in range(T_total):
     # Controller works faster than trajectory generation
     for i_control in range(NcontrolKnots):
         if i_control == 0:
@@ -150,20 +166,22 @@ while T < T_total:
     # Update tool and target placement
     toolPlacement = pinWrapper.get_EndEff_frame()
 
-    if T <= horizonLength:
-        OCP.changeGoalCostActivation(horizonLength - T, True)
-        drillingState = 1
+    if T < T_init:
+        drillingState = 0
         pass
-    elif T <= 2 * horizonLength:
+    elif T <= horizonLength + T_init:
+        # Approach phase
+        drillingState = 1
+        OCP.changeGoalCostActivation(horizonLength + T_init - T, True)
+
+        if T > horizonLength + T_init - T_GainScheduling:
+            if gainScheduling:
+                goalTrackingWeight += goalTrackingSlope
+                OCP.changeGoalTrackingWeights(goalTrackingWeight)
+        pass
+    else:
         drillingState = 2
         pass
-    elif T <= 3 * horizonLength +1:
-        drillingState = 3
-        if gainScheduling:
-            goalTrackingWeight += 1
-            OCP.changeGoalTrackingWeights(goalTrackingWeight)
-        elif variablePosture:
-            OCP.changePostureReference(3 * horizonLength + 1 - T, x_ref)
 
     # Log robot data
     plotter.logDrillingState(T, drillingState)
@@ -171,15 +189,25 @@ while T < T_total:
     plotter.logTorques(T, torques)
     plotter.logEndEffectorPos(T, toolPlacement.translation, oMtarget.translation)
 
-    T += 1
+    errorPlacement = np.linalg.norm(toolPlacement.translation - oMtarget.translation)
 
-ddp = OCP.solver
+    if errorPlacement < targetTolerance:
+        if not targetReached:
+            targetReached = True
+            reachTime = T - T_init
+    else:
+        targetReached = False
 
-plot_state_from_dic(return_state_vector(ddp))
-plot_command(return_command_vector(ddp))
-plot_costs_from_dic(return_cost_vectors(ddp, weighted=True))
+    # Check stop condition
+    if toolPlacement.translation[1] > 1 or toolPlacement.translation[1] < 0:
+        break
 
 simulator.end()
 print("Simulation ended")
 
-plotter.plotResults()
+# Reporting performances
+print(errorPlacement / 1e-3)
+print(reachTime / 100)
+
+if plotResults:
+    plotter.plotResults()
