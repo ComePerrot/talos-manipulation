@@ -33,7 +33,6 @@ class OCP_Point {
   // OCP Problem Maker private functions
   void buildSolver(const VectorXd x0, SE3 oMtarget,
                    const ModelMakerSettings &modelMakerSettings);
-  void solveFirst(const VectorXd x);
 
   // OCP Problem Helper private functions
   ActionModel ama(const unsigned long time);
@@ -46,6 +45,7 @@ class OCP_Point {
   OCP_Point(const OCPSettings_Point &OCPSettings, const RobotWrapper &designer);
 
   void initialize(const ConstVectorRef &x0, const SE3 &oMtarget);
+  void solveFirst(const VectorXd x);
   void solve(const ConstVectorRef &measured_x);
 
   // OCP Problem Helper public functions

@@ -33,10 +33,10 @@ void OCP_Point::buildSolver(const VectorXd x0, SE3 oMtarget,
 
   // Deactivate Control related costs for the terminal model
   iam(settings_.horizon_length)->set_dt(0);
-  costs(settings_.horizon_length)->get_costs().at("actuationTask")->active = false;
+  costs(settings_.horizon_length)->get_costs().at("actuationTask")->active =
+      false;
   costs(settings_.horizon_length)->get_costs().at("wrench_LF")->active = false;
   costs(settings_.horizon_length)->get_costs().at("wrench_RF")->active = false;
-
 }
 
 void OCP_Point::solveFirst(const VectorXd x) {
