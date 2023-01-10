@@ -45,10 +45,14 @@ void exposeOCPPointClass() {
       .def<void (OCP_Point::*)(const ConstVectorRef &, const SE3 &)>(
           "initialize", &OCP_Point::initialize,
           bp::args("self", "x0", "oMtarget"))
+      .def<void (OCP_Point::*)(const VectorXd)>(
+          "solveFirst", &OCP_Point::solveFirst, bp::args("self", "x"))
       .def<void (OCP_Point::*)(const ConstVectorRef &)>(
           "solve", &OCP_Point::solve, bp::args("self", "x_measured"))
       .def("changeGoalCostActivation", &OCP_Point::changeGoalCostActivation,
            bp::args("index", "value"))
+      .def("changeTarget", &OCP_Point::changeTarget,
+           bp::args("index", "position"))
       .def("changeGoalTrackingWeights", &OCP_Point::changeGoaleTrackingWeights,
            bp::args("weight"))
       .def("changePostureReference", &OCP_Point::changePostureReference,
