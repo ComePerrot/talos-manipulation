@@ -31,12 +31,13 @@ enableGUI = True
 plotResults = True
 plotCosts = False
 
-targetPos = [0.4, 0.4, 1.1]
+targetPos_1 = [0.6, 0.4, 1.1]
+targetPos_2 = np.array([0.6, 0.4 + 0.1, 1.1])
 targetTolerance = 0.005
 
 # Timing settings
 T_total = 300
-T_init = 50
+T_init = 0
 
 # Gain Scheduling
 gainScheduling = False
@@ -102,9 +103,9 @@ pinWrapper.addEndEffectorFrame(
 
 # OCP
 oMtarget = pin.SE3.Identity()
-oMtarget.translation[0] = targetPos[0]
-oMtarget.translation[1] = targetPos[1]
-oMtarget.translation[2] = targetPos[2]
+oMtarget.translation[0] = targetPos_1[0]
+oMtarget.translation[1] = targetPos_1[1]
+oMtarget.translation[2] = targetPos_1[2]
 
 oMtarget.rotation = np.array([[0, 0, -1], [0, -1, 0], [-1, 0, 0]])
 
@@ -140,8 +141,7 @@ OCP.solveFirst(pinWrapper.get_x0())
 
 # plot_state_from_dic(return_state_vector(OCP.solver))
 
-print(OCP.solver.xs[-1][7 + 14 : 7 + 18])
-ref_leftArm = OCP.solver.xs[-1][7 + 14 : 7 + 18]
+# ref_leftArm = OCP.solver.xs[-1][7 + 14 : 7 + 18]
 
 for index in range(horizonLength):
     OCP.changeGoalCostActivation(index, False)
@@ -204,16 +204,22 @@ for T in range(T_total):
         if variablePosture:
             OCP.changePostureReference(index, x0)
         pass
-    else:
+    if T > horizonLength + T_init and T <= 2 * horizonLength + T_init:
         drillingState = 2
-        pass
+        index = 2 * horizonLength + T_init - T
 
-    # Log robot data
-    plotter.logDrillingState(T, drillingState)
-    plotter.logState(T, x_measured)
-    plotter.logTorques(T, torques)
-    plotter.logEndEffectorPos(T, toolPlacement.translation, oMtarget.translation)
+        if index == 0:
+            oMtarget.translation[0] = targetPos_2[0]
+            oMtarget.translation[1] = targetPos_2[1]
+            oMtarget.translation[2] = targetPos_2[2]
 
+        OCP.changeTarget(index, targetPos_2)
+
+    # else:
+    #     drillingState = 3
+    #     pass
+
+    # Checking if target is reached
     errorPlacement = np.linalg.norm(toolPlacement.translation - oMtarget.translation)
 
     if errorPlacement < targetTolerance:
@@ -222,6 +228,27 @@ for T in range(T_total):
             reachTime = T - T_init
     else:
         targetReached = False
+
+    # Log robot data
+    plotter.logDrillingState(T, drillingState)
+    plotter.logState(T, x_measured)
+    plotter.logTorques(T, torques)
+    plotter.logEndEffectorPos(T, toolPlacement.translation, oMtarget.translation)
+    plotter.logTargetReached(T, targetReached)
+
+    pin.forwardKinematics(
+        pinWrapper.get_rModel(),
+        pinWrapper.get_rData(),
+        x_measured[: pinWrapper.get_rModel().nq],
+        x_measured[-pinWrapper.get_rModel().nv :],
+    )
+    speed = pin.getFrameVelocity(
+        pinWrapper.get_rModel(),
+        pinWrapper.get_rData(),
+        pinWrapper.get_EndEff_id(),
+    ).linear
+
+    plotter.logEndEffectorSpeed(T, speed)
 
     # Check stop condition
     if toolPlacement.translation[1] > 1 or toolPlacement.translation[1] < 0:
