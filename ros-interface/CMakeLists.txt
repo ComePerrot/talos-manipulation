@@ -6,7 +6,7 @@ SET(PROJECT_DESCRIPTION "Ros interface for Talos manipulation MPC")
 SET(PROJECT_URL https://github.com/${PROJECT_NAMESPACE}/talos-manipulation)
 
 # Project configuration
-set(DCMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+set(PROJECT_USE_CMAKE_EXPORT TRUE)
 
 # Check if the submodule cmake have been initialized
 set(JRL_CMAKE_MODULES "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -38,6 +38,7 @@ add_compile_options(-Wno-error)
 # Project dependencies
 add_project_dependency(Eigen3 REQUIRED)
 add_project_dependency(sobec REQUIRED)
+add_project_dependency(mpc-pointing REQUIRED)
 
 set(CATKIN_COMPONENTS
   roscpp
@@ -74,7 +75,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC sobec::sobec Eigen3::Eigen)
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
 add_executable(ros_mpc_pointing src/ros-mpc-pointing.cpp)
-target_link_libraries(ros_mpc_pointing ${PROJECT_NAME} mpc-pointing sobec::sobec Eigen3::Eigen ${catkin_LIBRARIES})
+target_link_libraries(ros_mpc_pointing ${PROJECT_NAME} mpc-pointing::mpc-pointing sobec::sobec Eigen3::Eigen ${catkin_LIBRARIES})
 
 if(CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)

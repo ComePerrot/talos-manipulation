@@ -10,7 +10,7 @@ SET(PROJECT_URL https://github.com/${PROJECT_NAMESPACE}/talos-manipulation)
 option(BUILD_PYTHON_INTERFACE "Build the python binding" ON)
 
 # Project configuration
-set(DCMAKE_EXPORT_COMPILE_COMMANDS=1)
+set(PROJECT_USE_CMAKE_EXPORT TRUE)
 
 # Check if the submodule cmake have been initialized
 set(JRL_CMAKE_MODULES "${CMAKE_CURRENT_LIST_DIR}/cmake")
