@@ -71,7 +71,7 @@ SET(${PROJECT_NAME}_HEADERS
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
                                    ${${PROJECT_NAME}_HEADERS})
 target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
-target_link_libraries(${PROJECT_NAME} PUBLIC sobec::sobec Eigen3::Eigen)
+target_link_libraries(${PROJECT_NAME} PUBLIC sobec::sobec Eigen3::Eigen ${catkin_LIBRARIES})
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
 add_executable(ros_mpc_pointing src/ros-mpc-pointing.cpp)
