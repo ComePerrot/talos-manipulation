@@ -8,11 +8,11 @@ void OCP_Point::buildSolver(const VectorXd x0, SE3 oMtarget,
   auto runningModels = std::vector<ActionModel>(settings_.horizon_length);
 
   for (size_t i = 0; i < settings_.horizon_length; i++) {
-    runningModels[i] = modelMaker_.formulatePointingTask();
+    runningModels[i] = modelMaker_.formulateRunningPointingTask();
   }
 
   // Terminal model
-  auto terminalModel = modelMaker_.formulatePointingTask();
+  auto terminalModel = modelMaker_.formulateTerminalPointingTask();
 
   boost::shared_ptr<ShootingProblem> shooting_problem =
       boost::make_shared<ShootingProblem>(x0, runningModels, terminalModel);
@@ -30,13 +30,6 @@ void OCP_Point::buildSolver(const VectorXd x0, SE3 oMtarget,
        modelIndex++) {
     changeGoalCostActivation(modelIndex, false);
   }
-
-  // Deactivate Control related costs for the terminal model
-  iam(settings_.horizon_length)->set_dt(0);
-  costs(settings_.horizon_length)->get_costs().at("actuationTask")->active =
-      false;
-  costs(settings_.horizon_length)->get_costs().at("wrench_LF")->active = false;
-  costs(settings_.horizon_length)->get_costs().at("wrench_RF")->active = false;
 }
 
 void OCP_Point::solveFirst(const VectorXd x) {
