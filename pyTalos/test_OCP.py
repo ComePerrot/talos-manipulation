@@ -101,6 +101,98 @@ pinWrapper.addEndEffectorFrame(
     "deburring_tool", "gripper_left_fingertip_3_link", gripper_SE3_tool
 )
 
+rModel = pinWrapper.get_rModel()
+
+print(rModel.lowerPositionLimit[7:])
+
+rModel.lowerPositionLimit = np.array(
+    [
+        # Base
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        # Left leg
+        -0.35,
+        -0.52,
+        -2.10,
+        0.0,
+        -1.31,
+        -0.52,
+        # Right leg
+        -1.57,
+        -0.52,
+        -2.10,
+        0.0,
+        -1.31,
+        -0.52,
+        # Torso
+        -1.3,
+        -0.1,
+        # Left arm
+        -1.57,
+        -0.2,
+        -2.44,
+        -2.1,
+        -2.53,
+        -1.3,
+        -0.6,
+        # Right arm
+        -0.4,
+        -2.88,
+        -2.44,
+        -2.1,
+    ]
+)
+
+print(rModel.lowerPositionLimit[7:])
+
+rModel.upperPositionLimit = np.array(
+    [
+        # Base
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        # Left leg
+        1.57,
+        0.52,
+        0.7,
+        2.62,
+        0.77,
+        0.52,
+        # Right leg
+        0.35,
+        0.52,
+        0.7,
+        2.62,
+        0.77,
+        0.52,
+        # Torso
+        1.3,
+        0.78,
+        # Left arm
+        0.52,
+        2.88,
+        2.44,
+        0,
+        2.53,
+        1.3,
+        0.6,
+        # Right arm
+        1.57,
+        -0.2,
+        2.44,
+        0,
+    ]
+)
+
 # OCP
 oMtarget = pin.SE3.Identity()
 oMtarget.translation[0] = targetPos_1[0]
