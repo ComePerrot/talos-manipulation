@@ -6,6 +6,8 @@
 #include <ros/ros.h>
 #include <tf2_ros/transform_listener.h>
 
+#include <pal_statistics/pal_statistics_macros.h>
+
 #include "ros-interface/ros-mpc-interface.h"
 
 sobec::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
@@ -31,6 +33,19 @@ sobec::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   ROS_INFO_STREAM("Adding end effector frame to the robot model");
   designer.addEndEffectorFrame("deburring_tool",
                                "gripper_left_fingertip_3_link", gripperMtool);
+
+  // Loading custom model limits
+  std::vector<double> lowerPositionLimit;
+  nh.getParam("lowerPositionLimit", lowerPositionLimit);
+  std::vector<double> upperPositionLimit;
+  nh.getParam("lowerPositionLimit", upperPositionLimit);
+
+  std::vector<double>::size_type size_limit = lowerPositionLimit.size();
+
+  designer.updateModelLimits(
+      Eigen::VectorXd::Map(lowerPositionLimit.data(), (Eigen::Index)size_limit),
+      Eigen::VectorXd::Map(upperPositionLimit.data(),
+                           (Eigen::Index)size_limit));
 
   return (designer);
 }
@@ -119,6 +134,8 @@ int main(int argc, char** argv) {
   MPC.initialize(x0.head(MPC.get_designer().get_rModel().nq),
                  x0.tail(MPC.get_designer().get_rModel().nv), toolMtarget);
 
+  // Register Variables HERE:
+  
   while (ros::ok()) {
     if (use_mocap > 0) {
       toolMtarget = Mocap.get_toolMtarget();
@@ -131,6 +148,8 @@ int main(int argc, char** argv) {
     Robot.update(MPC.get_u0(), MPC.get_K0());
 
     ros::spinOnce();
+
+    PUBLISH_STATISTICS("/introspection_data");
   }
 
   return (0);

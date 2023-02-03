@@ -46,6 +46,7 @@ set(CATKIN_COMPONENTS
   realtime_tools
   eigen_conversions
   linear_feedback_controller_msgs
+  pal_statistics
   tf2_ros
 )
 
