@@ -33,18 +33,24 @@ sobec::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   designer.addEndEffectorFrame("deburring_tool",
                                "gripper_left_fingertip_3_link", gripperMtool);
 
-  // Loading custom model limits
-  // std::vector<double> lowerPositionLimit;
-  // nh.getParam("lowerPositionLimit", lowerPositionLimit);
-  // std::vector<double> upperPositionLimit;
-  // nh.getParam("lowerPositionLimit", upperPositionLimit);
+  bool useCustomLimits;
+  nh.getParam("custom_limits", useCustomLimits);
 
-  // std::vector<double>::size_type size_limit = lowerPositionLimit.size();
+  if (useCustomLimits) {
+    ROS_INFO_STREAM("Updating Limits");
+    // Loading custom model limits
+    std::vector<double> lowerPositionLimit;
+    nh.getParam("lowerPositionLimit", lowerPositionLimit);
+    std::vector<double> upperPositionLimit;
+    nh.getParam("lowerPositionLimit", upperPositionLimit);
 
-  // designer.updateModelLimits(
-  //     Eigen::VectorXd::Map(lowerPositionLimit.data(), (Eigen::Index)size_limit),
-  //     Eigen::VectorXd::Map(upperPositionLimit.data(),
-  //                          (Eigen::Index)size_limit));
+    std::vector<double>::size_type size_limit = lowerPositionLimit.size();
+
+    designer.updateModelLimits(Eigen::VectorXd::Map(lowerPositionLimit.data(),
+                                                    (Eigen::Index)size_limit),
+                               Eigen::VectorXd::Map(upperPositionLimit.data(),
+                                                    (Eigen::Index)size_limit));
+  }
 
   return (designer);
 }
