@@ -106,6 +106,7 @@ void OCPSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
   read_double(modelMakerSettings.wGripperPos, "wGripperPos");
   read_double(modelMakerSettings.wGripperRot, "wGripperRot");
   read_double(modelMakerSettings.wGripperVel, "wGripperVel");
+  read_double(modelMakerSettings.scaleLimits, "scaleLimits");
 
   read_stateWeights(modelMakerSettings.stateWeights);
   read_controlWeights(modelMakerSettings.controlWeights);
