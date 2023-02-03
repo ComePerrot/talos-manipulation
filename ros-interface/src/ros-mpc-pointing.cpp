@@ -2,11 +2,10 @@
 #include <sobec/walk-with-traj/designer.hpp>
 // Must be included first
 
+#include <pal_statistics/pal_statistics_macros.h>
 #include <ros/package.h>
 #include <ros/ros.h>
 #include <tf2_ros/transform_listener.h>
-
-#include <pal_statistics/pal_statistics_macros.h>
 
 #include "ros-interface/ros-mpc-interface.h"
 
@@ -35,17 +34,17 @@ sobec::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
                                "gripper_left_fingertip_3_link", gripperMtool);
 
   // Loading custom model limits
-  std::vector<double> lowerPositionLimit;
-  nh.getParam("lowerPositionLimit", lowerPositionLimit);
-  std::vector<double> upperPositionLimit;
-  nh.getParam("lowerPositionLimit", upperPositionLimit);
+  // std::vector<double> lowerPositionLimit;
+  // nh.getParam("lowerPositionLimit", lowerPositionLimit);
+  // std::vector<double> upperPositionLimit;
+  // nh.getParam("lowerPositionLimit", upperPositionLimit);
 
-  std::vector<double>::size_type size_limit = lowerPositionLimit.size();
+  // std::vector<double>::size_type size_limit = lowerPositionLimit.size();
 
-  designer.updateModelLimits(
-      Eigen::VectorXd::Map(lowerPositionLimit.data(), (Eigen::Index)size_limit),
-      Eigen::VectorXd::Map(upperPositionLimit.data(),
-                           (Eigen::Index)size_limit));
+  // designer.updateModelLimits(
+  //     Eigen::VectorXd::Map(lowerPositionLimit.data(), (Eigen::Index)size_limit),
+  //     Eigen::VectorXd::Map(upperPositionLimit.data(),
+  //                          (Eigen::Index)size_limit));
 
   return (designer);
 }
@@ -134,12 +133,8 @@ int main(int argc, char** argv) {
   MPC.initialize(x0.head(MPC.get_designer().get_rModel().nq),
                  x0.tail(MPC.get_designer().get_rModel().nv), toolMtarget);
 
-  // Register Variables HERE:
-  
   while (ros::ok()) {
-    if (use_mocap > 0) {
-      toolMtarget = Mocap.get_toolMtarget();
-    }
+    ros::Time updateTime = ros::Time::now();
 
     // Solving MPC iteration
     MPC.iterate(Robot.get_robotState(), toolMtarget);
@@ -147,7 +142,9 @@ int main(int argc, char** argv) {
     // Sending command to robot
     Robot.update(MPC.get_u0(), MPC.get_K0());
 
-    ros::spinOnce();
+    while ((ros::Time::now() - updateTime) < ros::Duration(0.01)) {
+      ros::spinOnce();
+    }
 
     PUBLISH_STATISTICS("/introspection_data");
   }
