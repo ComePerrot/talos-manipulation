@@ -39,7 +39,7 @@ ocp-point:
   wWrenchCone: 0
   wGripperPos: 5
   wGripperRot: 30
-  wGripperVel: 0.5
+  wGripperVel: 2
   scaleLimits: 1
   statePosWeights:
     base: [500, 500, 500, 1000, 1000, 1000]
