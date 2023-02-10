@@ -59,6 +59,7 @@ SET(${PROJECT_NAME}_HEADERS
 
 SET(${PROJECT_NAME}_SOURCES
     src/ocp.cpp
+    src/ocp-debug.cpp
     src/ocp-params.cpp
     src/ocp-problem-helper.cpp
     src/ocp-problem-maker.cpp
@@ -77,6 +78,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 if(BUILD_PYTHON_INTERFACE)
   add_subdirectory(python)
 endif()
+
+add_executable(testOCP tests/test_OCP.cpp )
+target_link_libraries(testOCP ${PROJECT_NAME})
 
 # Installation
 install(
