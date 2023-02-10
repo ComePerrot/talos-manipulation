@@ -18,7 +18,14 @@ void OCP_Point::buildSolver(const VectorXd x0, SE3 oMtarget,
       boost::make_shared<ShootingProblem>(x0, runningModels, terminalModel);
   solver_ = boost::make_shared<SolverFDDP>(shooting_problem);
 
-  // Change Torque Reference
+  // Change References
+  VectorXd postureReference = x0;
+  postureReference.tail(designer_.get_rModel().nv) =
+      VectorXd::Zero(designer_.get_rModel().nv);
+  for (size_t modelIndex = 0; modelIndex <= settings_.horizon_length;
+       modelIndex++) {
+    changePostureReference(modelIndex, postureReference);
+  }
   setBalancingTorques();
 
   // Change Target placemenet
