@@ -140,6 +140,7 @@ int main(int argc, char** argv) {
                  x0.tail(MPC.get_designer().get_rModel().nv), toolMtarget);
 
   while (ros::ok()) {
+    ros::spinOnce();
     ros::Time updateTime = ros::Time::now();
 
     // Solving MPC iteration
