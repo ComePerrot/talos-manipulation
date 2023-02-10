@@ -9,6 +9,27 @@
 
 namespace mpc_p {
 using namespace crocoddyl;
+
+struct OCP_debugData {
+ public:
+  std::vector<Eigen::VectorXd> xi;
+  std::vector<Eigen::VectorXd> ui;
+
+  std::vector<Eigen::VectorXd> xs;
+  std::vector<Eigen::VectorXd> us;
+  std::vector<crocoddyl::SolverFDDP::MatrixXdRowMajor> K;
+
+  template <class Archive>
+  void serialize(Archive &ar, const unsigned int version) {
+    ar &xi;
+    ar &ui;
+
+    ar &xs;
+    ar &us;
+    ar &K;
+  }
+};
+
 struct OCPSettings_Point {
   size_t horizon_length;
   ModelMakerSettings modelMakerSettings;
@@ -63,6 +84,17 @@ class OCP_Point {
 
   // Debug
   void printCosts();
+
+  std::vector<OCP_debugData> debugDataOCP_;
+
+  void logData(const std::vector<Eigen::VectorXd> &x_init,
+               const std::vector<Eigen::VectorXd> &u_init,
+               const std::vector<Eigen::VectorXd> &xs,
+               const std::vector<Eigen::VectorXd> &us,
+               const std::vector<crocoddyl::SolverFDDP::MatrixXdRowMajor> &K);
+  void dumpToFile(std::string fileName);
+  std::vector<OCP_debugData> fetchFromFile(std::string fileName);
+  void reprOCP();
 
   // Setters and Getters
 
