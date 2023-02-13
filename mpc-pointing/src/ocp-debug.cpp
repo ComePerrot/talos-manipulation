@@ -36,6 +36,20 @@ std::vector<OCP_debugData> OCP_Point::fetchFromFile(std::string name) {
 }
 
 void OCP_Point::reprOCP() {
+  auto modelContacts = dam(0)->get_contacts()->get_contacts();
+
+  // Contacts
+  for (auto contact : modelContacts) {
+    auto second = contact.second;
+
+    std::cout << second->name << std::endl;
+    std::cout << "  active: " << second->active << std::endl;
+    std::cout << "  ";
+    second->contact->print(std::cout);
+    std::cout << std::endl;
+  }
+
+  // Costs
   auto modelCosts = costs(0)->get_costs();
 
   for (auto cost : modelCosts) {
