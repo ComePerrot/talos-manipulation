@@ -6,6 +6,32 @@
 
 namespace mpc_p {
 
+struct MPC_command {
+ public:
+  Eigen::VectorXd us0;
+  Eigen::MatrixXd K0;
+
+  template <class Archive>
+  void serialize(Archive &ar, const unsigned int version) {
+    ar &us0;
+    ar &K0;
+  }
+};
+
+struct MPC_debugData {
+ public:
+  Eigen::VectorXd x_input;
+
+  MPC_command output;
+
+  template <class Archive>
+  void serialize(Archive &ar, const unsigned int version) {
+    ar &x_input;
+
+    ar &output;
+  }
+};
+
 struct MPCSettings_Point {
   // Timing parameters
   size_t T_initialization;
@@ -82,6 +108,16 @@ class MPC_Point {
                const SE3 &toolMtarget);
 
   const VectorXd &shapeState(const ConstVectorRef &q, const ConstVectorRef &v);
+
+  // Debug
+  std::vector<MPC_debugData> debugDataMPC_;
+
+  void logData(const Eigen::Ref<const Eigen::VectorXd> x_input,
+               const Eigen::Ref<const Eigen::VectorXd> us0,
+               const Eigen::Ref<const Eigen::MatrixXd> K0);
+
+  void dumpToFile(std::string name);
+  std::vector<MPC_debugData> fetchFromFile(std::string name);
 
   // getters and setters
   MPCSettings_Point &get_settings() { return settings_; }
