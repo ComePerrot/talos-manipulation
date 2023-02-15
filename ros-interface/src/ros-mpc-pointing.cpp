@@ -114,6 +114,7 @@ class MOCAP_Interface {
 int main(int argc, char** argv) {
   ros::init(argc, argv, "ros_mpc_pointing");
   ros::NodeHandle nh;
+  pal_statistics::RegistrationsRAII registered_variables;
 
   // Robot Desginer & MPC
   sobec::RobotDesigner pinWrapper = buildRobotDesigner(nh);
@@ -135,19 +136,31 @@ int main(int argc, char** argv) {
     toolMtarget = pinocchio::SE3::Identity();
   }
 
-  Eigen::VectorXd x0 = Robot.get_robotState();
-  MPC.initialize(x0.head(MPC.get_designer().get_rModel().nq),
-                 x0.tail(MPC.get_designer().get_rModel().nv), toolMtarget);
+  Eigen::VectorXd x = Robot.get_robotState();
+  MPC.initialize(x.head(MPC.get_designer().get_rModel().nq),
+                 x.tail(MPC.get_designer().get_rModel().nv), toolMtarget);
+
+  REGISTER_VARIABLE("/introspection_data", "sent-torque", &MPC.get_u0()[3],
+                    &registered_variables);
+
+  Eigen::VectorXd u0;
+  Eigen::MatrixXd K0;
 
   while (ros::ok()) {
     ros::spinOnce();
     ros::Time updateTime = ros::Time::now();
 
+    // Get state from Robot intergace
+    x = Robot.get_robotState();
+
     // Solving MPC iteration
-    MPC.iterate(Robot.get_robotState(), toolMtarget);
+    MPC.iterate(x, toolMtarget);
 
     // Sending command to robot
-    Robot.update(MPC.get_u0(), MPC.get_K0());
+    u0 = MPC.get_u0();
+    K0 = MPC.get_K0();
+
+    Robot.update(u0, u0);
 
     while ((ros::Time::now() - updateTime) < ros::Duration(0.01)) {
       ros::spinOnce();
