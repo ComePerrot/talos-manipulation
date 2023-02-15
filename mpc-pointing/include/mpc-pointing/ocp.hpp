@@ -94,7 +94,7 @@ class OCP_Point {
                const std::vector<crocoddyl::SolverFDDP::MatrixXdRowMajor> &K);
   void dumpToFile(std::string fileName);
   std::vector<OCP_debugData> fetchFromFile(std::string fileName);
-  void reprOCP();
+  void reprOCP(const unsigned long time);
 
   // Setters and Getters
 
