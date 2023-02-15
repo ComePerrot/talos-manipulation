@@ -36,7 +36,7 @@ void OCP_Point::setBalancingTorques() {
   }
 }
 void OCP_Point::updateGoalPosition(const Eigen::Ref<const Vector3d> &position) {
-  for (size_t modelIndex = 0; modelIndex < settings_.horizon_length;
+  for (size_t modelIndex = 0; modelIndex <= settings_.horizon_length;
        modelIndex++) {
     boost::static_pointer_cast<crocoddyl::ResidualModelFrameTranslation>(
         costs(modelIndex)
@@ -47,7 +47,7 @@ void OCP_Point::updateGoalPosition(const Eigen::Ref<const Vector3d> &position) {
   }
 }
 void OCP_Point::updateGoalRotation(const Eigen::Ref<const Matrix3d> &rotation) {
-  for (size_t modelIndex = 0; modelIndex < settings_.horizon_length;
+  for (size_t modelIndex = 0; modelIndex <= settings_.horizon_length;
        modelIndex++) {
     boost::static_pointer_cast<crocoddyl::ResidualModelFrameRotation>(
         costs(modelIndex)
