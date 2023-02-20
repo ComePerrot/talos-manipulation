@@ -42,7 +42,7 @@ sobec::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
     std::vector<double> lowerPositionLimit;
     nh.getParam("lowerPositionLimit", lowerPositionLimit);
     std::vector<double> upperPositionLimit;
-    nh.getParam("lowerPositionLimit", upperPositionLimit);
+    nh.getParam("upperPositionLimit", upperPositionLimit);
 
     std::vector<double>::size_type size_limit = lowerPositionLimit.size();
 
@@ -140,15 +140,18 @@ int main(int argc, char** argv) {
   MPC.initialize(x.head(MPC.get_designer().get_rModel().nq),
                  x.tail(MPC.get_designer().get_rModel().nv), toolMtarget);
 
-  REGISTER_VARIABLE("/introspection_data", "sent-torque", &MPC.get_u0()[3],
+  REGISTER_VARIABLE("/introspection_data", "reachedCartesianPosition",
+                    &MPC.get_designer().get_EndEff_frame().translation().x(),
                     &registered_variables);
+  REGISTER_VARIABLE("/introspection_data", "desiredCartesianPosition",
+                    &MPC.get_Target_frame().translation().x(), &registered_variables);
 
   Eigen::VectorXd u0;
   Eigen::MatrixXd K0;
 
+  ros::Rate r(100);
   while (ros::ok()) {
     ros::spinOnce();
-    ros::Time updateTime = ros::Time::now();
 
     // Get state from Robot intergace
     x = Robot.get_robotState();
@@ -160,13 +163,11 @@ int main(int argc, char** argv) {
     u0 = MPC.get_u0();
     K0 = MPC.get_K0();
 
-    Robot.update(u0, u0);
-
-    while ((ros::Time::now() - updateTime) < ros::Duration(0.01)) {
-      ros::spinOnce();
-    }
+    Robot.update(u0, K0);
 
     PUBLISH_STATISTICS("/introspection_data");
+
+    r.sleep();
   }
 
   return (0);
