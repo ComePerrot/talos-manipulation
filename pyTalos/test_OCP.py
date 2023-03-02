@@ -29,7 +29,7 @@ from debug_ocp import (
 ################
 
 enableGUI = True
-plotResults = True
+plotResults = False
 plotCosts = False
 
 targetPos_1 = [0.6, 0.4, 1.1]
@@ -133,7 +133,7 @@ rModel.lowerPositionLimit = np.array(
         -0.1,
         # Left arm
         -1.57,
-        -0.2,
+        0.2,
         -2.44,
         -2.1,
         -2.53,
@@ -143,7 +143,7 @@ rModel.lowerPositionLimit = np.array(
         -0.4,
         -2.88,
         -2.44,
-        -2.1,
+        -2,
     ]
 )
 
@@ -232,7 +232,7 @@ OCP.solveFirst(pinWrapper.get_x0())
 xs_init = ddp.xs.tolist()
 us_init = ddp.us.tolist()
 
-with open('test_withTarget.pkl', 'wb') as file:
+with open("test_withTarget.pkl", "wb") as file:
     pickle.dump(pinWrapper.get_x0(), file)
     pickle.dump(xs_init, file)
     pickle.dump(us_init, file)
@@ -249,7 +249,7 @@ OCP.solveFirst(pinWrapper.get_x0())
 xs_init = ddp.xs.tolist()
 us_init = ddp.us.tolist()
 
-with open('test_withoutTarget.pkl', 'wb') as file:
+with open("test_withoutTarget.pkl", "wb") as file:
     pickle.dump(pinWrapper.get_x0(), file)
     pickle.dump(xs_init, file)
     pickle.dump(us_init, file)

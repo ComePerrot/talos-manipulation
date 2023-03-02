@@ -97,10 +97,10 @@ class OCP_Point {
   void reprOCP(const unsigned long time);
 
   // Setters and Getters
-
   const VectorXd get_torque();
   const MatrixXd get_gain();
 
+  OCPSettings_Point &get_settings() { return settings_; };
   DDP get_solver() { return (solver_); };
   ModelMaker &get_modelMaker() { return (modelMaker_); };
   size_t get_initialized() { return (initialized_); };

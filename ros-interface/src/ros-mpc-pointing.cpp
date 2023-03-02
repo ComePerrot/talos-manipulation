@@ -140,16 +140,22 @@ int main(int argc, char** argv) {
   MPC.initialize(x.head(MPC.get_designer().get_rModel().nq),
                  x.tail(MPC.get_designer().get_rModel().nv), toolMtarget);
 
+  for (size_t i = 0; i <= MPC.get_OCP().get_horizonLength(); i++) {
+    MPC.get_OCP().reprOCP(i);
+  }
+
   REGISTER_VARIABLE("/introspection_data", "reachedCartesianPosition",
                     &MPC.get_designer().get_EndEff_frame().translation().x(),
                     &registered_variables);
   REGISTER_VARIABLE("/introspection_data", "desiredCartesianPosition",
-                    &MPC.get_Target_frame().translation().x(), &registered_variables);
+                    &MPC.get_Target_frame().translation().x(),
+                    &registered_variables);
 
   Eigen::VectorXd u0;
   Eigen::MatrixXd K0;
 
-  ros::Rate r(100);
+  ros::Rate r(static_cast<double>(
+      1 / MPC.get_OCP().get_settings().modelMakerSettings.timeStep));
   while (ros::ok()) {
     ros::spinOnce();
 
