@@ -80,7 +80,7 @@ int main() {
   std::vector<mpc_p::OCP_debugData>::size_type testCase = 0;
   std::vector<mpc_p::OCP_debugData> debugData = OCP.fetchFromFile(
       "/local/users/cperrot/ws_wbmpc/archives/"
-      "CommandCost.txt");
+      "OCP_CommandCost.txt");
 
   // Initialize OCP with the same initial state
 

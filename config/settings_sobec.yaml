@@ -37,7 +37,7 @@ ocp-point:
   wPCoM: 500
   wVCoM: 0
   wWrenchCone: 0
-  wGripperPos: 5
+  wGripperPos: 7
   wGripperRot: 30
   wGripperVel: 2
   scaleLimits: 1
