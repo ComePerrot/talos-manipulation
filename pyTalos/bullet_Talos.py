@@ -54,8 +54,20 @@ class TalosDeburringSimulator:
         """
         # Start the PyBullet client
         if enableGUI:
-            self.physicsClient = p.connect(p.GUI)
+            self.physicsClient = p.connect(
+                p.GUI, options='--mp4="test.mp4" --mp4fps=1000'
+            )
             p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
+            p.configureDebugVisualizer(p.COV_ENABLE_SINGLE_STEP_RENDERING, 1)
+
+            p.resetDebugVisualizerCamera(
+                cameraDistance=1.2,
+                cameraYaw=160,
+                cameraPitch=-20,
+                cameraTargetPosition=[0, 0, 1.0],
+                physicsClientId=self.physicsClient,
+            )
+
         else:
             self.physicsClient = p.connect(p.DIRECT)
 
@@ -258,6 +270,7 @@ class TalosDeburringSimulator:
         self._setObjectPosition(self.target_MPC, oMtarget)
         self._applyTorques(torques)
         p.stepSimulation()
+        p.configureDebugVisualizer(p.COV_ENABLE_SINGLE_STEP_RENDERING, 1)
 
     def _applyTorques(self, torques):
         """Apply computed torques to the robot

@@ -251,7 +251,7 @@ void MPC_Point::updateOCP() {
         iteration_++;
       } else {
         iteration_ = 0;
-        drilling_state_ = 3;
+        drilling_state_ = 2;
       }
       break;
 
