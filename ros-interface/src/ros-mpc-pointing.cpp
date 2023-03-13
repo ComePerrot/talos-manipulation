@@ -158,6 +158,7 @@ int main(int argc, char** argv) {
     // Get state from Robot intergace
     x = Robot.get_robotState();
 
+
     // Solving MPC iteration
     MPC.iterate(x, toolMtarget);
 
