@@ -37,7 +37,7 @@ ocp-point:
   wPCoM: 500
   wVCoM: 0
   wWrenchCone: 0
-  wGripperPos: 7
+  wGripperPos: 5
   wGripperRot: 30
   wGripperVel: 2
   scaleLimits: 1
@@ -68,11 +68,11 @@ mpc-point:
   T_drilling: 100
   targetPos: [0.6,0.4,1.1]
   holes_offsets: [
-    [0,0,0],
-    [-0.078,0,0],
-    [-0.078,-0.045,0],
-    [0,-0.045,0]
-  ]
+    [0,0,0]]
+  #   [-0.078,0,0],
+  #   [-0.078,-0.045,0],
+  #   [0,-0.045,0]
+  # ]
   backwardOffset: 0.05
   tolerance: 0.005
   maxGoalWeight: 100

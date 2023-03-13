@@ -7,7 +7,6 @@
 import pinocchio as pin
 import numpy as np
 import yaml
-import pickle
 
 from sobec import RobotDesigner
 from mpc_pointing import OCP_Point, OCPSettings_Point
@@ -15,14 +14,14 @@ from mpc_pointing import OCP_Point, OCPSettings_Point
 from bullet_Talos import TalosDeburringSimulator
 from plotter import TalosPlotter
 
-from debug_ocp import (
-    plot_costs_from_dic,
-    return_cost_vectors,
-    plot_command,
-    return_command_vector,
-    plot_state_from_dic,
-    return_state_vector,
-)
+# from debug_ocp import (
+#     plot_costs_from_dic,
+#     return_cost_vectors,
+#     plot_command,
+#     return_command_vector,
+#     plot_state_from_dic,
+#     return_state_vector,
+# )
 
 ################
 #  PARAMETERS  #
@@ -232,10 +231,6 @@ OCP.solveFirst(pinWrapper.get_x0())
 xs_init = ddp.xs.tolist()
 us_init = ddp.us.tolist()
 
-with open("test_withTarget.pkl", "wb") as file:
-    pickle.dump(pinWrapper.get_x0(), file)
-    pickle.dump(xs_init, file)
-    pickle.dump(us_init, file)
 
 # plot_state_from_dic(return_state_vector(OCP.solver))
 
@@ -248,11 +243,6 @@ OCP.solveFirst(pinWrapper.get_x0())
 # Serialize initial resolution data
 xs_init = ddp.xs.tolist()
 us_init = ddp.us.tolist()
-
-with open("test_withoutTarget.pkl", "wb") as file:
-    pickle.dump(pinWrapper.get_x0(), file)
-    pickle.dump(xs_init, file)
-    pickle.dump(us_init, file)
 
 ###############
 #  MAIN LOOP  #

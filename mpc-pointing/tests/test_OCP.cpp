@@ -70,7 +70,7 @@ int main() {
 
   //  OCP
   std::string parameterFileOCP =
-      "/local/users/cperrot/ws_wbmpc/src/talos-manipulation/config/"
+      "/home/cperrot/workspaces/wbDeburring/src/talos-manipulation/config/"
       "settings_sobec.yaml";
   mpc_p::OCPSettings_Point ocpSettings = mpc_p::OCPSettings_Point();
   ocpSettings.readParamsFromYamlFile(parameterFileOCP);
@@ -79,8 +79,8 @@ int main() {
   // Load data from serialized file
   std::vector<mpc_p::OCP_debugData>::size_type testCase = 0;
   std::vector<mpc_p::OCP_debugData> debugData = OCP.fetchFromFile(
-      "/local/users/cperrot/ws_wbmpc/archives/"
-      "OCP_CommandCost.txt");
+      "/home/cperrot/workspaces/archives/"
+      "OCP_2.txt");
 
   // Initialize OCP with the same initial state
 
