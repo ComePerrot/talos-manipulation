@@ -140,10 +140,6 @@ int main(int argc, char** argv) {
   MPC.initialize(x.head(MPC.get_designer().get_rModel().nq),
                  x.tail(MPC.get_designer().get_rModel().nv), toolMtarget);
 
-  for (size_t i = 0; i <= MPC.get_OCP().get_horizonLength(); i++) {
-    MPC.get_OCP().reprOCP(i);
-  }
-
   REGISTER_VARIABLE("/introspection_data", "reachedCartesianPosition",
                     &MPC.get_designer().get_EndEff_frame().translation().x(),
                     &registered_variables);
