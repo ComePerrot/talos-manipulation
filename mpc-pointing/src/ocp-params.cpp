@@ -97,19 +97,17 @@ void OCPSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
 
   read_size_t(horizon_length, "horizon_length");
 
-  read_double(modelMakerSettings.wStateReg, "wStateReg");
-  read_double(modelMakerSettings.wControlReg, "wControlReg");
-  read_double(modelMakerSettings.wLimit, "wLimit");
-  read_double(modelMakerSettings.wPCoM, "wPCoM");
-  read_double(modelMakerSettings.wVCoM, "wVCoM");
-  read_double(modelMakerSettings.wWrenchCone, "wWrenchCone");
-  read_double(modelMakerSettings.wGripperPos, "wGripperPos");
-  read_double(modelMakerSettings.wGripperRot, "wGripperRot");
-  read_double(modelMakerSettings.wGripperVel, "wGripperVel");
-  read_double(modelMakerSettings.scaleLimits, "scaleLimits");
+  read_double(wStateReg, "wStateReg");
+  read_double(wControlReg, "wControlReg");
+  read_double(wLimit, "wLimit");
+  read_double(wPCoM, "wPCoM");
+  read_double(wGripperPos, "wGripperPos");
+  read_double(wGripperRot, "wGripperRot");
+  read_double(wGripperVel, "wGripperVel");
+  read_double(scaleLimits, "scaleLimits");
 
-  read_stateWeights(modelMakerSettings.stateWeights);
-  read_controlWeights(modelMakerSettings.controlWeights);
+  read_stateWeights(stateWeights);
+  read_controlWeights(controlWeights);
 }
 
 void OCPSettings_Point::readParamsFromYamlFile(const std::string &Filename) {

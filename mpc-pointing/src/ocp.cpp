@@ -2,7 +2,7 @@
 
 namespace mpc_p {
 OCP_Point::OCP_Point(const OCPSettings_Point &OCPSettings,
-                     const RobotWrapper &designer)
+                     const RobotDesigner &designer)
     : settings_(OCPSettings), designer_(designer) {}
 
 void OCP_Point::initialize(const ConstVectorRef &x0,
@@ -11,7 +11,7 @@ void OCP_Point::initialize(const ConstVectorRef &x0,
     throw std::runtime_error("The designer must be initialized.");
   }
 
-  buildSolver(x0, oMtarget, settings_.modelMakerSettings);
+  buildSolver(x0, oMtarget);
   solveFirst(x0);
 
   initialized_ = true;
