@@ -48,9 +48,10 @@ if(BUILD_PYTHON_INTERFACE)
 endif()
 add_project_dependency(ndcurves REQUIRED)
 add_project_dependency(crocoddyl REQUIRED)
-add_project_dependency(sobec REQUIRED)
+add_project_dependency(yaml-cpp REQUIRED)
 
 SET(${PROJECT_NAME}_HEADERS
+    include/${PROJECT_NAME}/designer.hpp
     include/${PROJECT_NAME}/fwd.hpp
     include/${PROJECT_NAME}/python-fwd.hpp
     include/${PROJECT_NAME}/ocp.hpp
@@ -58,7 +59,9 @@ SET(${PROJECT_NAME}_HEADERS
 )
 
 SET(${PROJECT_NAME}_SOURCES
+    src/designer.cpp
     src/ocp.cpp
+    src/ocp-cost-library.cpp
     src/ocp-debug.cpp
     src/ocp-params.cpp
     src/ocp-problem-helper.cpp
@@ -71,7 +74,7 @@ SET(${PROJECT_NAME}_SOURCES
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
                                    ${${PROJECT_NAME}_HEADERS})
 target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
-target_link_libraries(${PROJECT_NAME} PUBLIC crocoddyl::crocoddyl sobec::sobec
+target_link_libraries(${PROJECT_NAME} PUBLIC crocoddyl::crocoddyl
                                              yaml-cpp)
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 

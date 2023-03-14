@@ -2,6 +2,7 @@
 #define MPC_P
 
 #include "mpc-pointing/fwd.hpp"
+#include "mpc-pointing/designer.hpp"
 #include "mpc-pointing/ocp.hpp"
 
 namespace mpc_p {
@@ -59,7 +60,7 @@ struct MPCSettings_Point {
 class MPC_Point {
  private:
   MPCSettings_Point settings_;
-  RobotWrapper designer_;
+  RobotDesigner designer_;
   OCP_Point OCP_;
 
   VectorXd x0_;
@@ -97,7 +98,7 @@ class MPC_Point {
 
  public:
   MPC_Point(const MPCSettings_Point &settings,
-            const OCPSettings_Point &OCPSettings, const RobotWrapper &designer);
+            const OCPSettings_Point &OCPSettings, const RobotDesigner &designer);
 
   void initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
                   const SE3 &toolMtarget);
@@ -137,8 +138,8 @@ class MPC_Point {
   OCP_Point &get_OCP() { return OCP_; }
   void set_OCP(const OCP_Point &OCP) { OCP_ = OCP; }
 
-  RobotWrapper &get_designer() { return designer_; }
-  void set_designer(const RobotWrapper &designer) { designer_ = designer; }
+  RobotDesigner &get_designer() { return designer_; }
+  void set_designer(const RobotDesigner &designer) { designer_ = designer; }
 };
 }  // namespace mpc_p
 

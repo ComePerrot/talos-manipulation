@@ -26,12 +26,7 @@ void exposeOCPPointParams() {
       .add_property("horizon_length",
                     bp::make_getter(&OCPSettings_Point::horizon_length),
                     bp::make_setter(&OCPSettings_Point::horizon_length),
-                    "Number of nodes in the horizon")
-      .add_property(
-          "modelMakerSettings",
-          bp::make_getter(&OCPSettings_Point::modelMakerSettings),
-          bp::make_setter(&OCPSettings_Point::modelMakerSettings),
-          "Structure containing all the parameters to create the problem.");
+                    "Number of nodes in the horizon");
 }
 
 void exposeOCPPointClass() {
@@ -39,7 +34,7 @@ void exposeOCPPointClass() {
 
   bp::class_<OCP_Point>(
       "OCP_Point",
-      bp::init<const OCPSettings_Point &, const RobotWrapper &>(
+      bp::init<const OCPSettings_Point &, const RobotDesigner &>(
           bp::args("self", "OCPSettings", "designer"),
           "Initialize the OCP from parameter list and a robot designer"))
       .def<void (OCP_Point::*)(const ConstVectorRef &, const SE3 &)>(
@@ -57,11 +52,6 @@ void exposeOCPPointClass() {
            bp::args("weight"))
       .def("changePostureReference", &OCP_Point::changePostureReference,
            bp::args("index", "reference"))
-      .add_property(
-          "modelMaker",
-          bp::make_function(
-              &OCP_Point::get_modelMaker,
-              bp::return_value_policy<bp::reference_existing_object>()))
       .add_property("solver", &OCP_Point::get_solver)
       .add_property("torque", &OCP_Point::get_torque,
                     "Torque command computed by the OCP")
