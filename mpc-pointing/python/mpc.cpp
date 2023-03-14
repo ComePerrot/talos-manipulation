@@ -68,7 +68,7 @@ void exposeMPCPointClass() {
 
   bp::class_<MPC_Point>(
       "MPC_Point", bp::init<const MPCSettings_Point &,
-                            const OCPSettings_Point &, const RobotWrapper &>(
+                            const OCPSettings_Point &, const RobotDesigner &>(
                        bp::args("self", "settings", "OCPSettings", "designer"),
                        "Initialize the MPC (empty init)"))
       .def<void (MPC_Point::*)(const ConstVectorRef &, const ConstVectorRef &,

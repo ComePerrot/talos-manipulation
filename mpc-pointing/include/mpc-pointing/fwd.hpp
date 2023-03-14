@@ -10,6 +10,7 @@
 
 namespace mpc_p {
 // Eigen
+using Vector2d = Eigen::Vector2d;
 using Vector3d = Eigen::Vector3d;
 using VectorXd = Eigen::VectorXd;
 using Matrix3d = Eigen::Matrix3d;
@@ -30,11 +31,7 @@ using ActionData = boost::shared_ptr<crocoddyl::ActionDataAbstract>;
 using DifferentialActionModel =
     boost::shared_ptr<crocoddyl::DifferentialActionModelContactFwdDynamics>;
 using CostModelSum = boost::shared_ptr<crocoddyl::CostModelSum>;
-
-// Sobec
-using RobotWrapper = sobec::RobotDesigner;
-using ModelMaker = sobec::ModelMaker;
-using ModelMakerSettings = sobec::ModelMakerSettings;
+using Contact = boost::shared_ptr<crocoddyl::ContactModelMultiple>;
 }  // namespace mpc_p
 
 #endif  // MPC_P_FWD

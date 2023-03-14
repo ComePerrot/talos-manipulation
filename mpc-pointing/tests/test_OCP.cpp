@@ -5,8 +5,8 @@
 int main() {
   // Create OCP from configuration files
   //  Robot designer
-  sobec::RobotDesignerSettings designerSettings =
-      sobec::RobotDesignerSettings();
+  mpc_p::RobotDesignerSettings designerSettings =
+      mpc_p::RobotDesignerSettings();
 
   designerSettings.controlledJointsNames = {
       "root_joint",        "leg_left_1_joint",  "leg_left_2_joint",
@@ -27,7 +27,7 @@ int main() {
       "/opt/openrobots/share/example-robot-data/robots/talos_data/srdf/"
       "talos.srdf";
 
-  sobec::RobotDesigner pinWrapper = sobec::RobotDesigner(designerSettings);
+  mpc_p::RobotDesigner pinWrapper = mpc_p::RobotDesigner(designerSettings);
 
   pinocchio::SE3 gripperMtool = pinocchio::SE3::Identity();
   gripperMtool.translation().x() = 0;

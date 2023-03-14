@@ -6,10 +6,10 @@ namespace mpc_p {
 
 MPC_Point::MPC_Point(const MPCSettings_Point &settings,
                      const OCPSettings_Point &OCPSettings,
-                     const RobotWrapper &designer)
+                     const RobotDesigner &designer)
     : settings_(settings), designer_(designer), OCP_(OCPSettings, designer_) {
   backwardOffset_.translation().z() = settings_.backwardOffset;
-  goal_weight_ = OCP_.get_settings().modelMakerSettings.wGripperPos;
+  goal_weight_ = OCP_.get_settings().wGripperPos;
   for (auto offset : settings_.holes_offsets) {
     holes_offsets_.push_back(SE3(Matrix3d::Identity(), offset));
   }
@@ -35,21 +35,6 @@ void MPC_Point::initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
 
   initialized_ = true;
 }
-
-// void MPC_Point::initialize(const VectorXd &x0, const SE3 &toolMtarget) {
-//   x0_ = x0;
-//   designer_.updateReducedModel(x0_);
-
-//   // Setup target
-//   setTarget(toolMtarget);
-
-//   // Init OCP
-//   OCP_.initialize(x0_, oMtarget_);
-//   u0_ = OCP_.get_torque();
-//   K0_ = OCP_.get_gain();
-
-//   initialized_ = true;
-// }
 
 void MPC_Point::iterate(const ConstVectorRef &q_current,
                         const ConstVectorRef &v_current,
@@ -219,7 +204,7 @@ void MPC_Point::updateOCP() {
       if (iteration_ == 0) {
         std::cout << "Getting out of the hole" << std::endl;
         if (settings_.use_gainScheduling == 1) {
-          goal_weight_ = OCP_.get_settings().modelMakerSettings.wGripperPos;
+          goal_weight_ = OCP_.get_settings().wGripperPos;
           OCP_.changeGoaleTrackingWeights(goal_weight_);
         }
         oMbackwardHole_ = list_oMhole_[current_hole_].act(backwardOffset_);
