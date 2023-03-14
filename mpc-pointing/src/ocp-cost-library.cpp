@@ -65,13 +65,15 @@ void OCP_Point::defineJointLimits(CostModelSum &costCollector,
   double inf = 9999.0;
   lower_bound << Eigen::VectorXd::Constant(6, -inf),
       designer_.get_rModel().lowerPositionLimit.tail(
-          (Eigen::Index)state_->get_nq() - 7),
-      Eigen::VectorXd::Constant((Eigen::Index)state_->get_nv(), -inf);
+          static_cast<Eigen::Index>(state_->get_nq() - 7)),
+      Eigen::VectorXd::Constant(static_cast<Eigen::Index>(state_->get_nv()),
+                                -inf);
 
   upper_bound << Eigen::VectorXd::Constant(6, inf),
       designer_.get_rModel().upperPositionLimit.tail(
-          (Eigen::Index)state_->get_nq() - 7),
-      Eigen::VectorXd::Constant((Eigen::Index)state_->get_nv(), inf);
+          static_cast<Eigen::Index>(state_->get_nq() - 7)),
+      Eigen::VectorXd::Constant(static_cast<Eigen::Index>(state_->get_nv()),
+                                inf);
 
   crocoddyl::ActivationBounds bounds =
       crocoddyl::ActivationBounds(lower_bound, upper_bound, boundScale);

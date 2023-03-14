@@ -149,8 +149,7 @@ int main(int argc, char** argv) {
   Eigen::VectorXd u0;
   Eigen::MatrixXd K0;
 
-  ros::Rate r(static_cast<double>(
-      1 / MPC.get_OCP().get_settings().timeStep));
+  ros::Rate r(static_cast<double>(1 / MPC.get_OCP().get_settings().timeStep));
   while (ros::ok()) {
     ros::spinOnce();
 
