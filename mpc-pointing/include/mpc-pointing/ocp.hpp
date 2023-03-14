@@ -6,9 +6,10 @@
 #include <pinocchio/fwd.hpp>
 // include pinocchio first
 #include "mpc-pointing/fwd.hpp"
+#include "mpc-pointing/designer.hpp"
 
 namespace mpc_p {
-using namespace crocoddyl;
+// using namespace crocoddyl;
 
 struct OCP_debugData {
  public:
@@ -32,7 +33,25 @@ struct OCP_debugData {
 
 struct OCPSettings_Point {
   size_t horizon_length;
-  ModelMakerSettings modelMakerSettings;
+  // Timing
+  double timeStep = 0.01;
+
+  // Croco configuration
+  double wStateReg = 0;
+  double wControlReg = 0;
+  double wLimit = 0;
+  double wPCoM = 0;
+  double wGripperPos = 0;
+  double wGripperRot = 0;
+  double wGripperVel = 0;
+
+  double scaleLimits = 1;
+
+  Eigen::VectorXd stateWeights;
+  Eigen::VectorXd controlWeights;
+
+  double th_stop = 1e-6;  // threshold for stopping criterion
+  double th_grad = 1e-9;  // threshold for zero gradient.
 
   void readParamsFromYamlString(std::string &StringToParse);
   void readParamsFromYamlFile(const std::string &Filename);
@@ -41,9 +60,11 @@ struct OCPSettings_Point {
 class OCP_Point {
  private:
   OCPSettings_Point settings_;
-  RobotWrapper designer_;
-  ModelMaker modelMaker_;
+  RobotDesigner designer_;
   DDP solver_;
+
+  boost::shared_ptr<crocoddyl::StateMultibody> state_;
+  boost::shared_ptr<crocoddyl::ActuationModelFloatingBase> actuation_;
 
   bool initialized_ = false;
 
@@ -52,8 +73,20 @@ class OCP_Point {
   std::vector<VectorXd> warm_us_;
 
   // OCP Problem Maker private functions
-  void buildSolver(const VectorXd x0, SE3 oMtarget,
-                   const ModelMakerSettings &modelMakerSettings);
+  void buildSolver(const VectorXd x0, SE3 oMtarget);
+  ActionModel formulatePointingTask();
+  void defineFeetContact(Contact &contactCollector);
+  void definePostureTask(CostModelSum &costCollector, const double wStateReg);
+  void defineActuationTask(CostModelSum &costCollector,
+                           const double wControlReg);
+  void defineJointLimits(CostModelSum &costCollector, const double wLimit,
+                         const double boundScale);
+  void defineCoMPosition(CostModelSum &costCollector, const double wPCoM);
+  void defineGripperPlacement(CostModelSum &costCollector,
+                              const double wGripperPos,
+                              const double wGripperRot);
+  void defineGripperVelocity(CostModelSum &costCollector,
+                             const double wGripperVel);
 
   // OCP Problem Helper private functions
   ActionModel ama(const unsigned long time);
@@ -63,7 +96,7 @@ class OCP_Point {
   ActionData ada(const unsigned long time);
 
  public:
-  OCP_Point(const OCPSettings_Point &OCPSettings, const RobotWrapper &designer);
+  OCP_Point(const OCPSettings_Point &OCPSettings, const RobotDesigner &designer);
 
   void initialize(const ConstVectorRef &x0, const SE3 &oMtarget);
   void solveFirst(const VectorXd x);
@@ -102,7 +135,6 @@ class OCP_Point {
 
   OCPSettings_Point &get_settings() { return settings_; };
   DDP get_solver() { return (solver_); };
-  ModelMaker &get_modelMaker() { return (modelMaker_); };
   size_t get_initialized() { return (initialized_); };
   size_t get_horizonLength() { return (settings_.horizon_length); };
 };
