@@ -5,8 +5,8 @@
 
 #include <pinocchio/fwd.hpp>
 // include pinocchio first
-#include "mpc-pointing/fwd.hpp"
 #include "mpc-pointing/designer.hpp"
+#include "mpc-pointing/fwd.hpp"
 
 namespace mpc_p {
 // using namespace crocoddyl;
@@ -21,7 +21,7 @@ struct OCP_debugData {
   std::vector<crocoddyl::SolverFDDP::MatrixXdRowMajor> K;
 
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int version) {
+  void serialize(Archive &ar, const unsigned int /*version*/) {
     ar &xi;
     ar &ui;
 
@@ -96,7 +96,8 @@ class OCP_Point {
   ActionData ada(const unsigned long time);
 
  public:
-  OCP_Point(const OCPSettings_Point &OCPSettings, const RobotDesigner &designer);
+  OCP_Point(const OCPSettings_Point &OCPSettings,
+            const RobotDesigner &designer);
 
   void initialize(const ConstVectorRef &x0, const SE3 &oMtarget);
   void solveFirst(const VectorXd x);

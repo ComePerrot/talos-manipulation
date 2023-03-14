@@ -13,7 +13,7 @@ struct MPC_command {
   Eigen::MatrixXd K0;
 
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int version) {
+  void serialize(Archive &ar, const unsigned int /*version*/) {
     ar &us0;
     ar &K0;
   }
@@ -26,7 +26,7 @@ struct MPC_debugData {
   MPC_command output;
 
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int version) {
+  void serialize(Archive &ar, const unsigned int /*version*/) {
     ar &x_input;
 
     ar &output;

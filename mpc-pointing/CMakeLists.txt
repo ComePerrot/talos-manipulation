@@ -46,7 +46,6 @@ if(BUILD_PYTHON_INTERFACE)
   string(REGEX REPLACE "-" "_" PY_NAME ${PROJECT_NAME})
   set(${PY_NAME}_INSTALL_DIR ${PYTHON_SITELIB}/${PY_NAME})
 endif()
-add_project_dependency(ndcurves REQUIRED)
 add_project_dependency(crocoddyl REQUIRED)
 add_project_dependency(yaml-cpp REQUIRED)
 
