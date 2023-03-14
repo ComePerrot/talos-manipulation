@@ -1,5 +1,6 @@
 set(${PY_NAME}_SOURCES
     main.cpp
+    designer.cpp
     ocp.cpp
     mpc.cpp)
 

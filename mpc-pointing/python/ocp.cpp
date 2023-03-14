@@ -52,6 +52,7 @@ void exposeOCPPointClass() {
            bp::args("weight"))
       .def("changePostureReference", &OCP_Point::changePostureReference,
            bp::args("index", "reference"))
+      .add_property("state", &OCP_Point::get_state)
       .add_property("solver", &OCP_Point::get_solver)
       .add_property("torque", &OCP_Point::get_torque,
                     "Torque command computed by the OCP")

@@ -7,6 +7,7 @@
 namespace mpc_p {
 namespace python {
 
+void exposeDesigner();
 void exposeOCPPoint();
 void exposeMPCPoint();
 
