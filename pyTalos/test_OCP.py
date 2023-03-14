@@ -8,8 +8,7 @@ import pinocchio as pin
 import numpy as np
 import yaml
 
-from sobec import RobotDesigner
-from mpc_pointing import OCP_Point, OCPSettings_Point
+from mpc_pointing import OCP_Point, OCPSettings_Point, RobotDesigner
 
 from bullet_Talos import TalosDeburringSimulator
 from plotter import TalosPlotter
@@ -253,7 +252,7 @@ drillingState = 0
 targetReached = 0
 reachTime = 0
 
-state = OCP.modelMaker.getState()
+state = OCP.state
 toolPlacement = pinWrapper.get_EndEff_frame()
 ddp = OCP.solver
 
