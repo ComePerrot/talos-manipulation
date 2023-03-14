@@ -1,5 +1,4 @@
 #include <mpc-pointing/mpc.hpp>
-#include <sobec/walk-with-traj/designer.hpp>
 // Must be included first
 
 #include <pal_statistics/pal_statistics_macros.h>
@@ -9,10 +8,10 @@
 
 #include "ros-interface/ros-mpc-interface.h"
 
-sobec::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
+mpc_p::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   // Settings
-  sobec::RobotDesignerSettings designerSettings =
-      sobec::RobotDesignerSettings();
+  mpc_p::RobotDesignerSettings designerSettings =
+      mpc_p::RobotDesignerSettings();
   nh.getParam("left_foot_name", designerSettings.leftFootName);
   nh.getParam("right_foot_name", designerSettings.rightFootName);
   nh.getParam("urdf", designerSettings.urdfPath);
@@ -27,7 +26,7 @@ sobec::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   gripperMtool.translation().z() = gripperTtool[2];
 
   ROS_INFO_STREAM("Building robot designer");
-  sobec::RobotDesigner designer = sobec::RobotDesigner(designerSettings);
+  mpc_p::RobotDesigner designer = mpc_p::RobotDesigner(designerSettings);
 
   ROS_INFO_STREAM("Adding end effector frame to the robot model");
   designer.addEndEffectorFrame("deburring_tool",
@@ -56,7 +55,7 @@ sobec::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
 }
 
 mpc_p::MPC_Point buildMPC(ros::NodeHandle nh,
-                          const sobec::RobotDesigner& pinWrapper) {
+                          const mpc_p::RobotDesigner& pinWrapper) {
   std::string parameterFileName;
   nh.getParam("settings_file", parameterFileName);
   std::string parameterFilePath =
@@ -117,7 +116,7 @@ int main(int argc, char** argv) {
   pal_statistics::RegistrationsRAII registered_variables;
 
   // Robot Desginer & MPC
-  sobec::RobotDesigner pinWrapper = buildRobotDesigner(nh);
+  mpc_p::RobotDesigner pinWrapper = buildRobotDesigner(nh);
   mpc_p::MPC_Point MPC = buildMPC(nh, pinWrapper);
 
   // Mocap Interface
@@ -151,7 +150,7 @@ int main(int argc, char** argv) {
   Eigen::MatrixXd K0;
 
   ros::Rate r(static_cast<double>(
-      1 / MPC.get_OCP().get_settings().modelMakerSettings.timeStep));
+      1 / MPC.get_OCP().get_settings().timeStep));
   while (ros::ok()) {
     ros::spinOnce();
 
