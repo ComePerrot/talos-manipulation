@@ -131,6 +131,7 @@ class OCP_Point {
   void reprOCP(const unsigned long time);
 
   // Setters and Getters
+  boost::shared_ptr<crocoddyl::StateMultibody> get_state() { return state_; }
   const VectorXd get_torque();
   const MatrixXd get_gain();
 
