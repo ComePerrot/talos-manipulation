@@ -7,8 +7,7 @@
 import pinocchio as pin
 import yaml
 
-from sobec import RobotDesigner
-from mpc_pointing import MPC_Point, MPCSettings_Point, OCPSettings_Point
+from mpc_pointing import MPC_Point, MPCSettings_Point, OCPSettings_Point, RobotDesigner
 
 from bullet_Talos import TalosDeburringSimulator
 from plotter import TalosPlotter
@@ -109,7 +108,7 @@ plotter = TalosPlotter(pinWrapper.get_rModel(), T_total)
 ###############
 
 NcontrolKnots = 10
-state = MPC.OCP.modelMaker.getState()
+state = MPC.OCP.state
 T = 0
 toolPlacement = MPC.designer.get_EndEff_frame()
 targetPlacement = MPC.oMtarget
