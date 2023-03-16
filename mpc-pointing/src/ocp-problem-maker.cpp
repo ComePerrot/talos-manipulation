@@ -16,7 +16,7 @@ void OCP_Point::buildSolver(const VectorXd x0, SE3 oMtarget) {
   }
 
   // Terminal model
-  auto terminalModel = formulatePointingTask();
+  auto terminalModel = formulateTerminalPointingTask();
 
   boost::shared_ptr<crocoddyl::ShootingProblem> shooting_problem =
       boost::make_shared<crocoddyl::ShootingProblem>(x0, runningModels,
@@ -87,18 +87,55 @@ ActionModel OCP_Point::formulatePointingTask() {
   DifferentialActionModel runningDAM =
       boost::make_shared<crocoddyl::DifferentialActionModelContactFwdDynamics>(
           state_, actuation_, contacts, costs, 0., true);
+  setArmature(runningDAM);
 
-  auto pin_model_ = designer_.get_rModel();
-  VectorXd armature_ = Eigen::VectorXd::Zero(pin_model_.nv);
-  armature_[(long)pin_model_.getJointId("arm_left_5_joint") + 4] = 0.1;  // 0.7
-  armature_[(long)pin_model_.getJointId("arm_left_6_joint") + 4] = 0.1;  // 0.7
-  armature_[(long)pin_model_.getJointId("arm_left_7_joint") + 4] = 0.1;  // 1
-  runningDAM->set_armature(armature_);
   ActionModel runningModel =
       boost::make_shared<crocoddyl::IntegratedActionModelEuler>(
           runningDAM, settings_.timeStep);
 
   return runningModel;
+}
+
+ActionModel OCP_Point::formulateTerminalPointingTask(){
+  Contact contacts = boost::make_shared<crocoddyl::ContactModelMultiple>(
+      state_, actuation_->get_nu());
+  CostModelSum costs =
+      boost::make_shared<crocoddyl::CostModelSum>(state_, actuation_->get_nu());
+
+  defineFeetContact(contacts);
+
+  // Safety constraints
+  defineJointLimits(costs, settings_.wLimit, settings_.scaleLimits);
+
+  // Equilibrium constraints
+  defineCoMPosition(costs, settings_.wPCoM);
+
+  // Regulation task
+  definePostureTask(costs, settings_.wStateReg);
+
+  // End effector task
+  defineGripperPlacement(costs, settings_.wGripperPos, settings_.wGripperRot);
+  defineGripperVelocity(costs, settings_.wGripperVel);
+
+  DifferentialActionModel terminalDAM =
+      boost::make_shared<crocoddyl::DifferentialActionModelContactFwdDynamics>(
+          state_, actuation_, contacts, costs, 0., true);
+  setArmature(terminalDAM);
+
+  ActionModel terminalModel =
+      boost::make_shared<crocoddyl::IntegratedActionModelEuler>(
+          terminalDAM, 0);
+
+  return terminalModel;
+}
+
+void OCP_Point::setArmature(DifferentialActionModel DAM){
+  auto pin_model_ = designer_.get_rModel();
+  VectorXd armature = Eigen::VectorXd::Zero(pin_model_.nv);
+  armature[(long)pin_model_.getJointId("arm_left_5_joint") + 4] = 0.1;  // 0.7
+  armature[(long)pin_model_.getJointId("arm_left_6_joint") + 4] = 0.1;  // 0.7
+  armature[(long)pin_model_.getJointId("arm_left_7_joint") + 4] = 0.1;  // 1
+  DAM->set_armature(armature);
 }
 
 }  // namespace mpc_p
