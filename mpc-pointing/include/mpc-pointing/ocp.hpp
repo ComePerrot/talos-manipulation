@@ -75,6 +75,8 @@ class OCP_Point {
   // OCP Problem Maker private functions
   void buildSolver(const VectorXd x0, SE3 oMtarget);
   ActionModel formulatePointingTask();
+  ActionModel formulateTerminalPointingTask();
+  void setArmature(DifferentialActionModel DAM);
   void defineFeetContact(Contact &contactCollector);
   void definePostureTask(CostModelSum &costCollector, const double wStateReg);
   void defineActuationTask(CostModelSum &costCollector,
