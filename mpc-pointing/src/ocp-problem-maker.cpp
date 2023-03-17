@@ -96,7 +96,7 @@ ActionModel OCP_Point::formulatePointingTask() {
   return runningModel;
 }
 
-ActionModel OCP_Point::formulateTerminalPointingTask(){
+ActionModel OCP_Point::formulateTerminalPointingTask() {
   Contact contacts = boost::make_shared<crocoddyl::ContactModelMultiple>(
       state_, actuation_->get_nu());
   CostModelSum costs =
@@ -123,13 +123,12 @@ ActionModel OCP_Point::formulateTerminalPointingTask(){
   setArmature(terminalDAM);
 
   ActionModel terminalModel =
-      boost::make_shared<crocoddyl::IntegratedActionModelEuler>(
-          terminalDAM, 0);
+      boost::make_shared<crocoddyl::IntegratedActionModelEuler>(terminalDAM, 0);
 
   return terminalModel;
 }
 
-void OCP_Point::setArmature(DifferentialActionModel DAM){
+void OCP_Point::setArmature(DifferentialActionModel DAM) {
   auto pin_model_ = designer_.get_rModel();
   VectorXd armature = Eigen::VectorXd::Zero(pin_model_.nv);
   armature[(long)pin_model_.getJointId("arm_left_5_joint") + 4] = 0.1;  // 0.7
