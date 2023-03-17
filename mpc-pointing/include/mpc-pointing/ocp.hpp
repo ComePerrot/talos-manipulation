@@ -5,6 +5,31 @@
 
 #include <pinocchio/fwd.hpp>
 // include pinocchio first
+#include <crocoddyl/core/action-base.hpp>
+#include <crocoddyl/core/activations/quadratic-barrier.hpp>
+#include <crocoddyl/core/activations/quadratic-flat-log.hpp>
+#include <crocoddyl/core/activations/weighted-quadratic.hpp>
+#include <crocoddyl/core/fwd.hpp>
+#include <crocoddyl/core/integrator/euler.hpp>
+#include <crocoddyl/core/optctrl/shooting.hpp>
+#include <crocoddyl/core/residuals/control.hpp>
+#include <crocoddyl/core/solver-base.hpp>
+#include <crocoddyl/core/solvers/fddp.hpp>
+#include <crocoddyl/core/utils/exception.hpp>
+#include <crocoddyl/multibody/actions/contact-fwddyn.hpp>
+#include <crocoddyl/multibody/actuations/floating-base.hpp>
+#include <crocoddyl/multibody/contacts/contact-6d.hpp>
+#include <crocoddyl/multibody/contacts/multiple-contacts.hpp>
+#include <crocoddyl/multibody/frames.hpp>
+#include <crocoddyl/multibody/fwd.hpp>
+#include <crocoddyl/multibody/residuals/com-position.hpp>
+#include <crocoddyl/multibody/residuals/frame-placement.hpp>
+#include <crocoddyl/multibody/residuals/frame-rotation.hpp>
+#include <crocoddyl/multibody/residuals/frame-translation.hpp>
+#include <crocoddyl/multibody/residuals/frame-velocity.hpp>
+#include <crocoddyl/multibody/residuals/state.hpp>
+#include <crocoddyl/multibody/states/multibody.hpp>
+
 #include "mpc-pointing/designer.hpp"
 #include "mpc-pointing/fwd.hpp"
 

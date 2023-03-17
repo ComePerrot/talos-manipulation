@@ -94,5 +94,5 @@ class RobotDesigner {
   const Eigen::Vector3d &get_com_position() { return com_position_; }
 };
 
-}  // namespace sobec
-#endif  // MPC_P__DESIGNER
+}  // namespace mpc_p
+#endif  // MPC_P_DESIGNER

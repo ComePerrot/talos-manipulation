@@ -1,12 +1,13 @@
 #ifndef MPC_P_FWD
 #define MPC_P_FWD
 
+
 #include <pinocchio/fwd.hpp>
 // include pinocchio first
 #include <crocoddyl/core/fwd.hpp>
+#include <crocoddyl/multibody/fwd.hpp>
 #include <crocoddyl/core/solvers/fddp.hpp>
-#include <sobec/walk-with-traj/designer.hpp>
-#include <sobec/walk-with-traj/model_factory.hpp>
+#include <pinocchio/spatial/fwd.hpp>
 
 namespace mpc_p {
 // Eigen

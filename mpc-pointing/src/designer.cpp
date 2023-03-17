@@ -168,4 +168,4 @@ double RobotDesigner::getRobotMass() {
   return mass_;
 }
 
-}  // namespace sobec
+}  // namespace mpc_p
