@@ -30,8 +30,8 @@
 #include <crocoddyl/multibody/residuals/state.hpp>
 #include <crocoddyl/multibody/states/multibody.hpp>
 
-#include "mpc-pointing/designer.hpp"
-#include "mpc-pointing/fwd.hpp"
+#include "deburring_mpc/designer.hpp"
+#include "deburring_mpc/fwd.hpp"
 
 namespace mpc_p {
 // using namespace crocoddyl;

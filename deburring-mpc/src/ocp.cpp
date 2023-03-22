@@ -1,4 +1,4 @@
-#include "mpc-pointing/ocp.hpp"
+#include "deburring_mpc/ocp.hpp"
 
 namespace mpc_p {
 OCP_Point::OCP_Point(const OCPSettings_Point &OCPSettings,

@@ -1,6 +1,6 @@
 # flake8: noqa
 
-from .mpc_pointing_pywrap import (
+from .deburring_mpc_pywrap import (
     RobotDesigner,
     OCPSettings_Point,
     OCP_Point,

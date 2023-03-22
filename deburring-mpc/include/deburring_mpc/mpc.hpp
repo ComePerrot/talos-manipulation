@@ -1,9 +1,9 @@
 #ifndef MPC_P
 #define MPC_P
 
-#include "mpc-pointing/fwd.hpp"
-#include "mpc-pointing/designer.hpp"
-#include "mpc-pointing/ocp.hpp"
+#include "deburring_mpc/fwd.hpp"
+#include "deburring_mpc/designer.hpp"
+#include "deburring_mpc/ocp.hpp"
 
 namespace mpc_p {
 
