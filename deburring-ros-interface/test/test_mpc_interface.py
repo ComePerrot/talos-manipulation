@@ -10,7 +10,7 @@ from geometry_msgs.msg import Pose, Twist, Point, Quaternion, Vector3
 from sensor_msgs.msg import JointState
 from time import sleep
 
-PKG = "ros-interface"
+PKG = "deburring_ros_interface"
 NAME = "MPC_Interface_test"
 
 

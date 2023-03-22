@@ -1,10 +1,10 @@
 <launch>
-    <include file="$(find ros-interface)/launch/ros-mpc-basic.launch"/>
+    <include file="$(find deburring_ros_interface)/launch/ros-mpc-basic.launch"/>
     <!-- <test test-name="controlled_joints_nonempty" pkg="rostest" type="paramtest" name="paramtest_nonempty">
         <param name="param_name_target" value="/controlled_joints" />
     </test> -->
     <test test-name="ROSInterfaceBasic" 
-        pkg="ros-interface"
+        pkg="deburring_ros_interface"
         type="test_mpc_interface.py"
         time-limit="100.0"
         required="true"/>

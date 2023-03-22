@@ -1,0 +1,4 @@
+<launch>
+    <rosparam command="load" file="$(find deburring_ros_interface)/config/ros-mpc-pointing.yaml"/>
+    <node pkg="deburring_ros_interface" type="ros_mpc_pointing" name="ros_mpc_pointing" output="screen"/>
+</launch>

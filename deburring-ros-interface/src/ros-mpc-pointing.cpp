@@ -6,7 +6,7 @@
 #include <ros/ros.h>
 #include <tf2_ros/transform_listener.h>
 
-#include "ros-interface/ros-mpc-interface.h"
+#include "deburring_ros_interface/ros-mpc-interface.h"
 
 mpc_p::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   // Settings
@@ -59,7 +59,7 @@ mpc_p::MPC_Point buildMPC(ros::NodeHandle nh,
   std::string parameterFileName;
   nh.getParam("settings_file", parameterFileName);
   std::string parameterFilePath =
-      ros::package::getPath("ros-interface") + "/config/";
+      ros::package::getPath("deburring_ros_interface") + "/config/";
   std::string parameterFile = parameterFilePath + parameterFileName;
 
   mpc_p::OCPSettings_Point ocpSettings = mpc_p::OCPSettings_Point();
