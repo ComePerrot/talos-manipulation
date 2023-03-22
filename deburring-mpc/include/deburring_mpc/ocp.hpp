@@ -30,7 +30,7 @@
 #include <crocoddyl/multibody/residuals/state.hpp>
 #include <crocoddyl/multibody/states/multibody.hpp>
 
-#include "deburring_mpc/designer.hpp"
+#include "deburring_mpc/robot_designer.hpp"
 #include "deburring_mpc/fwd.hpp"
 
 namespace mpc_p {

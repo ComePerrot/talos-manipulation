@@ -50,7 +50,7 @@ add_project_dependency(crocoddyl REQUIRED)
 add_project_dependency(yaml-cpp REQUIRED)
 
 SET(${PROJECT_NAME}_HEADERS
-    include/${PROJECT_NAME}/designer.hpp
+    include/${PROJECT_NAME}/robot_designer.hpp
     include/${PROJECT_NAME}/fwd.hpp
     include/${PROJECT_NAME}/python-fwd.hpp
     include/${PROJECT_NAME}/ocp.hpp
@@ -58,7 +58,7 @@ SET(${PROJECT_NAME}_HEADERS
 )
 
 SET(${PROJECT_NAME}_SOURCES
-    src/designer.cpp
+    src/robot_designer.cpp
     src/ocp.cpp
     src/ocp-cost-library.cpp
     src/ocp-debug.cpp

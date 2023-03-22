@@ -5,7 +5,7 @@
 #include <pinocchio/algorithm/model.hpp>
 
 #include "pinocchio/multibody/model.hpp"
-#include "deburring_mpc/designer.hpp"
+#include "deburring_mpc/robot_designer.hpp"
 
 namespace mpc_p {
 namespace python {

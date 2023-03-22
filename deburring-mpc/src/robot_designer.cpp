@@ -1,4 +1,4 @@
-#include "deburring_mpc/designer.hpp"
+#include "deburring_mpc/robot_designer.hpp"
 
 #include <pinocchio/algorithm/compute-all-terms.hpp>
 #include <pinocchio/algorithm/frames.hpp>
