@@ -1,6 +1,6 @@
 set(${PY_NAME}_SOURCES
     main.cpp
-    designer.cpp
+    robot_designer.cpp
     ocp.cpp
     mpc.cpp)
 

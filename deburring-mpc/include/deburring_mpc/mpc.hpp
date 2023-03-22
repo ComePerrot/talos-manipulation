@@ -2,7 +2,7 @@
 #define MPC_P
 
 #include "deburring_mpc/fwd.hpp"
-#include "deburring_mpc/designer.hpp"
+#include "deburring_mpc/robot_designer.hpp"
 #include "deburring_mpc/ocp.hpp"
 
 namespace mpc_p {
