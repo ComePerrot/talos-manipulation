@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.1)
 
 # Project properties
 SET(PROJECT_NAMESPACE ComePerrot)
-SET(PROJECT_NAME mpc-pointing)
+SET(PROJECT_NAME deburring_mpc)
 SET(PROJECT_DESCRIPTION "Manipulation for Talos")
 SET(PROJECT_URL https://github.com/${PROJECT_NAMESPACE}/talos-manipulation)
 

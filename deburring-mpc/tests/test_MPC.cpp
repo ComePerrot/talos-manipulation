@@ -1,4 +1,4 @@
-#include "mpc-pointing/mpc.hpp"
+#include "deburring_mpc/mpc.hpp"
 
 int main() {
   // Create OCP from configuration files

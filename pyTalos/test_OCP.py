@@ -8,7 +8,7 @@ import pinocchio as pin
 import numpy as np
 import yaml
 
-from mpc_pointing import OCP_Point, OCPSettings_Point, RobotDesigner
+from deburring_mpc import OCP_Point, OCPSettings_Point, RobotDesigner
 
 from bullet_Talos import TalosDeburringSimulator
 from plotter import TalosPlotter

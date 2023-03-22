@@ -37,7 +37,7 @@ add_compile_options(-Wno-error)
 
 # Project dependencies
 add_project_dependency(Eigen3 REQUIRED)
-add_project_dependency(mpc-pointing REQUIRED)
+add_project_dependency(deburring_mpc REQUIRED)
 
 set(CATKIN_COMPONENTS
   roscpp
@@ -71,11 +71,11 @@ SET(${PROJECT_NAME}_HEADERS
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
                                    ${${PROJECT_NAME}_HEADERS})
 target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
-target_link_libraries(${PROJECT_NAME} PUBLIC mpc-pointing::mpc-pointing Eigen3::Eigen ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC deburring_mpc::deburring_mpc Eigen3::Eigen ${catkin_LIBRARIES})
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
 add_executable(ros_mpc_pointing src/ros-mpc-pointing.cpp)
-target_link_libraries(ros_mpc_pointing ${PROJECT_NAME} mpc-pointing::mpc-pointing Eigen3::Eigen ${catkin_LIBRARIES})
+target_link_libraries(ros_mpc_pointing ${PROJECT_NAME} deburring_mpc::deburring_mpc Eigen3::Eigen ${catkin_LIBRARIES})
 
 if(CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)

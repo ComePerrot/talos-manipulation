@@ -1,4 +1,4 @@
-#include "mpc-pointing/designer.hpp"
+#include "deburring_mpc/designer.hpp"
 
 #include <pinocchio/algorithm/compute-all-terms.hpp>
 #include <pinocchio/algorithm/frames.hpp>

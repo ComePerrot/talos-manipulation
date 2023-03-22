@@ -6,8 +6,8 @@
 #include <crocoddyl/core/solvers/fddp.hpp>
 #include <eigenpy/eigenpy.hpp>
 
-#include "mpc-pointing/fwd.hpp"
-#include "mpc-pointing/mpc.hpp"
+#include "deburring_mpc/fwd.hpp"
+#include "deburring_mpc/mpc.hpp"
 
 namespace mpc_p {
 namespace python {

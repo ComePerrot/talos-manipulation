@@ -5,7 +5,7 @@
 #include <pinocchio/algorithm/model.hpp>
 
 #include "pinocchio/multibody/model.hpp"
-#include "mpc-pointing/designer.hpp"
+#include "deburring_mpc/designer.hpp"
 
 namespace mpc_p {
 namespace python {

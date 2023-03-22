@@ -1,4 +1,4 @@
-#include "mpc-pointing/mpc.hpp"
+#include "deburring_mpc/mpc.hpp"
 
 namespace mpc_p {
 

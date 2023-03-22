@@ -12,7 +12,7 @@
 #include "pinocchio/multibody/data.hpp"
 #include "pinocchio/multibody/model.hpp"
 
-#include "mpc-pointing/fwd.hpp"
+#include "deburring_mpc/fwd.hpp"
 
 namespace mpc_p {
 

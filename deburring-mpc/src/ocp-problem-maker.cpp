@@ -1,4 +1,4 @@
-#include "mpc-pointing/ocp.hpp"
+#include "deburring_mpc/ocp.hpp"
 
 namespace mpc_p {
 void OCP_Point::buildSolver(const VectorXd x0, SE3 oMtarget) {
