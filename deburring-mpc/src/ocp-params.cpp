@@ -4,7 +4,7 @@
 
 namespace deburring {
 
-void OCPSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
+void OCPSettings::readParamsFromYamlString(std::string &StringToParse) {
   YAML::Node root = YAML::Load(StringToParse);
   YAML::Node config = root["ocp-point"];
 
@@ -110,7 +110,7 @@ void OCPSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
   read_controlWeights(controlWeights);
 }
 
-void OCPSettings_Point::readParamsFromYamlFile(const std::string &Filename) {
+void OCPSettings::readParamsFromYamlFile(const std::string &Filename) {
   std::ifstream t(Filename);
   std::stringstream buffer;
   buffer << t.rdbuf();

@@ -72,9 +72,9 @@ int main() {
   std::string parameterFileOCP =
       "/home/cperrot/workspaces/wbDeburring/src/talos-manipulation/config/"
       "settings_sobec.yaml";
-  deburring::OCPSettings_Point ocpSettings = deburring::OCPSettings_Point();
+  deburring::OCPSettings ocpSettings = deburring::OCPSettings();
   ocpSettings.readParamsFromYamlFile(parameterFileOCP);
-  deburring::OCP_Point OCP = deburring::OCP_Point(ocpSettings, pinWrapper);
+  deburring::OCP OCP = deburring::OCP(ocpSettings, pinWrapper);
 
   // Load data from serialized file
   std::vector<deburring::OCP_debugData>::size_type testCase = 0;

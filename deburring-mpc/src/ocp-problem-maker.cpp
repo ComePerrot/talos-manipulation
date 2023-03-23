@@ -1,7 +1,7 @@
 #include "deburring_mpc/ocp.hpp"
 
 namespace deburring {
-void OCP_Point::buildSolver(const VectorXd x0, SE3 oMtarget) {
+void OCP::buildSolver(const VectorXd x0, SE3 oMtarget) {
   designer_.updateReducedModel(x0);
 
   state_ = boost::make_shared<crocoddyl::StateMultibody>(
@@ -44,7 +44,7 @@ void OCP_Point::buildSolver(const VectorXd x0, SE3 oMtarget) {
   }
 }
 
-void OCP_Point::solveFirst(const VectorXd x) {
+void OCP::solveFirst(const VectorXd x) {
   // horizon settings
   std::vector<VectorXd> xs_init;
   std::vector<VectorXd> us_init;
@@ -62,7 +62,7 @@ void OCP_Point::solveFirst(const VectorXd x) {
   solver_->solve(xs_init, us_init, 500, false);
 }
 
-ActionModel OCP_Point::formulatePointingTask() {
+ActionModel OCP::formulatePointingTask() {
   Contact contacts = boost::make_shared<crocoddyl::ContactModelMultiple>(
       state_, actuation_->get_nu());
   CostModelSum costs =
@@ -96,7 +96,7 @@ ActionModel OCP_Point::formulatePointingTask() {
   return runningModel;
 }
 
-ActionModel OCP_Point::formulateTerminalPointingTask() {
+ActionModel OCP::formulateTerminalPointingTask() {
   Contact contacts = boost::make_shared<crocoddyl::ContactModelMultiple>(
       state_, actuation_->get_nu());
   CostModelSum costs =
@@ -128,7 +128,7 @@ ActionModel OCP_Point::formulateTerminalPointingTask() {
   return terminalModel;
 }
 
-void OCP_Point::setArmature(DifferentialActionModel DAM) {
+void OCP::setArmature(DifferentialActionModel DAM) {
   auto pin_model_ = designer_.get_rmodel();
   VectorXd armature = Eigen::VectorXd::Zero(pin_model_.nv);
   armature[(long)pin_model_.getJointId("arm_left_5_joint") + 4] = 0.1;  // 0.7

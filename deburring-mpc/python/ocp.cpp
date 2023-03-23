@@ -16,47 +16,47 @@ using namespace crocoddyl;
 namespace bp = boost::python;
 
 void exposeOCPPointParams() {
-  bp::register_ptr_to_python<boost::shared_ptr<OCPSettings_Point>>();
+  bp::register_ptr_to_python<boost::shared_ptr<OCPSettings>>();
 
-  bp::class_<OCPSettings_Point>(
-      "OCPSettings_Point",
+  bp::class_<OCPSettings>(
+      "OCPSettings",
       bp::init<>(bp::args("self"), "Empty initialization of the OCP params"))
-      .def("readFromYaml", &OCPSettings_Point::readParamsFromYamlFile,
+      .def("readFromYaml", &OCPSettings::readParamsFromYamlFile,
            bp::args("filename"))
       .add_property("horizon_length",
-                    bp::make_getter(&OCPSettings_Point::horizon_length),
-                    bp::make_setter(&OCPSettings_Point::horizon_length),
+                    bp::make_getter(&OCPSettings::horizon_length),
+                    bp::make_setter(&OCPSettings::horizon_length),
                     "Number of nodes in the horizon");
 }
 
 void exposeOCPPointClass() {
-  bp::register_ptr_to_python<boost::shared_ptr<OCP_Point>>();
+  bp::register_ptr_to_python<boost::shared_ptr<OCP>>();
 
-  bp::class_<OCP_Point>(
-      "OCP_Point",
-      bp::init<const OCPSettings_Point &, const RobotDesigner &>(
+  bp::class_<OCP>(
+      "OCP",
+      bp::init<const OCPSettings &, const RobotDesigner &>(
           bp::args("self", "OCPSettings", "designer"),
           "Initialize the OCP from parameter list and a robot designer"))
-      .def<void (OCP_Point::*)(const ConstVectorRef &, const SE3 &)>(
-          "initialize", &OCP_Point::initialize,
+      .def<void (OCP::*)(const ConstVectorRef &, const SE3 &)>(
+          "initialize", &OCP::initialize,
           bp::args("self", "x0", "oMtarget"))
-      .def<void (OCP_Point::*)(const VectorXd)>(
-          "solveFirst", &OCP_Point::solveFirst, bp::args("self", "x"))
-      .def<void (OCP_Point::*)(const ConstVectorRef &)>(
-          "solve", &OCP_Point::solve, bp::args("self", "x_measured"))
-      .def("changeGoalCostActivation", &OCP_Point::changeGoalCostActivation,
+      .def<void (OCP::*)(const VectorXd)>(
+          "solveFirst", &OCP::solveFirst, bp::args("self", "x"))
+      .def<void (OCP::*)(const ConstVectorRef &)>(
+          "solve", &OCP::solve, bp::args("self", "x_measured"))
+      .def("changeGoalCostActivation", &OCP::changeGoalCostActivation,
            bp::args("index", "value"))
-      .def("changeTarget", &OCP_Point::changeTarget,
+      .def("changeTarget", &OCP::changeTarget,
            bp::args("index", "position"))
-      .def("changeGoalTrackingWeights", &OCP_Point::changeGoaleTrackingWeights,
+      .def("changeGoalTrackingWeights", &OCP::changeGoaleTrackingWeights,
            bp::args("weight"))
-      .def("changePostureReference", &OCP_Point::changePostureReference,
+      .def("changePostureReference", &OCP::changePostureReference,
            bp::args("index", "reference"))
-      .add_property("state", &OCP_Point::get_state)
-      .add_property("solver", &OCP_Point::get_solver)
-      .add_property("torque", &OCP_Point::get_torque,
+      .add_property("state", &OCP::get_state)
+      .add_property("solver", &OCP::get_solver)
+      .add_property("torque", &OCP::get_torque,
                     "Torque command computed by the OCP")
-      .add_property("gain", &OCP_Point::get_gain, "Gains computed by the OCP");
+      .add_property("gain", &OCP::get_gain, "Gains computed by the OCP");
 }
 
 void exposeOCPPoint() {

@@ -4,7 +4,7 @@
 
 namespace deburring {
 
-void MPCSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
+void MPCSettings::readParamsFromYamlString(std::string &StringToParse) {
   YAML::Node root = YAML::Load(StringToParse);
   YAML::Node config = root["mpc-point"];
 
@@ -86,7 +86,7 @@ void MPCSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
   read_double(tolerance, "tolerance");
 }
 
-void MPCSettings_Point::readParamsFromYamlFile(const std::string &Filename) {
+void MPCSettings::readParamsFromYamlFile(const std::string &Filename) {
   std::ifstream t(Filename);
   std::stringstream buffer;
   buffer << t.rdbuf();

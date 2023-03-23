@@ -54,7 +54,7 @@ deburring::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   return (designer);
 }
 
-deburring::MPC_Point buildMPC(ros::NodeHandle nh,
+deburring::MPC buildMPC(ros::NodeHandle nh,
                           const deburring::RobotDesigner& pinWrapper) {
   std::string parameterFileName;
   nh.getParam("settings_file", parameterFileName);
@@ -62,13 +62,13 @@ deburring::MPC_Point buildMPC(ros::NodeHandle nh,
       ros::package::getPath("deburring_ros_interface") + "/config/";
   std::string parameterFile = parameterFilePath + parameterFileName;
 
-  deburring::OCPSettings_Point ocpSettings = deburring::OCPSettings_Point();
-  deburring::MPCSettings_Point mpcSettings = deburring::MPCSettings_Point();
+  deburring::OCPSettings ocpSettings = deburring::OCPSettings();
+  deburring::MPCSettings mpcSettings = deburring::MPCSettings();
 
   ocpSettings.readParamsFromYamlFile(parameterFile);
   mpcSettings.readParamsFromYamlFile(parameterFile);
 
-  deburring::MPC_Point mpc = deburring::MPC_Point(mpcSettings, ocpSettings, pinWrapper);
+  deburring::MPC mpc = deburring::MPC(mpcSettings, ocpSettings, pinWrapper);
 
   return (mpc);
 }
@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
 
   // Robot Desginer & MPC
   deburring::RobotDesigner pinWrapper = buildRobotDesigner(nh);
-  deburring::MPC_Point MPC = buildMPC(nh, pinWrapper);
+  deburring::MPC MPC = buildMPC(nh, pinWrapper);
 
   // Mocap Interface
   MOCAP_Interface Mocap = MOCAP_Interface();

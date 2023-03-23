@@ -1,7 +1,7 @@
 #include "deburring_mpc/ocp.hpp"
 
 namespace deburring {
-void OCP_Point::defineFeetContact(Contact &contactCollector) {
+void OCP::defineFeetContact(Contact &contactCollector) {
   boost::shared_ptr<crocoddyl::ContactModelAbstract> ContactModelLeft =
       boost::make_shared<crocoddyl::ContactModel6D>(
           state_, designer_.get_lf_id(), designer_.get_lf_frame(),
@@ -21,7 +21,7 @@ void OCP_Point::defineFeetContact(Contact &contactCollector) {
   contactCollector->changeContactStatus(designer_.get_rf_name(), true);
 }
 
-void OCP_Point::definePostureTask(CostModelSum &costCollector,
+void OCP::definePostureTask(CostModelSum &costCollector,
                                   const double wStateReg) {
   if (settings_.stateWeights.size() != designer_.get_rmodel().nv * 2) {
     throw std::invalid_argument("State weight size is wrong ");
@@ -39,7 +39,7 @@ void OCP_Point::definePostureTask(CostModelSum &costCollector,
   costCollector.get()->addCost("postureTask", postureModel, wStateReg, true);
 }
 
-void OCP_Point::defineActuationTask(CostModelSum &costCollector,
+void OCP::defineActuationTask(CostModelSum &costCollector,
                                     const double wControlReg) {
   if (settings_.controlWeights.size() != (int)actuation_->get_nu()) {
     throw std::invalid_argument("Control weight size is wrong ");
@@ -57,7 +57,7 @@ void OCP_Point::defineActuationTask(CostModelSum &costCollector,
                                true);
 }
 
-void OCP_Point::defineJointLimits(CostModelSum &costCollector,
+void OCP::defineJointLimits(CostModelSum &costCollector,
                                   const double wLimit,
                                   const double boundScale) {
   Eigen::VectorXd lower_bound(2 * state_->get_nv()),
@@ -89,7 +89,7 @@ void OCP_Point::defineJointLimits(CostModelSum &costCollector,
   costCollector.get()->addCost("jointLimits", jointLimitCost, wLimit, true);
 }
 
-void OCP_Point::defineCoMPosition(CostModelSum &costCollector,
+void OCP::defineCoMPosition(CostModelSum &costCollector,
                                   const double wPCoM) {
   Vector3d refPosition = designer_.get_com_position();
   boost::shared_ptr<crocoddyl::CostModelAbstract> CoMPositionCost =
@@ -100,7 +100,7 @@ void OCP_Point::defineCoMPosition(CostModelSum &costCollector,
   costCollector.get()->addCost("comPosition", CoMPositionCost, wPCoM, true);
 }
 
-void OCP_Point::defineGripperPlacement(CostModelSum &costCollector,
+void OCP::defineGripperPlacement(CostModelSum &costCollector,
                                        const double wGripperPos,
                                        const double wGripperRot) {
   pinocchio::SE3 goalPlacement = pinocchio::SE3::Identity();
@@ -128,7 +128,7 @@ void OCP_Point::defineGripperPlacement(CostModelSum &costCollector,
                                wGripperRot, true);
 }
 
-void OCP_Point::defineGripperVelocity(CostModelSum &costCollector,
+void OCP::defineGripperVelocity(CostModelSum &costCollector,
                                       const double wGripperVel) {
   pinocchio::Motion goalMotion = pinocchio::Motion(Eigen::VectorXd::Zero(6));
   boost::shared_ptr<crocoddyl::CostModelAbstract> gripperVelocityCost =
