@@ -37,13 +37,13 @@ class RobotDesigner {
   pinocchio::Data rdata_complete_, rdata_;
   // std::vector<pinocchio::JointIndex> pinocchioControlledJoints_;
 
-  Eigen::VectorXd q0_complete_, q0_;
-  Eigen::VectorXd v0_complete_, v0_;
-  Eigen::VectorXd x0_;
+  VectorXd q0_complete_, q0_;
+  VectorXd v0_complete_, v0_;
+  VectorXd x0_;
 
-  Eigen::Vector3d com_position_;
-  Eigen::Vector3d lf_position_;
-  Eigen::Vector3d rf_position_;
+  Vector3d com_position_;
+  Vector3d lf_position_;
+  Vector3d rf_position_;
 
   bool is_initialized_ = false;
 
@@ -55,20 +55,20 @@ class RobotDesigner {
   RobotDesigner(const RobotDesignerSettings &settings);
   void initialize(const RobotDesignerSettings &settings);
 
-  void updateReducedModel(const Eigen::VectorXd &x);
-  void updateCompleteModel(const Eigen::VectorXd &x);
+  void updateReducedModel(const ConstVectorRef &x);
+  void updateCompleteModel(const ConstVectorRef &x);
 
   void updateModelLimits(const Eigen::VectorXd lower_position_limit,
                          const Eigen::VectorXd upper_Position_limit);
   void addEndEffectorFrame(std::string end_effector_name, std::string parent_name,
-                           pinocchio::SE3 end_effector_placement);
+                           SE3 end_effector_placement);
 
   // accessors
   double get_robot_mass();
 
-  const pinocchio::SE3 &get_lf_frame();
-  const pinocchio::SE3 &get_rf_frame();
-  const pinocchio::SE3 &get_end_effector_frame();
+  const SE3 &get_lf_frame();
+  const SE3 &get_rf_frame();
+  const SE3 &get_end_effector_frame();
 
   bool get_is_initialized() { return is_initialized_; }
 
@@ -76,11 +76,11 @@ class RobotDesigner {
   const pinocchio::Model &get_rmodel_complete() { return rmodel_complete_; }
   const pinocchio::Data &get_rdata() { return rdata_; }
   const pinocchio::Data &get_rdata_complete() { return rdata_complete_; }
-  const Eigen::VectorXd &get_q0() { return q0_; }
-  const Eigen::VectorXd &get_v0() { return v0_; }
-  const Eigen::VectorXd &get_q0_complete() { return q0_complete_; }
-  const Eigen::VectorXd &get_v0_complete() { return v0_complete_; }
-  const Eigen::VectorXd &get_x0() { return x0_; }
+  const VectorXd &get_q0() { return q0_; }
+  const VectorXd &get_v0() { return v0_; }
+  const VectorXd &get_q0_complete() { return q0_complete_; }
+  const VectorXd &get_v0_complete() { return v0_complete_; }
+  const VectorXd &get_x0() { return x0_; }
 
   const std::string &get_lf_name() { return settings_.left_foot_name; }
   const std::string &get_rf_name() { return settings_.right_foot_name; }
@@ -92,9 +92,9 @@ class RobotDesigner {
     return controlled_joints_ids_;
   }
 
-  const Eigen::Vector3d &get_lf_position() { return lf_position_; }
-  const Eigen::Vector3d &get_rf_position() { return rf_position_; }
-  const Eigen::Vector3d &get_com_position() { return com_position_; }
+  const Vector3d &get_lf_position() { return lf_position_; }
+  const Vector3d &get_rf_position() { return rf_position_; }
+  const Vector3d &get_com_position() { return com_position_; }
 };
 
 }  // namespace mpc_p

@@ -9,6 +9,7 @@
 #include <crocoddyl/core/solvers/fddp.hpp>
 #include <pinocchio/spatial/fwd.hpp>
 
+
 namespace mpc_p {
 // Eigen
 using Vector2d = Eigen::Vector2d;
