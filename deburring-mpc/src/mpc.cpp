@@ -17,10 +17,10 @@ MPC_Point::MPC_Point(const MPCSettings_Point &settings,
 
 void MPC_Point::initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
                            const SE3 &toolMtarget) {
-  controlled_joints_id_ = designer_.get_controlledJointsIDs();
-  x_internal_.resize(designer_.get_rModel().nq + designer_.get_rModel().nv);
+  controlled_joints_ids_ = designer_.get_controlled_joints_ids();
+  x_internal_.resize(designer_.get_rmodel().nq + designer_.get_rmodel().nv);
 
-  x0_.resize(designer_.get_rModel().nq + designer_.get_rModel().nv);
+  x0_.resize(designer_.get_rmodel().nq + designer_.get_rmodel().nv);
   x0_ << shapeState(q0, v0);
   designer_.updateReducedModel(x0_);
   // designer_.updateCompleteModel(q0);
@@ -63,7 +63,7 @@ void MPC_Point::setTarget(const SE3 &toolMtarget) {
   //  Define oMtarget
   if (settings_.use_mocap == 1 || settings_.use_mocap == 2) {
     tool_se3_hole_ = toolMtarget.act(holes_offsets_[current_hole_]);
-    oMtarget_ = designer_.get_EndEff_frame().act(tool_se3_hole_);
+    oMtarget_ = designer_.get_end_effector_frame().act(tool_se3_hole_);
   } else {
     oMtarget_.translation() = settings_.targetPos;
 
@@ -105,7 +105,7 @@ void MPC_Point::setHolesPlacement() {
 void MPC_Point::updateTarget(const SE3 &toolMtarget) {
   if (settings_.use_mocap == 0 || settings_.use_mocap == 1) {
     tool_se3_hole_ =
-        designer_.get_EndEff_frame().actInv(list_oMhole_[current_hole_]);
+        designer_.get_end_effector_frame().actInv(list_oMhole_[current_hole_]);
     position_error_ = tool_se3_hole_.translation().norm();
   } else if (settings_.use_mocap == 2) {
     tool_se3_hole_ = toolMtarget.act(holes_offsets_[current_hole_]);
@@ -113,7 +113,7 @@ void MPC_Point::updateTarget(const SE3 &toolMtarget) {
     position_error_ = tool_se3_hole_.translation().norm();
 
     if (position_error_ < 0.05 && drilling_state_ == 2) {
-      oMtarget_ = designer_.get_EndEff_frame().act(tool_se3_hole_);
+      oMtarget_ = designer_.get_end_effector_frame().act(tool_se3_hole_);
 
       setHolesPlacement();
       OCP_.updateGoalPosition(list_oMhole_[current_hole_].translation());
@@ -258,21 +258,21 @@ void MPC_Point::updateOCP() {
 
 const VectorXd &MPC_Point::shapeState(const ConstVectorRef &q,
                                       const ConstVectorRef &v) {
-  if (q.size() == designer_.get_rModelComplete().nq &&
-      v.size() == designer_.get_rModelComplete().nv) {
+  if (q.size() == designer_.get_rmodel_complete().nq &&
+      v.size() == designer_.get_rmodel_complete().nv) {
     x_internal_.head<7>() = q.head<7>();
-    x_internal_.segment<6>(designer_.get_rModel().nq) = v.head<6>();
+    x_internal_.segment<6>(designer_.get_rmodel().nq) = v.head<6>();
 
     int i = 0;
-    for (unsigned long jointID : controlled_joints_id_)
+    for (unsigned long jointID : controlled_joints_ids_)
       if (jointID > 1) {
         x_internal_(i + 7) = q((long)jointID + 5);
-        x_internal_(designer_.get_rModel().nq + i + 6) = v((long)jointID + 4);
+        x_internal_(designer_.get_rmodel().nq + i + 6) = v((long)jointID + 4);
         i++;
       }
     return x_internal_;
-  } else if (q.size() == designer_.get_rModel().nq &&
-             v.size() == designer_.get_rModel().nv) {
+  } else if (q.size() == designer_.get_rmodel().nq &&
+             v.size() == designer_.get_rmodel().nv) {
     x_internal_ << q, v;
     return x_internal_;
   } else

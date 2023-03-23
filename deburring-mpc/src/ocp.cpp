@@ -7,7 +7,7 @@ OCP_Point::OCP_Point(const OCPSettings_Point &OCPSettings,
 
 void OCP_Point::initialize(const ConstVectorRef &x0,
                            const pinocchio::SE3 &oMtarget) {
-  if (!designer_.initialized_) {
+  if (!designer_.get_is_initialized()) {
     throw std::runtime_error("The designer must be initialized.");
   }
 

@@ -6,7 +6,7 @@ int main() {
   mpc_p::RobotDesignerSettings designerSettings =
       mpc_p::RobotDesignerSettings();
 
-  designerSettings.controlledJointsNames = {
+  designerSettings.controlled_joints_names = {
       "root_joint",        "leg_left_1_joint",  "leg_left_2_joint",
       "leg_left_3_joint",  "leg_left_4_joint",  "leg_left_5_joint",
       "leg_left_6_joint",  "leg_right_1_joint", "leg_right_2_joint",
@@ -16,12 +16,12 @@ int main() {
       "arm_left_4_joint",  "arm_left_5_joint",  "arm_left_6_joint",
       "arm_left_7_joint",  "arm_right_1_joint", "arm_right_2_joint",
       "arm_right_3_joint", "arm_right_4_joint"};
-  designerSettings.leftFootName = "left_sole_link";
-  designerSettings.rightFootName = "right_sole_link";
-  designerSettings.urdfPath =
+  designerSettings.left_foot_name = "left_sole_link";
+  designerSettings.right_foot_name = "right_sole_link";
+  designerSettings.urdf_path =
       "/opt/openrobots/share/example-robot-data/robots/talos_data/robots/"
       "talos_reduced.urdf";
-  designerSettings.srdfPath =
+  designerSettings.srdf_path =
       "/opt/openrobots/share/example-robot-data/robots/talos_data/srdf/"
       "talos.srdf";
 
@@ -88,8 +88,8 @@ int main() {
   // Initialize OCP with the same initial state
   Eigen::VectorXd x_current = debugData[iteration].x_input;
 
-  MPC.initialize(x_current.head(MPC.get_designer().get_rModel().nq),
-                 x_current.tail(MPC.get_designer().get_rModel().nv),
+  MPC.initialize(x_current.head(MPC.get_designer().get_rmodel().nq),
+                 x_current.tail(MPC.get_designer().get_rmodel().nv),
                  pinocchio::SE3::Identity());
 
   MPC.get_OCP().reprOCP(0);

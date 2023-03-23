@@ -12,11 +12,11 @@ mpc_p::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   // Settings
   mpc_p::RobotDesignerSettings designerSettings =
       mpc_p::RobotDesignerSettings();
-  nh.getParam("left_foot_name", designerSettings.leftFootName);
-  nh.getParam("right_foot_name", designerSettings.rightFootName);
-  nh.getParam("urdf", designerSettings.urdfPath);
-  nh.getParam("srdf", designerSettings.srdfPath);
-  nh.getParam("controlled_joints", designerSettings.controlledJointsNames);
+  nh.getParam("left_foot_name", designerSettings.left_foot_name);
+  nh.getParam("right_foot_name", designerSettings.right_foot_name);
+  nh.getParam("urdf", designerSettings.urdf_path);
+  nh.getParam("srdf", designerSettings.srdf_path);
+  nh.getParam("controlled_joints", designerSettings.controlled_joints_names);
 
   std::vector<double> gripperTtool;
   nh.getParam("tool_frame_pos", gripperTtool);
@@ -136,11 +136,11 @@ int main(int argc, char** argv) {
   }
 
   Eigen::VectorXd x = Robot.get_robotState();
-  MPC.initialize(x.head(MPC.get_designer().get_rModel().nq),
-                 x.tail(MPC.get_designer().get_rModel().nv), toolMtarget);
+  MPC.initialize(x.head(MPC.get_designer().get_rmodel().nq),
+                 x.tail(MPC.get_designer().get_rmodel().nv), toolMtarget);
 
   REGISTER_VARIABLE("/introspection_data", "reachedCartesianPosition",
-                    &MPC.get_designer().get_EndEff_frame().translation().x(),
+                    &MPC.get_designer().get_end_effector_frame().translation().x(),
                     &registered_variables);
   REGISTER_VARIABLE("/introspection_data", "desiredCartesianPosition",
                     &MPC.get_Target_frame().translation().x(),
