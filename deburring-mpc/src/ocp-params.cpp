@@ -2,7 +2,7 @@
 
 #include "deburring_mpc/ocp.hpp"
 
-namespace mpc_p {
+namespace deburring {
 
 void OCPSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
   YAML::Node root = YAML::Load(StringToParse);
@@ -118,4 +118,4 @@ void OCPSettings_Point::readParamsFromYamlFile(const std::string &Filename) {
   readParamsFromYamlString(StringToParse);
 }
 
-}  // namespace mpc_p
+}  // namespace deburring

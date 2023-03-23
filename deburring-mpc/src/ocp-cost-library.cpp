@@ -1,6 +1,6 @@
 #include "deburring_mpc/ocp.hpp"
 
-namespace mpc_p {
+namespace deburring {
 void OCP_Point::defineFeetContact(Contact &contactCollector) {
   boost::shared_ptr<crocoddyl::ContactModelAbstract> ContactModelLeft =
       boost::make_shared<crocoddyl::ContactModel6D>(
@@ -141,4 +141,4 @@ void OCP_Point::defineGripperVelocity(CostModelSum &costCollector,
                                wGripperVel, true);
 }
 
-}  // namespace mpc_p
+}  // namespace deburring

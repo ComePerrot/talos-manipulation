@@ -1,6 +1,6 @@
 #include "deburring_mpc/mpc.hpp"
 
-namespace mpc_p {
+namespace deburring {
 
 #define PI 3.14159265
 
@@ -279,4 +279,4 @@ const VectorXd &MPC_Point::shapeState(const ConstVectorRef &q,
     throw std::runtime_error(
         "q and v must have the dimentions of the reduced or complete model.");
 }
-}  // namespace mpc_p
+}  // namespace deburring

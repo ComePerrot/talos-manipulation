@@ -8,10 +8,10 @@
 
 #include "deburring_ros_interface/ros-mpc-interface.h"
 
-mpc_p::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
+deburring::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   // Settings
-  mpc_p::RobotDesignerSettings designerSettings =
-      mpc_p::RobotDesignerSettings();
+  deburring::RobotDesignerSettings designerSettings =
+      deburring::RobotDesignerSettings();
   nh.getParam("left_foot_name", designerSettings.left_foot_name);
   nh.getParam("right_foot_name", designerSettings.right_foot_name);
   nh.getParam("urdf", designerSettings.urdf_path);
@@ -26,7 +26,7 @@ mpc_p::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   gripperMtool.translation().z() = gripperTtool[2];
 
   ROS_INFO_STREAM("Building robot designer");
-  mpc_p::RobotDesigner designer = mpc_p::RobotDesigner(designerSettings);
+  deburring::RobotDesigner designer = deburring::RobotDesigner(designerSettings);
 
   ROS_INFO_STREAM("Adding end effector frame to the robot model");
   designer.addEndEffectorFrame("deburring_tool",
@@ -54,21 +54,21 @@ mpc_p::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   return (designer);
 }
 
-mpc_p::MPC_Point buildMPC(ros::NodeHandle nh,
-                          const mpc_p::RobotDesigner& pinWrapper) {
+deburring::MPC_Point buildMPC(ros::NodeHandle nh,
+                          const deburring::RobotDesigner& pinWrapper) {
   std::string parameterFileName;
   nh.getParam("settings_file", parameterFileName);
   std::string parameterFilePath =
       ros::package::getPath("deburring_ros_interface") + "/config/";
   std::string parameterFile = parameterFilePath + parameterFileName;
 
-  mpc_p::OCPSettings_Point ocpSettings = mpc_p::OCPSettings_Point();
-  mpc_p::MPCSettings_Point mpcSettings = mpc_p::MPCSettings_Point();
+  deburring::OCPSettings_Point ocpSettings = deburring::OCPSettings_Point();
+  deburring::MPCSettings_Point mpcSettings = deburring::MPCSettings_Point();
 
   ocpSettings.readParamsFromYamlFile(parameterFile);
   mpcSettings.readParamsFromYamlFile(parameterFile);
 
-  mpc_p::MPC_Point mpc = mpc_p::MPC_Point(mpcSettings, ocpSettings, pinWrapper);
+  deburring::MPC_Point mpc = deburring::MPC_Point(mpcSettings, ocpSettings, pinWrapper);
 
   return (mpc);
 }
@@ -116,8 +116,8 @@ int main(int argc, char** argv) {
   pal_statistics::RegistrationsRAII registered_variables;
 
   // Robot Desginer & MPC
-  mpc_p::RobotDesigner pinWrapper = buildRobotDesigner(nh);
-  mpc_p::MPC_Point MPC = buildMPC(nh, pinWrapper);
+  deburring::RobotDesigner pinWrapper = buildRobotDesigner(nh);
+  deburring::MPC_Point MPC = buildMPC(nh, pinWrapper);
 
   // Mocap Interface
   MOCAP_Interface Mocap = MOCAP_Interface();

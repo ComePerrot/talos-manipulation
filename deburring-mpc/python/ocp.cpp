@@ -9,7 +9,7 @@
 #include "deburring_mpc/fwd.hpp"
 #include "deburring_mpc/ocp.hpp"
 
-namespace mpc_p {
+namespace deburring {
 namespace python {
 
 using namespace crocoddyl;
@@ -65,4 +65,4 @@ void exposeOCPPoint() {
 }
 
 }  // namespace python
-}  // namespace mpc_p
+}  // namespace deburring

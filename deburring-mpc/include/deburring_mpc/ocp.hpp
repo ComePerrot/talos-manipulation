@@ -33,7 +33,7 @@
 #include "deburring_mpc/robot_designer.hpp"
 #include "deburring_mpc/fwd.hpp"
 
-namespace mpc_p {
+namespace deburring {
 // using namespace crocoddyl;
 
 struct OCP_debugData {
@@ -168,6 +168,6 @@ class OCP_Point {
   size_t get_horizonLength() { return (settings_.horizon_length); };
 };
 
-}  // namespace mpc_p
+}  // namespace deburring
 
 #endif  // OCP_P

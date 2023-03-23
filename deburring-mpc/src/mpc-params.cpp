@@ -2,7 +2,7 @@
 
 #include "deburring_mpc/mpc.hpp"
 
-namespace mpc_p {
+namespace deburring {
 
 void MPCSettings_Point::readParamsFromYamlString(std::string &StringToParse) {
   YAML::Node root = YAML::Load(StringToParse);
@@ -94,4 +94,4 @@ void MPCSettings_Point::readParamsFromYamlFile(const std::string &Filename) {
   readParamsFromYamlString(StringToParse);
 }
 
-}  // namespace mpc_p
+}  // namespace deburring

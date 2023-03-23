@@ -5,7 +5,7 @@
 #include "deburring_mpc/robot_designer.hpp"
 #include "deburring_mpc/ocp.hpp"
 
-namespace mpc_p {
+namespace deburring {
 
 struct MPC_command {
  public:
@@ -141,6 +141,6 @@ class MPC_Point {
   RobotDesigner &get_designer() { return designer_; }
   void set_designer(const RobotDesigner &designer) { designer_ = designer; }
 };
-}  // namespace mpc_p
+}  // namespace deburring
 
 #endif  // MPC_P

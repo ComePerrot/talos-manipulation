@@ -5,7 +5,7 @@
 #include <pinocchio/parsers/srdf.hpp>
 #include <pinocchio/parsers/urdf.hpp>
 
-namespace mpc_p {
+namespace deburring {
 
 RobotDesigner::RobotDesigner() {}
 
@@ -168,4 +168,4 @@ double RobotDesigner::get_robot_mass() {
   return robot_mass_;
 }
 
-}  // namespace mpc_p
+}  // namespace deburring

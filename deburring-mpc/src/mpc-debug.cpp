@@ -2,7 +2,7 @@
 
 #include "deburring_mpc/mpc.hpp"
 
-namespace mpc_p {
+namespace deburring {
 
 void MPC_Point::logData(const Eigen::Ref<const Eigen::VectorXd> x_input,
                         const Eigen::Ref<const Eigen::VectorXd> us0,
@@ -35,4 +35,4 @@ std::vector<MPC_debugData> MPC_Point::fetchFromFile(std::string name) {
   return (datas);
 }
 
-}  // namespace mpc_p
+}  // namespace deburring
