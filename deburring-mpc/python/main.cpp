@@ -8,7 +8,7 @@ BOOST_PYTHON_MODULE(deburring_mpc_pywrap) {
   // Enabling eigenpy support, i.e. numpy/eigen compatibility.
   eigenpy::enableEigenPy();
   ENABLE_SPECIFIC_MATRIX_TYPE(Eigen::VectorXi);
-  mpc_p::python::exposeDesigner();
-  mpc_p::python::exposeOCPPoint();
-  mpc_p::python::exposeMPCPoint();
+  deburring::python::exposeDesigner();
+  deburring::python::exposeOCPPoint();
+  deburring::python::exposeMPCPoint();
 }

@@ -5,8 +5,8 @@
 int main() {
   // Create OCP from configuration files
   //  Robot designer
-  mpc_p::RobotDesignerSettings designerSettings =
-      mpc_p::RobotDesignerSettings();
+  deburring::RobotDesignerSettings designerSettings =
+      deburring::RobotDesignerSettings();
 
   designerSettings.controlled_joints_names = {
       "root_joint",        "leg_left_1_joint",  "leg_left_2_joint",
@@ -27,7 +27,7 @@ int main() {
       "/opt/openrobots/share/example-robot-data/robots/talos_data/srdf/"
       "talos.srdf";
 
-  mpc_p::RobotDesigner pinWrapper = mpc_p::RobotDesigner(designerSettings);
+  deburring::RobotDesigner pinWrapper = deburring::RobotDesigner(designerSettings);
 
   pinocchio::SE3 gripperMtool = pinocchio::SE3::Identity();
   gripperMtool.translation().x() = 0;
@@ -72,13 +72,13 @@ int main() {
   std::string parameterFileOCP =
       "/home/cperrot/workspaces/wbDeburring/src/talos-manipulation/config/"
       "settings_sobec.yaml";
-  mpc_p::OCPSettings_Point ocpSettings = mpc_p::OCPSettings_Point();
+  deburring::OCPSettings_Point ocpSettings = deburring::OCPSettings_Point();
   ocpSettings.readParamsFromYamlFile(parameterFileOCP);
-  mpc_p::OCP_Point OCP = mpc_p::OCP_Point(ocpSettings, pinWrapper);
+  deburring::OCP_Point OCP = deburring::OCP_Point(ocpSettings, pinWrapper);
 
   // Load data from serialized file
-  std::vector<mpc_p::OCP_debugData>::size_type testCase = 0;
-  std::vector<mpc_p::OCP_debugData> debugData = OCP.fetchFromFile(
+  std::vector<deburring::OCP_debugData>::size_type testCase = 0;
+  std::vector<deburring::OCP_debugData> debugData = OCP.fetchFromFile(
       "/home/cperrot/workspaces/archives/"
       "OCP_2.txt");
 

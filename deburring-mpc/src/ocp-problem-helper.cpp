@@ -1,6 +1,6 @@
 #include "deburring_mpc/ocp.hpp"
 
-namespace mpc_p {
+namespace deburring {
 // Functions to interact with ddp
 void OCP_Point::recede() {
   solver_->get_problem()->circularAppend(
@@ -104,4 +104,4 @@ CostModelSum OCP_Point::costs(const unsigned long time) {
 ActionData OCP_Point::ada(const unsigned long time) {
   return solver_->get_problem()->get_runningDatas()[time];
 }
-}  // namespace mpc_p
+}  // namespace deburring

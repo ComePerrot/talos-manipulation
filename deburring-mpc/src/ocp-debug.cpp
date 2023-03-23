@@ -1,6 +1,6 @@
 #include "deburring_mpc/ocp.hpp"
 
-namespace mpc_p {
+namespace deburring {
 
 void OCP_Point::logData(
     const std::vector<Eigen::VectorXd>& x_init,
@@ -107,4 +107,4 @@ void OCP_Point::reprOCP(const unsigned long time) {
   }
 }
 
-}  // namespace mpc_p
+}  // namespace deburring

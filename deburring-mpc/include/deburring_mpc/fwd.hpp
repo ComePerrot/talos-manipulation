@@ -10,7 +10,7 @@
 #include <pinocchio/spatial/fwd.hpp>
 
 
-namespace mpc_p {
+namespace deburring {
 // Eigen
 using Vector2d = Eigen::Vector2d;
 using Vector3d = Eigen::Vector3d;
@@ -34,6 +34,6 @@ using DifferentialActionModel =
     boost::shared_ptr<crocoddyl::DifferentialActionModelContactFwdDynamics>;
 using CostModelSum = boost::shared_ptr<crocoddyl::CostModelSum>;
 using Contact = boost::shared_ptr<crocoddyl::ContactModelMultiple>;
-}  // namespace mpc_p
+}  // namespace deburring
 
 #endif  // MPC_P_FWD

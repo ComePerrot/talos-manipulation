@@ -13,7 +13,7 @@
 #include "pinocchio/multibody/data.hpp"
 #include "pinocchio/multibody/model.hpp"
 
-namespace mpc_p {
+namespace deburring {
 
 struct RobotDesignerSettings {
  public:
@@ -97,5 +97,5 @@ class RobotDesigner {
   const Vector3d &get_com_position() { return com_position_; }
 };
 
-}  // namespace mpc_p
+}  // namespace deburring
 #endif  // MPC_P_DESIGNER

@@ -7,7 +7,7 @@
 #include "pinocchio/multibody/model.hpp"
 #include "deburring_mpc/robot_designer.hpp"
 
-namespace mpc_p {
+namespace deburring {
 namespace python {
 namespace bp = boost::python;
 
@@ -149,4 +149,4 @@ void exposeDesigner() {
 }
 
 }  // namespace python
-}  // namespace mpc_p
+}  // namespace deburring

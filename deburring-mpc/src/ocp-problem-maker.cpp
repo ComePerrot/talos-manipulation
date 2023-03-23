@@ -1,6 +1,6 @@
 #include "deburring_mpc/ocp.hpp"
 
-namespace mpc_p {
+namespace deburring {
 void OCP_Point::buildSolver(const VectorXd x0, SE3 oMtarget) {
   designer_.updateReducedModel(x0);
 
@@ -137,4 +137,4 @@ void OCP_Point::setArmature(DifferentialActionModel DAM) {
   DAM->set_armature(armature);
 }
 
-}  // namespace mpc_p
+}  // namespace deburring

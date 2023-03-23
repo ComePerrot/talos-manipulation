@@ -1,6 +1,6 @@
 #include "deburring_mpc/ocp.hpp"
 
-namespace mpc_p {
+namespace deburring {
 OCP_Point::OCP_Point(const OCPSettings_Point &OCPSettings,
                      const RobotDesigner &designer)
     : settings_(OCPSettings), designer_(designer) {}
@@ -38,4 +38,4 @@ void OCP_Point::solve(const ConstVectorRef &measured_x) {
 const VectorXd OCP_Point::get_torque() { return (solver_->get_us()[0]); }
 const MatrixXd OCP_Point::get_gain() { return (solver_->get_K()[0]); }
 
-}  // namespace mpc_p
+}  // namespace deburring
