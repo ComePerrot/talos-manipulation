@@ -5,7 +5,7 @@ void OCP_Point::buildSolver(const VectorXd x0, SE3 oMtarget) {
   designer_.updateReducedModel(x0);
 
   state_ = boost::make_shared<crocoddyl::StateMultibody>(
-      boost::make_shared<pinocchio::Model>(designer_.get_rModel()));
+      boost::make_shared<pinocchio::Model>(designer_.get_rmodel()));
   actuation_ =
       boost::make_shared<crocoddyl::ActuationModelFloatingBase>(state_);
 
@@ -25,8 +25,8 @@ void OCP_Point::buildSolver(const VectorXd x0, SE3 oMtarget) {
 
   // Change References
   VectorXd postureReference = x0;
-  postureReference.tail(designer_.get_rModel().nv) =
-      VectorXd::Zero(designer_.get_rModel().nv);
+  postureReference.tail(designer_.get_rmodel().nv) =
+      VectorXd::Zero(designer_.get_rmodel().nv);
   for (size_t modelIndex = 0; modelIndex <= settings_.horizon_length;
        modelIndex++) {
     changePostureReference(modelIndex, postureReference);
@@ -129,7 +129,7 @@ ActionModel OCP_Point::formulateTerminalPointingTask() {
 }
 
 void OCP_Point::setArmature(DifferentialActionModel DAM) {
-  auto pin_model_ = designer_.get_rModel();
+  auto pin_model_ = designer_.get_rmodel();
   VectorXd armature = Eigen::VectorXd::Zero(pin_model_.nv);
   armature[(long)pin_model_.getJointId("arm_left_5_joint") + 4] = 0.1;  // 0.7
   armature[(long)pin_model_.getJointId("arm_left_6_joint") + 4] = 0.1;  // 0.7

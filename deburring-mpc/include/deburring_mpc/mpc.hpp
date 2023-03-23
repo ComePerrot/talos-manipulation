@@ -87,7 +87,7 @@ class MPC_Point {
   SE3 oMbackwardHole_;
   SE3 tool_se3_hole_;
   double position_error_ = 0;
-  std::vector<unsigned long> controlled_joints_id_;
+  std::vector<unsigned long> controlled_joints_ids_;
   VectorXd x_internal_;
 
  private:

@@ -4,26 +4,26 @@ namespace mpc_p {
 void OCP_Point::defineFeetContact(Contact &contactCollector) {
   boost::shared_ptr<crocoddyl::ContactModelAbstract> ContactModelLeft =
       boost::make_shared<crocoddyl::ContactModel6D>(
-          state_, designer_.get_LF_id(), designer_.get_LF_frame(),
+          state_, designer_.get_lf_id(), designer_.get_lf_frame(),
           actuation_->get_nu(), Eigen::Vector2d(0., 4.));
 
   boost::shared_ptr<crocoddyl::ContactModelAbstract> ContactModelRight =
       boost::make_shared<crocoddyl::ContactModel6D>(
-          state_, designer_.get_RF_id(), designer_.get_RF_frame(),
+          state_, designer_.get_rf_id(), designer_.get_rf_frame(),
           actuation_->get_nu(), Vector2d(0., 4.));
 
-  contactCollector->addContact(designer_.get_LF_name(), ContactModelLeft,
+  contactCollector->addContact(designer_.get_lf_name(), ContactModelLeft,
                                false);
-  contactCollector->addContact(designer_.get_RF_name(), ContactModelRight,
+  contactCollector->addContact(designer_.get_rf_name(), ContactModelRight,
                                false);
 
-  contactCollector->changeContactStatus(designer_.get_LF_name(), true);
-  contactCollector->changeContactStatus(designer_.get_RF_name(), true);
+  contactCollector->changeContactStatus(designer_.get_lf_name(), true);
+  contactCollector->changeContactStatus(designer_.get_rf_name(), true);
 }
 
 void OCP_Point::definePostureTask(CostModelSum &costCollector,
                                   const double wStateReg) {
-  if (settings_.stateWeights.size() != designer_.get_rModel().nv * 2) {
+  if (settings_.stateWeights.size() != designer_.get_rmodel().nv * 2) {
     throw std::invalid_argument("State weight size is wrong ");
   }
   boost::shared_ptr<crocoddyl::ActivationModelWeightedQuad> activationWQ =
@@ -64,13 +64,13 @@ void OCP_Point::defineJointLimits(CostModelSum &costCollector,
       upper_bound(2 * state_->get_nv());
   double inf = 9999.0;
   lower_bound << Eigen::VectorXd::Constant(6, -inf),
-      designer_.get_rModel().lowerPositionLimit.tail(
+      designer_.get_rmodel().lowerPositionLimit.tail(
           static_cast<Eigen::Index>(state_->get_nq() - 7)),
       Eigen::VectorXd::Constant(static_cast<Eigen::Index>(state_->get_nv()),
                                 -inf);
 
   upper_bound << Eigen::VectorXd::Constant(6, inf),
-      designer_.get_rModel().upperPositionLimit.tail(
+      designer_.get_rmodel().upperPositionLimit.tail(
           static_cast<Eigen::Index>(state_->get_nq() - 7)),
       Eigen::VectorXd::Constant(static_cast<Eigen::Index>(state_->get_nv()),
                                 inf);
@@ -111,7 +111,7 @@ void OCP_Point::defineGripperPlacement(CostModelSum &costCollector,
           state_,
           boost::make_shared<crocoddyl::ActivationModelQuadFlatLog>(3, 0.02),
           boost::make_shared<crocoddyl::ResidualModelFrameTranslation>(
-              state_, designer_.get_EndEff_id(), goalPlacement.translation(),
+              state_, designer_.get_end_effector_id(), goalPlacement.translation(),
               actuation_->get_nu()));
 
   costCollector.get()->addCost("gripperPosition", gripperPositionCost,
@@ -121,7 +121,7 @@ void OCP_Point::defineGripperPlacement(CostModelSum &costCollector,
   boost::shared_ptr<crocoddyl::CostModelAbstract> gripperRotationCost =
       boost::make_shared<crocoddyl::CostModelResidual>(
           state_, boost::make_shared<crocoddyl::ResidualModelFrameRotation>(
-                      state_, designer_.get_EndEff_id(),
+                      state_, designer_.get_end_effector_id(),
                       goalPlacement.rotation(), actuation_->get_nu()));
 
   costCollector.get()->addCost("gripperRotation", gripperRotationCost,
@@ -134,7 +134,7 @@ void OCP_Point::defineGripperVelocity(CostModelSum &costCollector,
   boost::shared_ptr<crocoddyl::CostModelAbstract> gripperVelocityCost =
       boost::make_shared<crocoddyl::CostModelResidual>(
           state_, boost::make_shared<crocoddyl::ResidualModelFrameVelocity>(
-                      state_, designer_.get_EndEff_id(), goalMotion,
+                      state_, designer_.get_end_effector_id(), goalMotion,
                       pinocchio::WORLD, actuation_->get_nu()));
 
   costCollector.get()->addCost("gripperVelocity", gripperVelocityCost,

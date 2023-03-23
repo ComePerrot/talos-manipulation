@@ -17,44 +17,44 @@ void RobotDesigner::initialize(const RobotDesignerSettings &settings) {
   settings_ = settings;
 
   // COMPLETE MODEL //
-  if (settings_.robotDescription.size() > 0) {
-    pinocchio::urdf::buildModelFromXML(settings_.robotDescription,
+  if (settings_.robot_description.size() > 0) {
+    pinocchio::urdf::buildModelFromXML(settings_.robot_description,
                                        pinocchio::JointModelFreeFlyer(),
-                                       rModelComplete_);
+                                       rmodel_complete_);
     std::cout << "### Build pinocchio model from rosparam robot_description."
               << std::endl;
-  } else if (settings_.urdfPath.size() > 0) {
+  } else if (settings_.urdf_path.size() > 0) {
     pinocchio::urdf::buildModel(
-        settings_.urdfPath, pinocchio::JointModelFreeFlyer(), rModelComplete_);
+        settings_.urdf_path, pinocchio::JointModelFreeFlyer(), rmodel_complete_);
     std::cout << "### Build pinocchio model from urdf file." << std::endl;
   } else {
     throw std::invalid_argument(
-        "the urdf file, or robotDescription must be specified.");
+        "the urdf file, or robot_description must be specified.");
   }
-  rDataComplete_ = pinocchio::Data(rModelComplete_);
+  rdata_complete_ = pinocchio::Data(rmodel_complete_);
 
-  pinocchio::srdf::loadReferenceConfigurations(rModelComplete_,
-                                               settings_.srdfPath, false);
-  pinocchio::srdf::loadRotorParameters(rModelComplete_, settings_.srdfPath,
+  pinocchio::srdf::loadReferenceConfigurations(rmodel_complete_,
+                                               settings_.srdf_path, false);
+  pinocchio::srdf::loadRotorParameters(rmodel_complete_, settings_.srdf_path,
                                        false);
-  q0Complete_ = rModelComplete_.referenceConfigurations["half_sitting"];
-  v0Complete_ = Eigen::VectorXd::Zero(rModelComplete_.nv);
+  q0_complete_ = rmodel_complete_.referenceConfigurations["half_sitting"];
+  v0_complete_ = Eigen::VectorXd::Zero(rmodel_complete_.nv);
 
   // REDUCED MODEL //
 
-  if (settings_.controlledJointsNames[0] != "root_joint") {
+  if (settings_.controlled_joints_names[0] != "root_joint") {
     throw std::invalid_argument(
         "the joint at index 0 must be called 'root_joint' ");
   }
 
   // Check if listed joints belong to model
   for (std::vector<std::string>::const_iterator it =
-           settings_.controlledJointsNames.begin();
-       it != settings_.controlledJointsNames.end(); ++it) {
+           settings_.controlled_joints_names.begin();
+       it != settings_.controlled_joints_names.end(); ++it) {
     const std::string &joint_name = *it;
     std::cout << joint_name << std::endl;
-    std::cout << rModelComplete_.getJointId(joint_name) << std::endl;
-    if (not(rModelComplete_.existJointName(joint_name))) {
+    std::cout << rmodel_complete_.getJointId(joint_name) << std::endl;
+    if (not(rmodel_complete_.existJointName(joint_name))) {
       std::cout << "joint: " << joint_name << " does not belong to the model"
                 << std::endl;
     }
@@ -63,109 +63,109 @@ void RobotDesigner::initialize(const RobotDesignerSettings &settings) {
   // making list of blocked joints
   std::vector<unsigned long> locked_joints_id;
   for (std::vector<std::string>::const_iterator it =
-           rModelComplete_.names.begin() + 1;
-       it != rModelComplete_.names.end(); ++it) {
+           rmodel_complete_.names.begin() + 1;
+       it != rmodel_complete_.names.end(); ++it) {
     const std::string &joint_name = *it;
-    if (std::find(settings_.controlledJointsNames.begin(),
-                  settings_.controlledJointsNames.end(),
-                  joint_name) == settings_.controlledJointsNames.end()) {
-      locked_joints_id.push_back(rModelComplete_.getJointId(joint_name));
+    if (std::find(settings_.controlled_joints_names.begin(),
+                  settings_.controlled_joints_names.end(),
+                  joint_name) == settings_.controlled_joints_names.end()) {
+      locked_joints_id.push_back(rmodel_complete_.getJointId(joint_name));
     }
   }
 
-  rModel_ = pinocchio::buildReducedModel(rModelComplete_, locked_joints_id,
-                                         q0Complete_);
-  rData_ = pinocchio::Data(rModel_);
+  rmodel_ = pinocchio::buildReducedModel(rmodel_complete_, locked_joints_id,
+                                         q0_complete_);
+  rdata_ = pinocchio::Data(rmodel_);
 
-  pinocchio::srdf::loadReferenceConfigurations(rModel_, settings_.srdfPath,
+  pinocchio::srdf::loadReferenceConfigurations(rmodel_, settings_.srdf_path,
                                                false);
-  pinocchio::srdf::loadRotorParameters(rModel_, settings_.srdfPath, false);
-  q0_ = rModel_.referenceConfigurations["half_sitting"];
-  v0_ = Eigen::VectorXd::Zero(rModel_.nv);
-  x0_.resize(rModel_.nq + rModel_.nv);
+  pinocchio::srdf::loadRotorParameters(rmodel_, settings_.srdf_path, false);
+  q0_ = rmodel_.referenceConfigurations["half_sitting"];
+  v0_ = Eigen::VectorXd::Zero(rmodel_.nv);
+  x0_.resize(rmodel_.nq + rmodel_.nv);
   x0_ << q0_, v0_;
   // Generating list of indices for controlled joints //
-  for (std::vector<std::string>::const_iterator it = rModel_.names.begin() + 1;
-       it != rModel_.names.end(); ++it) {
+  for (std::vector<std::string>::const_iterator it = rmodel_.names.begin() + 1;
+       it != rmodel_.names.end(); ++it) {
     const std::string &joint_name = *it;
-    if (std::find(settings_.controlledJointsNames.begin(),
-                  settings_.controlledJointsNames.end(),
-                  joint_name) != settings_.controlledJointsNames.end()) {
-      controlled_joints_id_.push_back(rModelComplete_.getJointId(joint_name));
+    if (std::find(settings_.controlled_joints_names.begin(),
+                  settings_.controlled_joints_names.end(),
+                  joint_name) != settings_.controlled_joints_names.end()) {
+      controlled_joints_ids_.push_back(rmodel_complete_.getJointId(joint_name));
     }
   }
 
-  leftFootId_ = rModel_.getFrameId(settings_.leftFootName);
-  rightFootId_ = rModel_.getFrameId(settings_.rightFootName);
+  left_foot_id_ = rmodel_.getFrameId(settings_.left_foot_name);
+  right_foot_id_ = rmodel_.getFrameId(settings_.right_foot_name);
 
   updateReducedModel(q0_);
-  initialized_ = true;
+  is_initialized_ = true;
 }
 
 void RobotDesigner::updateReducedModel(const Eigen::VectorXd &x) {
   /** x is the reduced posture, or contains the reduced posture in the first
    * elements */
-  pinocchio::forwardKinematics(rModel_, rData_, x.head(rModel_.nq));
-  pinocchio::updateFramePlacements(rModel_, rData_);
+  pinocchio::forwardKinematics(rmodel_, rdata_, x.head(rmodel_.nq));
+  pinocchio::updateFramePlacements(rmodel_, rdata_);
   com_position_ =
-      pinocchio::centerOfMass(rModel_, rData_, x.head(rModel_.nq), false);
-  LF_position_ = rData_.oMf[leftFootId_].translation();
-  RF_position_ = rData_.oMf[rightFootId_].translation();
+      pinocchio::centerOfMass(rmodel_, rdata_, x.head(rmodel_.nq), false);
+  lf_position_ = rdata_.oMf[left_foot_id_].translation();
+  rf_position_ = rdata_.oMf[right_foot_id_].translation();
 }
 
 void RobotDesigner::updateCompleteModel(const Eigen::VectorXd &x) {
   /** x is the complete posture, or contains the complete posture in the first
    * elements */
-  pinocchio::forwardKinematics(rModelComplete_, rDataComplete_,
-                               x.head(rModelComplete_.nq));
-  pinocchio::updateFramePlacements(rModelComplete_, rDataComplete_);
-  com_position_ = pinocchio::centerOfMass(rModelComplete_, rDataComplete_,
-                                          x.head(rModelComplete_.nq), false);
-  LF_position_ = rData_.oMf[leftFootId_].translation();
-  RF_position_ = rData_.oMf[rightFootId_].translation();
+  pinocchio::forwardKinematics(rmodel_complete_, rdata_complete_,
+                               x.head(rmodel_complete_.nq));
+  pinocchio::updateFramePlacements(rmodel_complete_, rdata_complete_);
+  com_position_ = pinocchio::centerOfMass(rmodel_complete_, rdata_complete_,
+                                          x.head(rmodel_complete_.nq), false);
+  lf_position_ = rdata_.oMf[left_foot_id_].translation();
+  rf_position_ = rdata_.oMf[right_foot_id_].translation();
 }
 
 void RobotDesigner::updateModelLimits(
-    const Eigen::VectorXd lowerPositionLimit,
-    const Eigen::VectorXd upperPositionLimit) {
-  if ((rModel_.lowerPositionLimit.size() != lowerPositionLimit.size()) ||
-      (rModel_.upperPositionLimit.size() != upperPositionLimit.size())) {
+    const Eigen::VectorXd lower_position_limit,
+    const Eigen::VectorXd upper_Position_limit) {
+  if ((rmodel_.lowerPositionLimit.size() != lower_position_limit.size()) ||
+      (rmodel_.upperPositionLimit.size() != upper_Position_limit.size())) {
     throw std::runtime_error("Provided limit vector size does not match");
   }
-  rModel_.lowerPositionLimit = lowerPositionLimit;
-  rModel_.upperPositionLimit = upperPositionLimit;
+  rmodel_.lowerPositionLimit = lower_position_limit;
+  rmodel_.upperPositionLimit = upper_Position_limit;
 }
 
-void RobotDesigner::addEndEffectorFrame(std::string endEffectorName,
-                                        std::string parentName,
-                                        pinocchio::SE3 endEffectorPlacement) {
-  pinocchio::FrameIndex parentId = rModel_.getFrameId(parentName);
-  pinocchio::Frame parentFrame = rModel_.frames[parentId];
+void RobotDesigner::addEndEffectorFrame(std::string end_effector_name,
+                                        std::string parent_name,
+                                        pinocchio::SE3 end_effector_placement) {
+  pinocchio::FrameIndex parent_id = rmodel_.getFrameId(parent_name);
+  pinocchio::Frame parent_frame = rmodel_.frames[parent_id];
 
-  rModel_.addBodyFrame(endEffectorName, parentFrame.parent,
-                       parentFrame.placement.act(endEffectorPlacement),
-                       (int)parentId);
+  rmodel_.addBodyFrame(end_effector_name, parent_frame.parent,
+                       parent_frame.placement.act(end_effector_placement),
+                       (int)parent_id);
 
-  EndEffectorId_ = rModel_.getFrameId(endEffectorName);
-  rData_ = pinocchio::Data(rModel_);
+  end_effector_id_ = rmodel_.getFrameId(end_effector_name);
+  rdata_ = pinocchio::Data(rmodel_);
 }
 
-const pinocchio::SE3 &RobotDesigner::get_LF_frame() {
-  return rData_.oMf[leftFootId_];
+const pinocchio::SE3 &RobotDesigner::get_lf_frame() {
+  return rdata_.oMf[left_foot_id_];
 }
 
-const pinocchio::SE3 &RobotDesigner::get_RF_frame() {
-  return rData_.oMf[rightFootId_];
+const pinocchio::SE3 &RobotDesigner::get_rf_frame() {
+  return rdata_.oMf[right_foot_id_];
 }
 
-const pinocchio::SE3 &RobotDesigner::get_EndEff_frame() {
-  return rData_.oMf[EndEffectorId_];
+const pinocchio::SE3 &RobotDesigner::get_end_effector_frame() {
+  return rdata_.oMf[end_effector_id_];
 }
 
-double RobotDesigner::getRobotMass() {
-  mass_ = 0;
-  for (pinocchio::Inertia &I : rModel_.inertias) mass_ += I.mass();
-  return mass_;
+double RobotDesigner::get_robot_mass() {
+  robot_mass_ = 0;
+  for (pinocchio::Inertia &I : rmodel_.inertias) robot_mass_ += I.mass();
+  return robot_mass_;
 }
 
 }  // namespace mpc_p
