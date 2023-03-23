@@ -38,7 +38,7 @@ void RobotDesigner::initialize(const RobotDesignerSettings &settings) {
   pinocchio::srdf::loadRotorParameters(rmodel_complete_, settings_.srdf_path,
                                        false);
   q0_complete_ = rmodel_complete_.referenceConfigurations["half_sitting"];
-  v0_complete_ = Eigen::VectorXd::Zero(rmodel_complete_.nv);
+  v0_complete_ = VectorXd::Zero(rmodel_complete_.nv);
 
   // REDUCED MODEL //
 
@@ -102,7 +102,7 @@ void RobotDesigner::initialize(const RobotDesignerSettings &settings) {
   is_initialized_ = true;
 }
 
-void RobotDesigner::updateReducedModel(const Eigen::VectorXd &x) {
+void RobotDesigner::updateReducedModel(const ConstVectorRef &x) {
   /** x is the reduced posture, or contains the reduced posture in the first
    * elements */
   pinocchio::forwardKinematics(rmodel_, rdata_, x.head(rmodel_.nq));
@@ -113,7 +113,7 @@ void RobotDesigner::updateReducedModel(const Eigen::VectorXd &x) {
   rf_position_ = rdata_.oMf[right_foot_id_].translation();
 }
 
-void RobotDesigner::updateCompleteModel(const Eigen::VectorXd &x) {
+void RobotDesigner::updateCompleteModel(const ConstVectorRef &x) {
   /** x is the complete posture, or contains the complete posture in the first
    * elements */
   pinocchio::forwardKinematics(rmodel_complete_, rdata_complete_,
@@ -150,15 +150,15 @@ void RobotDesigner::addEndEffectorFrame(std::string end_effector_name,
   rdata_ = pinocchio::Data(rmodel_);
 }
 
-const pinocchio::SE3 &RobotDesigner::get_lf_frame() {
+const SE3 &RobotDesigner::get_lf_frame() {
   return rdata_.oMf[left_foot_id_];
 }
 
-const pinocchio::SE3 &RobotDesigner::get_rf_frame() {
+const SE3 &RobotDesigner::get_rf_frame() {
   return rdata_.oMf[right_foot_id_];
 }
 
-const pinocchio::SE3 &RobotDesigner::get_end_effector_frame() {
+const SE3 &RobotDesigner::get_end_effector_frame() {
   return rdata_.oMf[end_effector_id_];
 }
 
