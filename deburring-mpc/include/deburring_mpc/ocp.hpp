@@ -34,7 +34,6 @@
 #include "deburring_mpc/fwd.hpp"
 
 namespace deburring {
-// using namespace crocoddyl;
 
 struct OCP_debugData {
  public:
@@ -56,7 +55,7 @@ struct OCP_debugData {
   }
 };
 
-struct OCPSettings_Point {
+struct OCPSettings {
   size_t horizon_length;
   // Timing
   double timeStep = 0.01;
@@ -82,9 +81,9 @@ struct OCPSettings_Point {
   void readParamsFromYamlFile(const std::string &Filename);
 };
 
-class OCP_Point {
+class OCP {
  private:
-  OCPSettings_Point settings_;
+  OCPSettings settings_;
   RobotDesigner designer_;
   DDP solver_;
 
@@ -123,7 +122,7 @@ class OCP_Point {
   ActionData ada(const unsigned long time);
 
  public:
-  OCP_Point(const OCPSettings_Point &OCPSettings,
+  OCP(const OCPSettings &OCPSettings,
             const RobotDesigner &designer);
 
   void initialize(const ConstVectorRef &x0, const SE3 &oMtarget);
@@ -162,7 +161,7 @@ class OCP_Point {
   const VectorXd get_torque();
   const MatrixXd get_gain();
 
-  OCPSettings_Point &get_settings() { return settings_; };
+  OCPSettings &get_settings() { return settings_; };
   DDP get_solver() { return (solver_); };
   size_t get_initialized() { return (initialized_); };
   size_t get_horizonLength() { return (settings_.horizon_length); };

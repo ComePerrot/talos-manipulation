@@ -4,8 +4,8 @@ namespace deburring {
 
 #define PI 3.14159265
 
-MPC_Point::MPC_Point(const MPCSettings_Point &settings,
-                     const OCPSettings_Point &OCPSettings,
+MPC::MPC(const MPCSettings &settings,
+                     const OCPSettings &OCPSettings,
                      const RobotDesigner &designer)
     : settings_(settings), designer_(designer), OCP_(OCPSettings, designer_) {
   backwardOffset_.translation().z() = settings_.backwardOffset;
@@ -15,7 +15,7 @@ MPC_Point::MPC_Point(const MPCSettings_Point &settings,
   }
 }
 
-void MPC_Point::initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
+void MPC::initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
                            const SE3 &toolMtarget) {
   controlled_joints_ids_ = designer_.get_controlled_joints_ids();
   x_internal_.resize(designer_.get_rmodel().nq + designer_.get_rmodel().nv);
@@ -36,13 +36,13 @@ void MPC_Point::initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
   initialized_ = true;
 }
 
-void MPC_Point::iterate(const ConstVectorRef &q_current,
+void MPC::iterate(const ConstVectorRef &q_current,
                         const ConstVectorRef &v_current,
                         const SE3 &toolMtarget) {
   iterate(shapeState(q_current, v_current), toolMtarget);
 }
 
-void MPC_Point::iterate(const VectorXd &x0, const SE3 &toolMtarget) {
+void MPC::iterate(const VectorXd &x0, const SE3 &toolMtarget) {
   x0_ = x0;
 
   designer_.updateReducedModel(x0_);
@@ -56,7 +56,7 @@ void MPC_Point::iterate(const VectorXd &x0, const SE3 &toolMtarget) {
   K0_ = OCP_.get_gain();
 }
 
-void MPC_Point::setTarget(const SE3 &toolMtarget) {
+void MPC::setTarget(const SE3 &toolMtarget) {
   // Setup target
   number_holes_ = settings_.holes_offsets.size();
 
@@ -90,7 +90,7 @@ void MPC_Point::setTarget(const SE3 &toolMtarget) {
   setHolesPlacement();
 }
 
-void MPC_Point::setHolesPlacement() {
+void MPC::setHolesPlacement() {
   if (list_oMhole_.empty()) {
     for (size_t h = 0; h < number_holes_; h++) {
       list_oMhole_.push_back(oMtarget_.act(holes_offsets_[h]));
@@ -102,7 +102,7 @@ void MPC_Point::setHolesPlacement() {
   }
 }
 
-void MPC_Point::updateTarget(const SE3 &toolMtarget) {
+void MPC::updateTarget(const SE3 &toolMtarget) {
   if (settings_.use_mocap == 0 || settings_.use_mocap == 1) {
     tool_se3_hole_ =
         designer_.get_end_effector_frame().actInv(list_oMhole_[current_hole_]);
@@ -121,7 +121,7 @@ void MPC_Point::updateTarget(const SE3 &toolMtarget) {
   }
 }
 
-void MPC_Point::updateOCP() {
+void MPC::updateOCP() {
   switch (drilling_state_) {
     case 0:  // Initialization
       if (iteration_ < settings_.T_initialization) {
@@ -256,7 +256,7 @@ void MPC_Point::updateOCP() {
   }
 }
 
-const VectorXd &MPC_Point::shapeState(const ConstVectorRef &q,
+const VectorXd &MPC::shapeState(const ConstVectorRef &q,
                                       const ConstVectorRef &v) {
   if (q.size() == designer_.get_rmodel_complete().nq &&
       v.size() == designer_.get_rmodel_complete().nv) {

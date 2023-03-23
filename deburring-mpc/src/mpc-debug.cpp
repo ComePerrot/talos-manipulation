@@ -4,7 +4,7 @@
 
 namespace deburring {
 
-void MPC_Point::logData(const Eigen::Ref<const Eigen::VectorXd> x_input,
+void MPC::logData(const Eigen::Ref<const Eigen::VectorXd> x_input,
                         const Eigen::Ref<const Eigen::VectorXd> us0,
                         const Eigen::Ref<const Eigen::MatrixXd> K0) {
   MPC_debugData data;
@@ -19,13 +19,13 @@ void MPC_Point::logData(const Eigen::Ref<const Eigen::VectorXd> x_input,
   debugDataMPC_.push_back(data);
 }
 
-void MPC_Point::dumpToFile(std::string name) {
+void MPC::dumpToFile(std::string name) {
   std::ofstream ofs(name.c_str());
   boost::archive::text_oarchive oa(ofs);
   oa << debugDataMPC_;
 }
 
-std::vector<MPC_debugData> MPC_Point::fetchFromFile(std::string name) {
+std::vector<MPC_debugData> MPC::fetchFromFile(std::string name) {
   std::vector<MPC_debugData> datas;
 
   std::ifstream ifs(name.c_str());

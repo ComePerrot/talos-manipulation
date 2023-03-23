@@ -2,7 +2,7 @@
 
 namespace deburring {
 
-void OCP_Point::logData(
+void OCP::logData(
     const std::vector<Eigen::VectorXd>& x_init,
     const std::vector<Eigen::VectorXd>& u_init,
     const std::vector<Eigen::VectorXd>& xs,
@@ -19,13 +19,13 @@ void OCP_Point::logData(
   debugDataOCP_.push_back(data);
 }
 
-void OCP_Point::dumpToFile(std::string name) {
+void OCP::dumpToFile(std::string name) {
   std::ofstream ofs(name.c_str());
   boost::archive::text_oarchive oa(ofs);
   oa << debugDataOCP_;
 }
 
-std::vector<OCP_debugData> OCP_Point::fetchFromFile(std::string name) {
+std::vector<OCP_debugData> OCP::fetchFromFile(std::string name) {
   std::vector<OCP_debugData> datas;
 
   std::ifstream ifs(name.c_str());
@@ -35,7 +35,7 @@ std::vector<OCP_debugData> OCP_Point::fetchFromFile(std::string name) {
   return (datas);
 }
 
-void OCP_Point::reprOCP(const unsigned long time) {
+void OCP::reprOCP(const unsigned long time) {
   auto modelContacts = dam(time)->get_contacts()->get_contacts();
 
   // Contacts

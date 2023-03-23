@@ -7,7 +7,7 @@
 import pinocchio as pin
 import yaml
 
-from deburring_mpc import MPC_Point, MPCSettings_Point, OCPSettings_Point, RobotDesigner
+from deburring_mpc import MPC, MPCSettings, OCPSettings, RobotDesigner
 
 from bullet_Talos import TalosDeburringSimulator
 from plotter import TalosPlotter
@@ -46,8 +46,8 @@ with open(filename, "r") as paramFile:
 controlledJoints = params["robot"]["controlledJoints"]
 toolFramePos = params["robot"]["toolFramePos"]
 
-MPCparams = MPCSettings_Point()
-OCPparams = OCPSettings_Point()
+MPCparams = MPCSettings()
+OCPparams = OCPSettings()
 
 print("Loading data from file: \n" + filename)
 OCPparams.readFromYaml(filename)
@@ -74,7 +74,7 @@ pinWrapper.add_end_effector_frame(
 )
 
 # MPC
-MPC = MPC_Point(MPCparams, OCPparams, pinWrapper)
+MPC = MPC(MPCparams, OCPparams, pinWrapper)
 MPC.initialize(
     pinWrapper.get_rmodel_complete().referenceConfigurations["half_sitting"],
     pinWrapper.get_v0_complete(),

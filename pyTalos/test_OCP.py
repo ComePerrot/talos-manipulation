@@ -8,7 +8,7 @@ import pinocchio as pin
 import numpy as np
 import yaml
 
-from deburring_mpc import OCP_Point, OCPSettings_Point, RobotDesigner
+from deburring_mpc import OCP, OCPSettings, RobotDesigner
 
 from bullet_Talos import TalosDeburringSimulator
 from plotter import TalosPlotter
@@ -73,7 +73,7 @@ with open(filename, "r") as paramFile:
 controlledJoints = params["robot"]["controlledJoints"]
 toolFramePos = params["robot"]["toolFramePos"]
 
-OCPparams = OCPSettings_Point()
+OCPparams = OCPSettings()
 
 print("Loading data from file: \n" + filename)
 OCPparams.readFromYaml(filename)
@@ -196,7 +196,7 @@ oMtarget.translation[2] = targetPos_1[2]
 
 oMtarget.rotation = np.array([[0, 0, -1], [0, -1, 0], [-1, 0, 0]])
 
-OCP = OCP_Point(OCPparams, pinWrapper)
+OCP = OCP(OCPparams, pinWrapper)
 OCP.initialize(pinWrapper.get_x0(), oMtarget)
 print("OCP successfully loaded")
 

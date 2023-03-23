@@ -1,11 +1,11 @@
 #include "deburring_mpc/ocp.hpp"
 
 namespace deburring {
-OCP_Point::OCP_Point(const OCPSettings_Point &OCPSettings,
+OCP::OCP(const OCPSettings &OCPSettings,
                      const RobotDesigner &designer)
     : settings_(OCPSettings), designer_(designer) {}
 
-void OCP_Point::initialize(const ConstVectorRef &x0,
+void OCP::initialize(const ConstVectorRef &x0,
                            const pinocchio::SE3 &oMtarget) {
   if (!designer_.get_is_initialized()) {
     throw std::runtime_error("The designer must be initialized.");
@@ -17,7 +17,7 @@ void OCP_Point::initialize(const ConstVectorRef &x0,
   initialized_ = true;
 }
 
-void OCP_Point::solve(const ConstVectorRef &measured_x) {
+void OCP::solve(const ConstVectorRef &measured_x) {
   warm_xs_ = solver_->get_xs();
   warm_xs_.erase(warm_xs_.begin());
   warm_xs_[0] = measured_x;
@@ -35,7 +35,7 @@ void OCP_Point::solve(const ConstVectorRef &measured_x) {
 }
 
 ///@todo: add initialization check before returning torque or gain
-const VectorXd OCP_Point::get_torque() { return (solver_->get_us()[0]); }
-const MatrixXd OCP_Point::get_gain() { return (solver_->get_K()[0]); }
+const VectorXd OCP::get_torque() { return (solver_->get_us()[0]); }
+const MatrixXd OCP::get_gain() { return (solver_->get_K()[0]); }
 
 }  // namespace deburring

@@ -71,13 +71,13 @@ int main() {
   std::string parameterFile =
       "/home/cperrot/workspaces/wbDeburring/src/talos-manipulation/config/"
       "settings_sobec.yaml";
-  deburring::OCPSettings_Point ocpSettings = deburring::OCPSettings_Point();
+  deburring::OCPSettings ocpSettings = deburring::OCPSettings();
   ocpSettings.readParamsFromYamlFile(parameterFile);
   //    MPC parameters
-  deburring::MPCSettings_Point mpcSettings = deburring::MPCSettings_Point();
+  deburring::MPCSettings mpcSettings = deburring::MPCSettings();
   mpcSettings.readParamsFromYamlFile(parameterFile);
 
-  deburring::MPC_Point MPC = deburring::MPC_Point(mpcSettings, ocpSettings, pinWrapper);
+  deburring::MPC MPC = deburring::MPC(mpcSettings, ocpSettings, pinWrapper);
 
   // Load data from serialized file
   std::vector<deburring::MPC_debugData>::size_type iteration = 0;

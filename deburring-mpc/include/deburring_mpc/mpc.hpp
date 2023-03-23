@@ -33,7 +33,7 @@ struct MPC_debugData {
   }
 };
 
-struct MPCSettings_Point {
+struct MPCSettings {
   // Timing parameters
   size_t T_initialization;
   size_t T_stabilization;
@@ -57,11 +57,11 @@ struct MPCSettings_Point {
   void readParamsFromYamlFile(const std::string &Filename);
 };
 
-class MPC_Point {
+class MPC {
  private:
-  MPCSettings_Point settings_;
+  MPCSettings settings_;
   RobotDesigner designer_;
-  OCP_Point OCP_;
+  OCP OCP_;
 
   VectorXd x0_;
   VectorXd u0_;
@@ -97,8 +97,8 @@ class MPC_Point {
   void updateOCP();
 
  public:
-  MPC_Point(const MPCSettings_Point &settings,
-            const OCPSettings_Point &OCPSettings, const RobotDesigner &designer);
+  MPC(const MPCSettings &settings,
+            const OCPSettings &OCPSettings, const RobotDesigner &designer);
 
   void initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
                   const SE3 &toolMtarget);
@@ -121,7 +121,7 @@ class MPC_Point {
   std::vector<MPC_debugData> fetchFromFile(std::string name);
 
   // getters and setters
-  MPCSettings_Point &get_settings() { return settings_; }
+  MPCSettings &get_settings() { return settings_; }
 
   int get_drillingState() { return drilling_state_; }
 
@@ -135,8 +135,8 @@ class MPC_Point {
     return list_oMhole_[current_hole_];
   }
 
-  OCP_Point &get_OCP() { return OCP_; }
-  void set_OCP(const OCP_Point &OCP) { OCP_ = OCP; }
+  OCP &get_OCP() { return OCP_; }
+  void set_OCP(const OCP &OCP) { OCP_ = OCP; }
 
   RobotDesigner &get_designer() { return designer_; }
   void set_designer(const RobotDesigner &designer) { designer_ = designer; }
