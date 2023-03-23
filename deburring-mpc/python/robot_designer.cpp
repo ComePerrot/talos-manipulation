@@ -20,14 +20,14 @@ inline void py_list_to_std_vector(const bp::object &iterable,
 
 void initialize(RobotDesigner &self, bp::dict settings) {
   RobotDesignerSettings conf;
-  conf.urdfPath = bp::extract<std::string>(settings["urdfPath"]);
-  conf.srdfPath = bp::extract<std::string>(settings["srdfPath"]);
-  conf.leftFootName = bp::extract<std::string>(settings["leftFootName"]);
-  conf.rightFootName = bp::extract<std::string>(settings["rightFootName"]);
-  conf.robotDescription =
-      bp::extract<std::string>(settings["robotDescription"]);
-  py_list_to_std_vector(settings["controlledJointsNames"],
-                        conf.controlledJointsNames);
+  conf.urdf_path = bp::extract<std::string>(settings["urdf_path"]);
+  conf.srdf_path = bp::extract<std::string>(settings["srdf_path"]);
+  conf.left_foot_name = bp::extract<std::string>(settings["left_foot_name"]);
+  conf.right_foot_name = bp::extract<std::string>(settings["right_foot_name"]);
+  conf.robot_description =
+      bp::extract<std::string>(settings["robot_description"]);
+  py_list_to_std_vector(settings["controlled_joints_names"],
+                        conf.controlled_joints_names);
 
   self.initialize(conf);
 }
@@ -35,114 +35,114 @@ void initialize(RobotDesigner &self, bp::dict settings) {
 bp::dict get_settings(RobotDesigner &self) {
   RobotDesignerSettings conf = self.get_settings();
   bp::dict settings;
-  settings["urdfPath"] = conf.urdfPath;
-  settings["srdfPath"] = conf.srdfPath;
-  settings["leftFootName"] = conf.leftFootName;
-  settings["rightFootName"] = conf.rightFootName;
-  settings["robotDescription"] = conf.robotDescription;
+  settings["urdf_path"] = conf.urdf_path;
+  settings["srdf_path"] = conf.srdf_path;
+  settings["left_foot_name"] = conf.left_foot_name;
+  settings["right_foot_name"] = conf.right_foot_name;
+  settings["robot_description"] = conf.robot_description;
 
   return settings;
 }
 
-pinocchio::Model get_rModelComplete(RobotDesigner &self) {
-  return self.get_rModelComplete();
+pinocchio::Model get_rmodel_complete(RobotDesigner &self) {
+  return self.get_rmodel_complete();
 }
 
-// pinocchio::Model get_rModel(RobotDesigner &self) { return self.get_rModel();
+// pinocchio::Model get_rmodel(RobotDesigner &self) { return self.get_rmodel();
 // }
 
-pinocchio::Data get_rData(RobotDesigner &self) { return self.get_rData(); }
+pinocchio::Data get_rdata(RobotDesigner &self) { return self.get_rdata(); }
 
-pinocchio::Data get_rDataComplete(RobotDesigner &self) {
-  return self.get_rDataComplete();
+pinocchio::Data get_rdata_complete(RobotDesigner &self) {
+  return self.get_rdata_complete();
 }
 
 void exposeDesigner() {
   bp::class_<RobotDesigner>("RobotDesigner", bp::init<>())
       .def("initialize", &initialize)
-      .def("updateReducedModel", &RobotDesigner::updateReducedModel)
-      .def("updateCompleteModel", &RobotDesigner::updateCompleteModel)
-      .def("addEndEffectorFrame", &RobotDesigner::addEndEffectorFrame)
-      .def("get_LF_frame",
+      .def("update_reduced_model", &RobotDesigner::updateReducedModel)
+      .def("update_complete_model", &RobotDesigner::updateCompleteModel)
+      .def("add_end_effector_frame", &RobotDesigner::addEndEffectorFrame)
+      .def("get_lf_frame",
            bp::make_function(
-               &RobotDesigner::get_LF_frame,
+               &RobotDesigner::get_lf_frame,
                bp::return_value_policy<bp::reference_existing_object>()))
-      .def("get_EndEff_frame",
+      .def("get_end_effector_frame",
            bp::make_function(
-               &RobotDesigner::get_EndEff_frame,
+               &RobotDesigner::get_end_effector_frame,
                bp::return_value_policy<bp::reference_existing_object>()))
-      .def("get_RF_frame",
+      .def("get_rf_frame",
            bp::make_function(
-               &RobotDesigner::get_RF_frame,
+               &RobotDesigner::get_rf_frame,
                bp::return_value_policy<bp::reference_existing_object>()))
-      .def("getRobotMass", &RobotDesigner::getRobotMass)
-      .def("get_rModel",
+      .def("get_robot_mass", &RobotDesigner::get_robot_mass)
+      .def("get_rmodel",
            bp::make_function(
-               &RobotDesigner::get_rModel,
+               &RobotDesigner::get_rmodel,
                bp::return_value_policy<bp::reference_existing_object>()))
-      .def("get_rModelComplete",
+      .def("get_rmodel_complete",
            bp::make_function(
-               &RobotDesigner::get_rModelComplete,
+               &RobotDesigner::get_rmodel_complete,
                bp::return_value_policy<bp::reference_existing_object>()))
-      .def("get_rData",
+      .def("get_rdata",
            bp::make_function(
-               &RobotDesigner::get_rData,
+               &RobotDesigner::get_rdata,
                bp::return_value_policy<bp::reference_existing_object>()))
-      .def("get_rDataComplete",
+      .def("get_rdata_complete",
            bp::make_function(
-               &RobotDesigner::get_rDataComplete,
+               &RobotDesigner::get_rdata_complete,
                bp::return_value_policy<bp::reference_existing_object>()))
       .def("get_q0",
            bp::make_function(
                &RobotDesigner::get_q0,
                bp::return_value_policy<bp::reference_existing_object>()))
-      .def("get_q0Complete",
+      .def("get_q0_complete",
            bp::make_function(
-               &RobotDesigner::get_q0Complete,
+               &RobotDesigner::get_q0_complete,
                bp::return_value_policy<bp::reference_existing_object>()))
       .def("get_v0",
            bp::make_function(
                &RobotDesigner::get_v0,
                bp::return_value_policy<bp::reference_existing_object>()))
-      .def("get_v0Complete",
+      .def("get_v0_complete",
            bp::make_function(
-               &RobotDesigner::get_v0Complete,
+               &RobotDesigner::get_v0_complete,
                bp::return_value_policy<bp::reference_existing_object>()))
       .def("get_x0",
            bp::make_function(
                &RobotDesigner::get_x0,
                bp::return_value_policy<bp::reference_existing_object>()))
-      .def("get_LF_name",
+      .def("get_lf_name",
            bp::make_function(
-               &RobotDesigner::get_LF_name,
+               &RobotDesigner::get_lf_name,
                bp::return_value_policy<bp::copy_const_reference>()))
-      .def("get_RF_name",
+      .def("get_rf_name",
            bp::make_function(
-               &RobotDesigner::get_RF_name,
+               &RobotDesigner::get_rf_name,
                bp::return_value_policy<bp::copy_const_reference>()))
-      .def("get_LF_id",
+      .def("get_lf_id",
            bp::make_function(
-               &RobotDesigner::get_LF_id,
+               &RobotDesigner::get_lf_id,
                bp::return_value_policy<bp::copy_const_reference>()))
-      .def("get_RF_id",
+      .def("get_rf_id",
            bp::make_function(
-               &RobotDesigner::get_RF_id,
+               &RobotDesigner::get_rf_id,
                bp::return_value_policy<bp::copy_const_reference>()))
       .def("get_com_position",
            bp::make_function(
                &RobotDesigner::get_com_position,
                bp::return_value_policy<bp::copy_const_reference>()))
-      .def("get_EndEff_id",
+      .def("get_end_effector_id",
            bp::make_function(
-               &RobotDesigner::get_EndEff_id,
+               &RobotDesigner::get_end_effector_id,
                bp::return_value_policy<bp::copy_const_reference>()))
       .def("get_settings",
            bp::make_function(
                &RobotDesigner::get_settings,
                bp::return_value_policy<bp::reference_existing_object>()))
-      .def("get_controlledJointsIDs",
+      .def("get_controlled_joints_ids",
            bp::make_function(
-               &RobotDesigner::get_controlledJointsIDs,
+               &RobotDesigner::get_controlled_joints_ids,
                bp::return_value_policy<bp::copy_const_reference>()));
 
   return;

@@ -81,12 +81,12 @@ horizonLength = OCPparams.horizon_length
 
 # Robot model
 design_conf = dict(
-    urdfPath=URDF,
-    srdfPath=SRDF,
-    leftFootName="right_sole_link",
-    rightFootName="left_sole_link",
-    robotDescription="",
-    controlledJointsNames=controlledJoints,
+    urdf_path=URDF,
+    srdf_path=SRDF,
+    left_foot_name="right_sole_link",
+    right_foot_name="left_sole_link",
+    robot_description="",
+    controlled_joints_names=controlledJoints,
 )
 pinWrapper = RobotDesigner()
 pinWrapper.initialize(design_conf)
@@ -96,11 +96,11 @@ gripper_SE3_tool.translation[0] = toolFramePos[0]
 gripper_SE3_tool.translation[1] = toolFramePos[1]
 gripper_SE3_tool.translation[2] = toolFramePos[2]
 
-pinWrapper.addEndEffectorFrame(
+pinWrapper.add_end_effector_frame(
     "deburring_tool", "gripper_left_fingertip_3_link", gripper_SE3_tool
 )
 
-rModel = pinWrapper.get_rModel()
+rModel = pinWrapper.get_rmodel()
 
 rModel.lowerPositionLimit = np.array(
     [
@@ -205,16 +205,16 @@ ddp = OCP.solver
 # Simulator
 simulator = TalosDeburringSimulator(
     URDF=URDF,
-    initialConfiguration=pinWrapper.get_q0Complete(),
-    robotJointNames=pinWrapper.get_rModelComplete().names,
-    controlledJointsIDs=pinWrapper.get_controlledJointsIDs(),
-    toolPlacement=pinWrapper.get_EndEff_frame(),
+    initialConfiguration=pinWrapper.get_q0_complete(),
+    robotJointNames=pinWrapper.get_rmodel_complete().names,
+    controlledJointsIDs=pinWrapper.get_controlled_joints_ids(),
+    toolPlacement=pinWrapper.get_end_effector_frame(),
     targetPlacement=oMtarget,
     enableGUI=enableGUI,
 )
 
 # Plotter
-plotter = TalosPlotter(pinWrapper.get_rModel(), T_total)
+plotter = TalosPlotter(pinWrapper.get_rmodel(), T_total)
 
 ########################
 #  INITIAL RESOLUTION  #
@@ -253,7 +253,7 @@ targetReached = 0
 reachTime = 0
 
 state = OCP.state
-toolPlacement = pinWrapper.get_EndEff_frame()
+toolPlacement = pinWrapper.get_end_effector_frame()
 ddp = OCP.solver
 
 goalTrackingWeight = 10
@@ -276,11 +276,11 @@ for T in range(T_total):
         simulator.step(torques, toolPlacement, oMtarget)
 
     # Solve MPC iteration
-    pinWrapper.updateReducedModel(x_measured)
+    pinWrapper.update_reduced_model(x_measured)
     OCP.solve(x_measured)
 
     # Update tool placement
-    toolPlacement = pinWrapper.get_EndEff_frame()
+    toolPlacement = pinWrapper.get_end_effector_frame()
 
     # Handling phases of the movement
     if T < T_init:  # Initial phase
@@ -333,15 +333,15 @@ for T in range(T_total):
     plotter.logTargetReached(T, targetReached)
 
     pin.forwardKinematics(
-        pinWrapper.get_rModel(),
-        pinWrapper.get_rData(),
-        x_measured[: pinWrapper.get_rModel().nq],
-        x_measured[-pinWrapper.get_rModel().nv :],
+        pinWrapper.get_rmodel(),
+        pinWrapper.get_rdata(),
+        x_measured[: pinWrapper.get_rmodel().nq],
+        x_measured[-pinWrapper.get_rmodel().nv :],
     )
     speed = pin.getFrameVelocity(
-        pinWrapper.get_rModel(),
-        pinWrapper.get_rData(),
-        pinWrapper.get_EndEff_id(),
+        pinWrapper.get_rmodel(),
+        pinWrapper.get_rdata(),
+        pinWrapper.get_end_effector_id(),
     ).linear
 
     plotter.logEndEffectorSpeed(T, speed)
