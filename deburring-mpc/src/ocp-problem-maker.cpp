@@ -9,27 +9,27 @@ void OCP::buildSolver(const VectorXd x0, SE3 oMtarget) {
   actuation_ =
       boost::make_shared<crocoddyl::ActuationModelFloatingBase>(state_);
 
-  auto runningModels = std::vector<ActionModel>(settings_.horizon_length);
+  auto running_models = std::vector<ActionModel>(settings_.horizon_length);
 
-  for (size_t i = 0; i < settings_.horizon_length; i++) {
-    runningModels[i] = formulatePointingTask();
+  for (size_t node_index = 0; node_index < settings_.horizon_length; node_index++) {
+    running_models[node_index] = formulatePointingTask();
   }
 
   // Terminal model
-  auto terminalModel = formulateTerminalPointingTask();
+  auto terminal_model = formulateTerminalPointingTask();
 
   boost::shared_ptr<crocoddyl::ShootingProblem> shooting_problem =
-      boost::make_shared<crocoddyl::ShootingProblem>(x0, runningModels,
-                                                     terminalModel);
+      boost::make_shared<crocoddyl::ShootingProblem>(x0, running_models,
+                                                     terminal_model);
   solver_ = boost::make_shared<crocoddyl::SolverFDDP>(shooting_problem);
 
   // Change References
-  VectorXd postureReference = x0;
-  postureReference.tail(designer_.get_rmodel().nv) =
+  VectorXd posture_reference = x0;
+  posture_reference.tail(designer_.get_rmodel().nv) =
       VectorXd::Zero(designer_.get_rmodel().nv);
-  for (size_t modelIndex = 0; modelIndex <= settings_.horizon_length;
-       modelIndex++) {
-    changePostureReference(modelIndex, postureReference);
+  for (size_t node_index = 0; node_index <= settings_.horizon_length;
+       node_index++) {
+    changePostureReference(node_index, posture_reference);
   }
   setBalancingTorques();
 
@@ -38,9 +38,9 @@ void OCP::buildSolver(const VectorXd x0, SE3 oMtarget) {
   updateGoalRotation(oMtarget.rotation());
 
   // Deactivate Target cost at the beginning
-  for (size_t modelIndex = 0; modelIndex <= settings_.horizon_length;
-       modelIndex++) {
-    changeGoalCostActivation(modelIndex, false);
+  for (size_t node_index = 0; node_index <= settings_.horizon_length;
+       node_index++) {
+    changeGoalCostActivation(node_index, false);
   }
 }
 
@@ -71,29 +71,29 @@ ActionModel OCP::formulatePointingTask() {
   defineFeetContact(contacts);
 
   // Safety constraints
-  defineJointLimits(costs, settings_.wLimit, settings_.scaleLimits);
+  defineJointLimits(costs, settings_.w_limit, settings_.limit_scale);
 
   // Equilibrium constraints
-  defineCoMPosition(costs, settings_.wPCoM);
+  defineCoMPosition(costs, settings_.w_com_pos);
 
   // Regulation task
-  definePostureTask(costs, settings_.wStateReg);
-  defineActuationTask(costs, settings_.wControlReg);
+  definePostureTask(costs, settings_.w_state_reg);
+  defineActuationTask(costs, settings_.w_control_reg);
 
   // End effector task
-  defineGripperPlacement(costs, settings_.wGripperPos, settings_.wGripperRot);
-  defineGripperVelocity(costs, settings_.wGripperVel);
+  defineGripperPlacement(costs, settings_.w_gripper_pos, settings_.w_gripper_rot);
+  defineGripperVelocity(costs, settings_.w_gripper_vel);
 
-  DifferentialActionModel runningDAM =
+  DifferentialActionModel running_dam =
       boost::make_shared<crocoddyl::DifferentialActionModelContactFwdDynamics>(
           state_, actuation_, contacts, costs, 0., true);
-  setArmature(runningDAM);
+  setArmature(running_dam);
 
-  ActionModel runningModel =
+  ActionModel running_model =
       boost::make_shared<crocoddyl::IntegratedActionModelEuler>(
-          runningDAM, settings_.timeStep);
+          running_dam, settings_.time_step);
 
-  return runningModel;
+  return running_model;
 }
 
 ActionModel OCP::formulateTerminalPointingTask() {
@@ -105,27 +105,27 @@ ActionModel OCP::formulateTerminalPointingTask() {
   defineFeetContact(contacts);
 
   // Safety constraints
-  defineJointLimits(costs, settings_.wLimit, settings_.scaleLimits);
+  defineJointLimits(costs, settings_.w_limit, settings_.limit_scale);
 
   // Equilibrium constraints
-  defineCoMPosition(costs, settings_.wPCoM);
+  defineCoMPosition(costs, settings_.w_com_pos);
 
   // Regulation task
-  definePostureTask(costs, settings_.wStateReg);
+  definePostureTask(costs, settings_.w_state_reg);
 
   // End effector task
-  defineGripperPlacement(costs, settings_.wGripperPos, settings_.wGripperRot);
-  defineGripperVelocity(costs, settings_.wGripperVel);
+  defineGripperPlacement(costs, settings_.w_gripper_pos, settings_.w_gripper_rot);
+  defineGripperVelocity(costs, settings_.w_gripper_vel);
 
-  DifferentialActionModel terminalDAM =
+  DifferentialActionModel terminal_dam =
       boost::make_shared<crocoddyl::DifferentialActionModelContactFwdDynamics>(
           state_, actuation_, contacts, costs, 0., true);
-  setArmature(terminalDAM);
+  setArmature(terminal_dam);
 
-  ActionModel terminalModel =
-      boost::make_shared<crocoddyl::IntegratedActionModelEuler>(terminalDAM, 0);
+  ActionModel terminal_model =
+      boost::make_shared<crocoddyl::IntegratedActionModelEuler>(terminal_dam, 0);
 
-  return terminalModel;
+  return terminal_model;
 }
 
 void OCP::setArmature(DifferentialActionModel DAM) {
