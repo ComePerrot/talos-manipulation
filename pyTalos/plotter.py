@@ -6,7 +6,7 @@ class TalosPlotter:
     def __init__(self, rmodel, T_total):
         self.rmodel = rmodel
 
-        self.drillingState = np.zeros(T_total)
+        self.drilling_state = np.zeros(T_total)
         self.targetReached = np.zeros(T_total)
         self.x = np.zeros((T_total, 63))
         self.u = np.zeros((T_total, 25))
@@ -14,8 +14,8 @@ class TalosPlotter:
         self.desiredPos = np.zeros((T_total, 3))
         self.EndEffectorSpeed = np.zeros((T_total, 3))
 
-    def logDrillingState(self, T_current, drillingState):
-        self.drillingState[T_current] = drillingState
+    def logDrillingState(self, T_current, drilling_state):
+        self.drilling_state[T_current] = drilling_state
 
     def logTargetReached(self, T_current, targetReached):
         self.targetReached[T_current] = targetReached
@@ -55,7 +55,7 @@ class TalosPlotter:
         plt.grid(True)
         plt.subplot(414)
         plt.title("Drilling state")
-        plt.plot(self.drillingState, label="Drilling state")
+        plt.plot(self.drilling_state, label="Drilling state")
         plt.plot(self.targetReached, label="target reached")
         plt.legend(loc="lower right")
         plt.xlabel("Time")

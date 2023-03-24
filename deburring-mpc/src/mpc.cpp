@@ -136,8 +136,8 @@ void MPC::updateOCP() {
       if (iteration_ == 0) {
         std::cout << "Initiating movement" << std::endl;
       }
-      if (iteration_ <= OCP_.get_horizonLength()) {
-        OCP_.changeGoalCostActivation(OCP_.get_horizonLength() - iteration_,
+      if (iteration_ <= OCP_.get_horizon_length()) {
+        OCP_.changeGoalCostActivation(OCP_.get_horizon_length() - iteration_,
                                       true);
         iteration_++;
       } else {
@@ -175,7 +175,7 @@ void MPC::updateOCP() {
           goal_weight_ < settings_.gain_schedulig_max_weight) {
         goal_weight_ += settings_.gain_schedulig_slope;
 
-        OCP_.changeGoaleTrackingWeights(goal_weight_);
+        OCP_.changeGoalTrackingWeights(goal_weight_);
 
         iteration_++;
       } else {
@@ -205,12 +205,12 @@ void MPC::updateOCP() {
         std::cout << "Getting out of the hole" << std::endl;
         if (settings_.use_gain_scheduling == 1) {
           goal_weight_ = OCP_.get_settings().w_gripper_pos;
-          OCP_.changeGoaleTrackingWeights(goal_weight_);
+          OCP_.changeGoalTrackingWeights(goal_weight_);
         }
         oMbackwardHole_ = list_oMhole_[current_hole_].act(backwardOffset_);
       }
-      if (iteration_ <= OCP_.get_horizonLength()) {
-        OCP_.changeTarget(OCP_.get_horizonLength() - iteration_,
+      if (iteration_ <= OCP_.get_horizon_length()) {
+        OCP_.changeTarget(OCP_.get_horizon_length() - iteration_,
                           oMbackwardHole_.translation());
         iteration_++;
       } else {
@@ -231,8 +231,8 @@ void MPC::updateOCP() {
           drilling_state_ = 7;
         }
       }
-      if (iteration_ <= OCP_.get_horizonLength()) {
-        OCP_.changeTarget(OCP_.get_horizonLength() - iteration_,
+      if (iteration_ <= OCP_.get_horizon_length()) {
+        OCP_.changeTarget(OCP_.get_horizon_length() - iteration_,
                           list_oMhole_[current_hole_].translation());
         iteration_++;
       } else {
@@ -242,8 +242,8 @@ void MPC::updateOCP() {
       break;
 
     case 7:  // Returning to initial position
-      if (iteration_ <= OCP_.get_horizonLength()) {
-        OCP_.changeGoalCostActivation(OCP_.get_horizonLength() - iteration_,
+      if (iteration_ <= OCP_.get_horizon_length()) {
+        OCP_.changeGoalCostActivation(OCP_.get_horizon_length() - iteration_,
                                       false);
         iteration_++;
       } else {

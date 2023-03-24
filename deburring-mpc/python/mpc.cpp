@@ -96,7 +96,7 @@ void exposeMPCClass() {
       .add_property(
           "oMtarget",
           bp::make_function(
-              &MPC::get_Target_frame,
+              &MPC::get_target_frame,
               bp::return_value_policy<bp::reference_existing_object>()),
           "placement of the target in the robot frame")
       .add_property(
@@ -117,7 +117,7 @@ void exposeMPCClass() {
               &MPC::get_K0,
               bp::return_value_policy<bp::reference_existing_object>()),
           "Riccati gains")
-      .add_property("drillingState", &MPC::get_drillingState,
+      .add_property("drilling_state", &MPC::get_drilling_state,
                     "Riccati gains");
 }
 

@@ -248,7 +248,7 @@ us_init = ddp.us.tolist()
 ###############
 NcontrolKnots = 10
 T = 0
-drillingState = 0
+drilling_state = 0
 targetReached = 0
 reachTime = 0
 
@@ -284,10 +284,10 @@ for T in range(T_total):
 
     # Handling phases of the movement
     if T < T_init:  # Initial phase
-        drillingState = 0
+        drilling_state = 0
         pass
     elif T <= horizonLength + T_init:  # Approach phase
-        drillingState = 1
+        drilling_state = 1
         index = horizonLength + T_init - T
         OCP.change_goal_cost_activation(index, True)
 
@@ -301,7 +301,7 @@ for T in range(T_total):
             OCP.change_posture_reference(index, x0)
         pass
     if T > horizonLength + T_init and T <= 2 * horizonLength + T_init:
-        drillingState = 2
+        drilling_state = 2
         index = 2 * horizonLength + T_init - T
 
         if index == 0:
@@ -312,7 +312,7 @@ for T in range(T_total):
         OCP.change_target(index, targetPos_2)
 
     # else:
-    #     drillingState = 3
+    #     drilling_state = 3
     #     pass
 
     # Checking if target is reached
@@ -326,7 +326,7 @@ for T in range(T_total):
         targetReached = False
 
     # Log robot data
-    plotter.logDrillingState(T, drillingState)
+    plotter.logDrillingState(T, drilling_state)
     plotter.logState(T, x_measured)
     plotter.logTorques(T, torques)
     plotter.logEndEffectorPos(T, toolPlacement.translation, oMtarget.translation)
