@@ -84,6 +84,7 @@ void MPCSettings::readParamsFromYamlString(std::string &string_to_parse) {
   read_v3d(target_position, "target_position");
   read_stdvect_v3d(holes_offsets, "holes_offsets");
   read_double(precision_threshold, "precision_threshold");
+  read_double(backward_offset, "backward_offset");
 }
 
 void MPCSettings::readParamsFromYamlFile(const std::string &filename) {

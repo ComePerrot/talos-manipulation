@@ -54,10 +54,10 @@ void exposeMPCParams() {
       .add_property(
           "holes_offsets", bp::make_getter(&MPCSettings::holes_offsets),
           bp::make_setter(&MPCSettings::holes_offsets), "holes_offsets.")
-      .add_property("backwardOffset",
-                    bp::make_getter(&MPCSettings::backwardOffset),
-                    bp::make_setter(&MPCSettings::backwardOffset),
-                    "backwardOffset.")
+      .add_property("backward_offset",
+                    bp::make_getter(&MPCSettings::backward_offset),
+                    bp::make_setter(&MPCSettings::backward_offset),
+                    "backward_offset.")
       .add_property("precision_threshold", bp::make_getter(&MPCSettings::precision_threshold),
                     bp::make_setter(&MPCSettings::precision_threshold),
                     "precision_threshold.");

@@ -71,7 +71,7 @@ MPC:
   #   [-0.078,-0.045,0],
   #   [0,-0.045,0]
   ]
-  backwardOffset: 0.05
+  backward_offset: 0.05
   precision_threshold: 0.005
   use_mocap: 0
   use_gain_scheduling: 1
