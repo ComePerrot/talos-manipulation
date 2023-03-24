@@ -57,7 +57,7 @@ pinocchio::Data get_rdata_complete(RobotDesigner &self) {
   return self.get_rdata_complete();
 }
 
-void exposeDesigner() {
+void exposeRobotDesigner() {
   bp::class_<RobotDesigner>("RobotDesigner", bp::init<>())
       .def("initialize", &initialize)
       .def("update_reduced_model", &RobotDesigner::updateReducedModel)

@@ -76,7 +76,7 @@ toolFramePos = params["robot"]["toolFramePos"]
 OCPparams = OCPSettings()
 
 print("Loading data from file: \n" + filename)
-OCPparams.readFromYaml(filename)
+OCPparams.read_from_yaml(filename)
 horizonLength = OCPparams.horizon_length
 
 # Robot model
@@ -221,10 +221,10 @@ plotter = TalosPlotter(pinWrapper.get_rmodel(), T_total)
 ########################
 
 for index in range(horizonLength):
-    OCP.changeGoalCostActivation(index, True)
+    OCP.change_goal_cost_activation(index, True)
 
 x_measured = simulator.getRobotState()
-OCP.solveFirst(pinWrapper.get_x0())
+OCP.solve_first(pinWrapper.get_x0())
 
 # Serialize initial resolution data
 xs_init = ddp.xs.tolist()
@@ -236,8 +236,8 @@ us_init = ddp.us.tolist()
 # ref_leftArm = OCP.solver.xs[-1][7 + 14 : 7 + 18]
 
 for index in range(horizonLength):
-    OCP.changeGoalCostActivation(index, False)
-OCP.solveFirst(pinWrapper.get_x0())
+    OCP.change_goal_cost_activation(index, False)
+OCP.solve_first(pinWrapper.get_x0())
 
 # Serialize initial resolution data
 xs_init = ddp.xs.tolist()
@@ -289,16 +289,16 @@ for T in range(T_total):
     elif T <= horizonLength + T_init:  # Approach phase
         drillingState = 1
         index = horizonLength + T_init - T
-        OCP.changeGoalCostActivation(index, True)
+        OCP.change_goal_cost_activation(index, True)
 
         if gainScheduling:
             if T > horizonLength + T_init - T_GainScheduling:
                 if gainScheduling:
                     goalTrackingWeight += goalTrackingSlope
-                    OCP.changeGoalTrackingWeights(goalTrackingWeight)
+                    OCP.change_goal_tracking_weights(goalTrackingWeight)
 
         if variablePosture:
-            OCP.changePostureReference(index, x0)
+            OCP.change_posture_reference(index, x0)
         pass
     if T > horizonLength + T_init and T <= 2 * horizonLength + T_init:
         drillingState = 2
@@ -309,7 +309,7 @@ for T in range(T_total):
             oMtarget.translation[1] = targetPos_2[1]
             oMtarget.translation[2] = targetPos_2[2]
 
-        OCP.changeTarget(index, targetPos_2)
+        OCP.change_target(index, targetPos_2)
 
     # else:
     #     drillingState = 3
