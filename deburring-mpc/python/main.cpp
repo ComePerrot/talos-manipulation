@@ -1,6 +1,6 @@
 #include <eigenpy/eigenpy.hpp>
 
-#include "deburring_mpc/python-fwd.hpp"
+#include "deburring_mpc/python_fwd.hpp"
 
 BOOST_PYTHON_MODULE(deburring_mpc_pywrap) {
   boost::python::import("pinocchio");

@@ -52,7 +52,7 @@ add_project_dependency(yaml-cpp REQUIRED)
 SET(${PROJECT_NAME}_HEADERS
     include/${PROJECT_NAME}/robot_designer.hpp
     include/${PROJECT_NAME}/fwd.hpp
-    include/${PROJECT_NAME}/python-fwd.hpp
+    include/${PROJECT_NAME}/python_fwd.hpp
     include/${PROJECT_NAME}/ocp.hpp
     include/${PROJECT_NAME}/mpc.hpp
 )
@@ -60,14 +60,14 @@ SET(${PROJECT_NAME}_HEADERS
 SET(${PROJECT_NAME}_SOURCES
     src/robot_designer.cpp
     src/ocp.cpp
-    src/ocp-cost-library.cpp
-    src/ocp-debug.cpp
-    src/ocp-params.cpp
-    src/ocp-problem-helper.cpp
-    src/ocp-problem-maker.cpp
+    src/ocp_cost_library.cpp
+    src/ocp_debug.cpp
+    src/ocp_params.cpp
+    src/ocp_problem_helper.cpp
+    src/ocp_problem_maker.cpp
     src/mpc.cpp
-    src/mpc-debug.cpp
-    src/mpc-params.cpp
+    src/mpc_debug.cpp
+    src/mpc_params.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
