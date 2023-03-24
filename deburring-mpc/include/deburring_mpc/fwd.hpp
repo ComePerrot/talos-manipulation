@@ -1,5 +1,5 @@
-#ifndef MPC_P_FWD
-#define MPC_P_FWD
+#ifndef DEBURRING_FWD
+#define DEBURRING_FWD
 
 
 #include <pinocchio/fwd.hpp>
@@ -36,4 +36,4 @@ using CostModelSum = boost::shared_ptr<crocoddyl::CostModelSum>;
 using Contact = boost::shared_ptr<crocoddyl::ContactModelMultiple>;
 }  // namespace deburring
 
-#endif  // MPC_P_FWD
+#endif  // DEBURRING_FWD

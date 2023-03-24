@@ -1,5 +1,5 @@
-#ifndef OCP_P
-#define OCP_P
+#ifndef DEBURRING_OCP
+#define DEBURRING_OCP
 
 #include <memory.h>
 
@@ -166,4 +166,4 @@ class OCP {
 
 }  // namespace deburring
 
-#endif  // OCP_P
+#endif  // DEBURRING_OCP

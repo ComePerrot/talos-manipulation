@@ -1,5 +1,5 @@
-#ifndef MPC_P
-#define MPC_P
+#ifndef DEBURRING_MPC
+#define DEBURRING_MPC
 
 #include "deburring_mpc/fwd.hpp"
 #include "deburring_mpc/robot_designer.hpp"
@@ -143,4 +143,4 @@ class MPC {
 };
 }  // namespace deburring
 
-#endif  // MPC_P
+#endif  // DEBURRING_MPC
