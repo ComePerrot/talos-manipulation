@@ -8,7 +8,7 @@ MPC::MPC(const MPCSettings &mpc_settings,
                      const OCPSettings &ocp_settings,
                      const RobotDesigner &designer)
     : settings_(mpc_settings), designer_(designer), OCP_(ocp_settings, designer_) {
-  backwardOffset_.translation().z() = settings_.backwardOffset;
+  backward_offset_.translation().z() = settings_.backward_offset;
   goal_weight_ = OCP_.get_settings().w_gripper_pos;
   for (auto offset : settings_.holes_offsets) {
     holes_offsets_.push_back(SE3(Matrix3d::Identity(), offset));
@@ -62,8 +62,8 @@ void MPC::setTarget(const SE3 &toolMtarget) {
 
   //  Define oMtarget
   if (settings_.use_mocap == 1 || settings_.use_mocap == 2) {
-    tool_se3_hole_ = toolMtarget.act(holes_offsets_[current_hole_]);
-    oMtarget_ = designer_.get_end_effector_frame().act(tool_se3_hole_);
+    toolMhole_ = toolMtarget.act(holes_offsets_[current_hole_]);
+    oMtarget_ = designer_.get_end_effector_frame().act(toolMhole_);
   } else {
     oMtarget_.translation() = settings_.target_position;
 
@@ -104,16 +104,16 @@ void MPC::setHolesPlacement() {
 
 void MPC::updateTarget(const SE3 &toolMtarget) {
   if (settings_.use_mocap == 0 || settings_.use_mocap == 1) {
-    tool_se3_hole_ =
+    toolMhole_ =
         designer_.get_end_effector_frame().actInv(list_oMhole_[current_hole_]);
-    position_error_ = tool_se3_hole_.translation().norm();
+    position_error_ = toolMhole_.translation().norm();
   } else if (settings_.use_mocap == 2) {
-    tool_se3_hole_ = toolMtarget.act(holes_offsets_[current_hole_]);
+    toolMhole_ = toolMtarget.act(holes_offsets_[current_hole_]);
 
-    position_error_ = tool_se3_hole_.translation().norm();
+    position_error_ = toolMhole_.translation().norm();
 
     if (position_error_ < 0.05 && drilling_state_ == 2) {
-      oMtarget_ = designer_.get_end_effector_frame().act(tool_se3_hole_);
+      oMtarget_ = designer_.get_end_effector_frame().act(toolMhole_);
 
       setHolesPlacement();
       OCP_.updateGoalPosition(list_oMhole_[current_hole_].translation());
@@ -207,11 +207,11 @@ void MPC::updateOCP() {
           goal_weight_ = OCP_.get_settings().w_gripper_pos;
           OCP_.changeGoalTrackingWeights(goal_weight_);
         }
-        oMbackwardHole_ = list_oMhole_[current_hole_].act(backwardOffset_);
+        oMdisengaged_target_ = list_oMhole_[current_hole_].act(backward_offset_);
       }
       if (iteration_ <= OCP_.get_horizon_length()) {
         OCP_.changeTarget(OCP_.get_horizon_length() - iteration_,
-                          oMbackwardHole_.translation());
+                          oMdisengaged_target_.translation());
         iteration_++;
       } else {
         iteration_ = 0;

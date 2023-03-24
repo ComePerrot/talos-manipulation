@@ -50,7 +50,7 @@ struct MPCSettings {
   // Target
   Vector3d target_position;
   std::vector<Vector3d> holes_offsets;
-  double backwardOffset;
+  double backward_offset;
   double precision_threshold;
 
   void readParamsFromYamlString(std::string &string_to_parse);
@@ -77,15 +77,15 @@ class MPC {
   size_t number_holes_;
   std::vector<SE3> holes_offsets_;
   std::vector<SE3> list_oMhole_;  // Holes position in the robot frame
-  SE3 backwardOffset_ = SE3::Identity();
+  SE3 backward_offset_ = SE3::Identity();
 
   // Security management
   bool initialized_ = false;
 
   // Memory preallocations:
   SE3 oMtarget_;
-  SE3 oMbackwardHole_;
-  SE3 tool_se3_hole_;
+  SE3 oMdisengaged_target_;
+  SE3 toolMhole_;
   double position_error_ = 0;
   std::vector<unsigned long> controlled_joints_ids_;
   VectorXd x_internal_;
