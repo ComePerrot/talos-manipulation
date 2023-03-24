@@ -1,5 +1,5 @@
-#ifndef MPC_P_DESIGNER
-#define MPC_P_DESIGNER
+#ifndef DEBURRING_DESIGNER
+#define DEBURRING_DESIGNER
 
 #include <pinocchio/fwd.hpp>
 // Include pinocchio first
@@ -98,4 +98,4 @@ class RobotDesigner {
 };
 
 }  // namespace deburring
-#endif  // MPC_P_DESIGNER
+#endif  // DEBURRING_DESIGNER
