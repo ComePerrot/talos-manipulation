@@ -6,10 +6,10 @@ namespace deburring {
 
 void MPCSettings::readParamsFromYamlString(std::string &string_to_parse) {
   YAML::Node root = YAML::Load(string_to_parse);
-  YAML::Node config = root["mpc-point"];
+  YAML::Node config = root["MPC"];
 
   if (!config) {
-    std::cerr << "No mpc-point section." << std::endl;
+    std::cerr << "No MPC section." << std::endl;
     return;
   }
 
