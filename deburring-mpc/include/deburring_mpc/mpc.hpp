@@ -43,18 +43,18 @@ struct MPCSettings {
   int use_mocap;
 
   // GainScheduling
-  int use_gainScheduling;
-  double gainSchedulig_slope;
-  double maxGoalWeight;
+  int use_gain_scheduling;
+  double gain_schedulig_slope;
+  double gain_schedulig_max_weight;
 
   // Target
-  Vector3d targetPos;
+  Vector3d target_position;
   std::vector<Vector3d> holes_offsets;
   double backwardOffset;
-  double tolerance;
+  double precision_threshold;
 
-  void readParamsFromYamlString(std::string &StringToParse);
-  void readParamsFromYamlFile(const std::string &Filename);
+  void readParamsFromYamlString(std::string &string_to_parse);
+  void readParamsFromYamlFile(const std::string &filename);
 };
 
 class MPC {
@@ -97,8 +97,8 @@ class MPC {
   void updateOCP();
 
  public:
-  MPC(const MPCSettings &settings,
-            const OCPSettings &OCPSettings, const RobotDesigner &designer);
+  MPC(const MPCSettings &mpc_settings,
+            const OCPSettings &ocp_settings, const RobotDesigner &designer);
 
   void initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
                   const SE3 &toolMtarget);
@@ -131,7 +131,7 @@ class MPC {
 
   const MatrixXd &get_K0() const { return K0_; }
 
-  const pinocchio::SE3 &get_Target_frame() const {
+  const SE3 &get_Target_frame() const {
     return list_oMhole_[current_hole_];
   }
 

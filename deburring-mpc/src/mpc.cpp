@@ -4,10 +4,10 @@ namespace deburring {
 
 #define PI 3.14159265
 
-MPC::MPC(const MPCSettings &settings,
-                     const OCPSettings &OCPSettings,
+MPC::MPC(const MPCSettings &mpc_settings,
+                     const OCPSettings &ocp_settings,
                      const RobotDesigner &designer)
-    : settings_(settings), designer_(designer), OCP_(OCPSettings, designer_) {
+    : settings_(mpc_settings), designer_(designer), OCP_(ocp_settings, designer_) {
   backwardOffset_.translation().z() = settings_.backwardOffset;
   goal_weight_ = OCP_.get_settings().w_gripper_pos;
   for (auto offset : settings_.holes_offsets) {
@@ -65,7 +65,7 @@ void MPC::setTarget(const SE3 &toolMtarget) {
     tool_se3_hole_ = toolMtarget.act(holes_offsets_[current_hole_]);
     oMtarget_ = designer_.get_end_effector_frame().act(tool_se3_hole_);
   } else {
-    oMtarget_.translation() = settings_.targetPos;
+    oMtarget_.translation() = settings_.target_position;
 
     // To have the gripper_left_fingertip_3_link in the right orientation we
     // need :
@@ -170,10 +170,10 @@ void MPC::updateOCP() {
       if (iteration_ == 0) {
         std::cout << "Initiating increase gain phase" << std::endl;
       }
-      if (settings_.use_gainScheduling == 1 &&
-          position_error_ > settings_.tolerance &&
-          goal_weight_ < settings_.maxGoalWeight) {
-        goal_weight_ += settings_.gainSchedulig_slope;
+      if (settings_.use_gain_scheduling == 1 &&
+          position_error_ > settings_.precision_threshold &&
+          goal_weight_ < settings_.gain_schedulig_max_weight) {
+        goal_weight_ += settings_.gain_schedulig_slope;
 
         OCP_.changeGoaleTrackingWeights(goal_weight_);
 
@@ -203,7 +203,7 @@ void MPC::updateOCP() {
     case 5:  // Getting out of hole
       if (iteration_ == 0) {
         std::cout << "Getting out of the hole" << std::endl;
-        if (settings_.use_gainScheduling == 1) {
+        if (settings_.use_gain_scheduling == 1) {
           goal_weight_ = OCP_.get_settings().w_gripper_pos;
           OCP_.changeGoaleTrackingWeights(goal_weight_);
         }

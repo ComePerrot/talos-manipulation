@@ -4,8 +4,8 @@
 
 namespace deburring {
 
-void MPCSettings::readParamsFromYamlString(std::string &StringToParse) {
-  YAML::Node root = YAML::Load(StringToParse);
+void MPCSettings::readParamsFromYamlString(std::string &string_to_parse) {
+  YAML::Node root = YAML::Load(string_to_parse);
   YAML::Node config = root["mpc-point"];
 
   if (!config) {
@@ -78,20 +78,20 @@ void MPCSettings::readParamsFromYamlString(std::string &StringToParse) {
   read_size_t(T_stabilization, "T_stabilization");
   read_size_t(T_drilling, "T_drilling");
   read_int(use_mocap, "use_mocap");
-  read_int(use_gainScheduling, "use_gainScheduling");
-  read_double(gainSchedulig_slope, "gainSchedulig_slope");
-  read_double(maxGoalWeight, "maxGoalWeight");
-  read_v3d(targetPos, "targetPos");
+  read_int(use_gain_scheduling, "use_gain_scheduling");
+  read_double(gain_schedulig_slope, "gain_schedulig_slope");
+  read_double(gain_schedulig_max_weight, "gain_schedulig_max_weight");
+  read_v3d(target_position, "target_position");
   read_stdvect_v3d(holes_offsets, "holes_offsets");
-  read_double(tolerance, "tolerance");
+  read_double(precision_threshold, "precision_threshold");
 }
 
-void MPCSettings::readParamsFromYamlFile(const std::string &Filename) {
-  std::ifstream t(Filename);
+void MPCSettings::readParamsFromYamlFile(const std::string &filename) {
+  std::ifstream t(filename);
   std::stringstream buffer;
   buffer << t.rdbuf();
-  std::string StringToParse = buffer.str();
-  readParamsFromYamlString(StringToParse);
+  std::string string_to_parse = buffer.str();
+  readParamsFromYamlString(string_to_parse);
 }
 
 }  // namespace deburring

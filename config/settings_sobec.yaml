@@ -64,7 +64,7 @@ mpc-point:
   T_initialization: 100
   T_stabilization: 200
   T_drilling: 100
-  targetPos: [0.6,0.4,1.1]
+  target_position: [0.6,0.4,1.1]
   holes_offsets: [
     [0,0,0]]
   #   [-0.078,0,0],
@@ -72,10 +72,10 @@ mpc-point:
   #   [0,-0.045,0]
   # ]
   backwardOffset: 0.05
-  tolerance: 0.005
-  maxGoalWeight: 100
+  precision_threshold: 0.005
+  gain_schedulig_max_weight: 100
   use_mocap: 0
-  use_gainScheduling: 1
-  gainSchedulig_slope: 0.5
+  use_gain_scheduling: 1
+  gain_schedulig_slope: 0.5
 
 
