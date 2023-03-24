@@ -15,13 +15,13 @@ namespace python {
 using namespace crocoddyl;
 namespace bp = boost::python;
 
-void exposeMPCPointParams() {
+void exposeMPCParams() {
   bp::register_ptr_to_python<boost::shared_ptr<MPCSettings> >();
 
   bp::class_<MPCSettings>(
       "MPCSettings",
       bp::init<>(bp::args("self"), "Empty initialization of the MPC params"))
-      .def("readFromYaml", &MPCSettings::readParamsFromYamlFile,
+      .def("read_from_yaml", &MPCSettings::readParamsFromYamlFile,
            bp::args("filename"))
       .add_property("T_initialization",
                     bp::make_getter(&MPCSettings::T_initialization),
@@ -63,7 +63,7 @@ void exposeMPCPointParams() {
                     "precision_threshold.");
 }
 
-void exposeMPCPointClass() {
+void exposeMPCClass() {
   bp::register_ptr_to_python<boost::shared_ptr<MPC> >();
 
   bp::class_<MPC>(
@@ -121,9 +121,9 @@ void exposeMPCPointClass() {
                     "Riccati gains");
 }
 
-void exposeMPCPoint() {
-  exposeMPCPointParams();
-  exposeMPCPointClass();
+void exposeMPC() {
+  exposeMPCParams();
+  exposeMPCClass();
 }
 
 }  // namespace python

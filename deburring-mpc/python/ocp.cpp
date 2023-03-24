@@ -15,13 +15,13 @@ namespace python {
 using namespace crocoddyl;
 namespace bp = boost::python;
 
-void exposeOCPPointParams() {
+void exposeOCPParams() {
   bp::register_ptr_to_python<boost::shared_ptr<OCPSettings>>();
 
   bp::class_<OCPSettings>(
       "OCPSettings",
       bp::init<>(bp::args("self"), "Empty initialization of the OCP params"))
-      .def("readFromYaml", &OCPSettings::readParamsFromYamlFile,
+      .def("read_from_yaml", &OCPSettings::readParamsFromYamlFile,
            bp::args("filename"))
       .add_property("horizon_length",
                     bp::make_getter(&OCPSettings::horizon_length),
@@ -29,7 +29,7 @@ void exposeOCPPointParams() {
                     "Number of nodes in the horizon");
 }
 
-void exposeOCPPointClass() {
+void exposeOCPClass() {
   bp::register_ptr_to_python<boost::shared_ptr<OCP>>();
 
   bp::class_<OCP>(
@@ -41,16 +41,16 @@ void exposeOCPPointClass() {
           "initialize", &OCP::initialize,
           bp::args("self", "x0", "oMtarget"))
       .def<void (OCP::*)(const VectorXd)>(
-          "solveFirst", &OCP::solveFirst, bp::args("self", "x"))
+          "solve_first", &OCP::solveFirst, bp::args("self", "x"))
       .def<void (OCP::*)(const ConstVectorRef &)>(
           "solve", &OCP::solve, bp::args("self", "x_measured"))
-      .def("changeGoalCostActivation", &OCP::changeGoalCostActivation,
+      .def("change_goal_cost_activation", &OCP::changeGoalCostActivation,
            bp::args("index", "value"))
-      .def("changeTarget", &OCP::changeTarget,
+      .def("change_target", &OCP::changeTarget,
            bp::args("index", "position"))
-      .def("changeGoalTrackingWeights", &OCP::changeGoaleTrackingWeights,
+      .def("change_goal_tracking_weights", &OCP::changeGoaleTrackingWeights,
            bp::args("weight"))
-      .def("changePostureReference", &OCP::changePostureReference,
+      .def("change_posture_reference", &OCP::changePostureReference,
            bp::args("index", "reference"))
       .add_property("state", &OCP::get_state)
       .add_property("solver", &OCP::get_solver)
@@ -59,9 +59,9 @@ void exposeOCPPointClass() {
       .add_property("gain", &OCP::get_gain, "Gains computed by the OCP");
 }
 
-void exposeOCPPoint() {
-  exposeOCPPointParams();
-  exposeOCPPointClass();
+void exposeOCP() {
+  exposeOCPParams();
+  exposeOCPClass();
 }
 
 }  // namespace python

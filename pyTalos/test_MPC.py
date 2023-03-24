@@ -50,8 +50,8 @@ MPCparams = MPCSettings()
 OCPparams = OCPSettings()
 
 print("Loading data from file: \n" + filename)
-OCPparams.readFromYaml(filename)
-MPCparams.readFromYaml(filename)
+OCPparams.read_from_yaml(filename)
+MPCparams.read_from_yaml(filename)
 
 # Robot model
 design_conf = dict(

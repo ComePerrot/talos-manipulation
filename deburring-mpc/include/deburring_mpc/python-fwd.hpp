@@ -7,9 +7,9 @@
 namespace deburring {
 namespace python {
 
-void exposeDesigner();
-void exposeOCPPoint();
-void exposeMPCPoint();
+void exposeRobotDesigner();
+void exposeOCP();
+void exposeMPC();
 
 }  // namespace python
 }  // namespace deburring
