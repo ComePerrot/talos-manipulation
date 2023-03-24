@@ -10,13 +10,13 @@
 
 deburring::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   // Settings
-  deburring::RobotDesignerSettings designerSettings =
+  deburring::RobotDesignerSettings designer_settings =
       deburring::RobotDesignerSettings();
-  nh.getParam("left_foot_name", designerSettings.left_foot_name);
-  nh.getParam("right_foot_name", designerSettings.right_foot_name);
-  nh.getParam("urdf", designerSettings.urdf_path);
-  nh.getParam("srdf", designerSettings.srdf_path);
-  nh.getParam("controlled_joints", designerSettings.controlled_joints_names);
+  nh.getParam("left_foot_name", designer_settings.left_foot_name);
+  nh.getParam("right_foot_name", designer_settings.right_foot_name);
+  nh.getParam("urdf", designer_settings.urdf_path);
+  nh.getParam("srdf", designer_settings.srdf_path);
+  nh.getParam("controlled_joints", designer_settings.controlled_joints_names);
 
   std::vector<double> gripperTtool;
   nh.getParam("tool_frame_pos", gripperTtool);
@@ -26,28 +26,28 @@ deburring::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   gripperMtool.translation().z() = gripperTtool[2];
 
   ROS_INFO_STREAM("Building robot designer");
-  deburring::RobotDesigner designer = deburring::RobotDesigner(designerSettings);
+  deburring::RobotDesigner designer = deburring::RobotDesigner(designer_settings);
 
   ROS_INFO_STREAM("Adding end effector frame to the robot model");
   designer.addEndEffectorFrame("deburring_tool",
                                "gripper_left_fingertip_3_link", gripperMtool);
 
-  bool useCustomLimits;
-  nh.getParam("custom_limits", useCustomLimits);
+  bool use_custom_limits;
+  nh.getParam("custom_limits", use_custom_limits);
 
-  if (useCustomLimits) {
+  if (use_custom_limits) {
     ROS_INFO_STREAM("Updating Limits");
     // Loading custom model limits
-    std::vector<double> lowerPositionLimit;
-    nh.getParam("lowerPositionLimit", lowerPositionLimit);
-    std::vector<double> upperPositionLimit;
-    nh.getParam("upperPositionLimit", upperPositionLimit);
+    std::vector<double> lower_position_limits;
+    nh.getParam("lowerPositionLimit", lower_position_limits);
+    std::vector<double> upper_position_limits;
+    nh.getParam("upperPositionLimit", upper_position_limits);
 
-    std::vector<double>::size_type size_limit = lowerPositionLimit.size();
+    std::vector<double>::size_type size_limit = lower_position_limits.size();
 
-    designer.updateModelLimits(Eigen::VectorXd::Map(lowerPositionLimit.data(),
+    designer.updateModelLimits(Eigen::VectorXd::Map(lower_position_limits.data(),
                                                     (Eigen::Index)size_limit),
-                               Eigen::VectorXd::Map(upperPositionLimit.data(),
+                               Eigen::VectorXd::Map(upper_position_limits.data(),
                                                     (Eigen::Index)size_limit));
   }
 
@@ -73,9 +73,9 @@ deburring::MPC buildMPC(ros::NodeHandle nh,
   return (mpc);
 }
 
-class MOCAP_Interface {
+class MoCapInterface {
  public:
-  MOCAP_Interface() {
+  MoCapInterface() {
     tf_buffer_ = std::make_unique<tf2_ros::Buffer>();
     tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
@@ -94,20 +94,26 @@ class MOCAP_Interface {
  private:
   void readTF() {
     try {
-      transformStamped =
+      transform_stamped_ =
           tf_buffer_->lookupTransform("target", "tool", ros::Time(0));
     } catch (tf2::TransformException& ex) {
       ROS_WARN("%s", ex.what());
     }
-    tf::transformMsgToEigen(transformStamped.transform, eigenTransform);
+    tf::transformMsgToEigen(transform_stamped_.transform, eigen_transform_);
     toolMtarget_ =
-        pinocchio::SE3(eigenTransform.rotation(), eigenTransform.translation());
+        pinocchio::SE3(eigen_transform_.rotation(), eigen_transform_.translation());
   }
-  geometry_msgs::TransformStamped transformStamped;
-  Eigen::Affine3d eigenTransform;
-  pinocchio::SE3 toolMtarget_ = pinocchio::SE3::Identity();
+  
+  // TF variables
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
+
+  // Target position wrt tool
+  pinocchio::SE3 toolMtarget_ = pinocchio::SE3::Identity();
+
+  // Memmory allocation
+  geometry_msgs::TransformStamped transform_stamped_;
+  Eigen::Affine3d eigen_transform_;
 };
 
 int main(int argc, char** argv) {
@@ -116,14 +122,14 @@ int main(int argc, char** argv) {
   pal_statistics::RegistrationsRAII registered_variables;
 
   // Robot Desginer & MPC
-  deburring::RobotDesigner pinWrapper = buildRobotDesigner(nh);
-  deburring::MPC MPC = buildMPC(nh, pinWrapper);
+  deburring::RobotDesigner pin_wrapper = buildRobotDesigner(nh);
+  deburring::MPC MPC = buildMPC(nh, pin_wrapper);
 
   // Mocap Interface
-  MOCAP_Interface Mocap = MOCAP_Interface();
+  MoCapInterface Mocap = MoCapInterface();
 
   // Robot Interface
-  ROS_MPC_Interface Robot = ROS_MPC_Interface(nh);
+  DeburringROSInterface Robot = DeburringROSInterface(nh);
 
   // Initialize MPC
   int use_mocap = MPC.get_settings().use_mocap;
