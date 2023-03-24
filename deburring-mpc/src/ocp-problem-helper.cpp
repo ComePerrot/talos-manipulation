@@ -14,32 +14,32 @@ void OCP::changeTarget(const size_t index,
       ->set_reference(position);
 }
 void OCP::setBalancingTorques() {
-  for (size_t modelIndex = 0; modelIndex < settings_.horizon_length;
-       modelIndex++) {
+  for (size_t node_index = 0; node_index < settings_.horizon_length;
+       node_index++) {
     VectorXd x_ref = boost::static_pointer_cast<crocoddyl::ResidualModelState>(
-                         costs(modelIndex)
+                         costs(node_index)
                              ->get_costs()
                              .at("postureTask")
                              ->cost->get_residual())
                          ->get_reference();
 
-    VectorXd balancingTorque;
-    balancingTorque.resize((long)iam(modelIndex)->get_nu());
-    iam(modelIndex)->quasiStatic(ada(modelIndex), balancingTorque, x_ref);
+    VectorXd balancing_torques;
+    balancing_torques.resize((long)iam(node_index)->get_nu());
+    iam(node_index)->quasiStatic(ada(node_index), balancing_torques, x_ref);
 
     boost::static_pointer_cast<crocoddyl::ResidualModelControl>(
-        costs(modelIndex)
+        costs(node_index)
             ->get_costs()
             .at("actuationTask")
             ->cost->get_residual())
-        ->set_reference(balancingTorque);
+        ->set_reference(balancing_torques);
   }
 }
 void OCP::updateGoalPosition(const Eigen::Ref<const Vector3d> &position) {
-  for (size_t modelIndex = 0; modelIndex <= settings_.horizon_length;
-       modelIndex++) {
+  for (size_t node_index = 0; node_index <= settings_.horizon_length;
+       node_index++) {
     boost::static_pointer_cast<crocoddyl::ResidualModelFrameTranslation>(
-        costs(modelIndex)
+        costs(node_index)
             ->get_costs()
             .at("gripperPosition")
             ->cost->get_residual())
@@ -47,10 +47,10 @@ void OCP::updateGoalPosition(const Eigen::Ref<const Vector3d> &position) {
   }
 }
 void OCP::updateGoalRotation(const Eigen::Ref<const Matrix3d> &rotation) {
-  for (size_t modelIndex = 0; modelIndex <= settings_.horizon_length;
-       modelIndex++) {
+  for (size_t node_index = 0; node_index <= settings_.horizon_length;
+       node_index++) {
     boost::static_pointer_cast<crocoddyl::ResidualModelFrameRotation>(
-        costs(modelIndex)
+        costs(node_index)
             ->get_costs()
             .at("gripperRotation")
             ->cost->get_residual())
@@ -62,9 +62,9 @@ void OCP::changeGoalCostActivation(const size_t index, const bool value) {
   costs(index)->get_costs().at("gripperRotation")->active = value;
 }
 void OCP::changeGoaleTrackingWeights(double weight) {
-  for (size_t modelIndex = 0; modelIndex < settings_.horizon_length;
-       modelIndex++) {
-    costs(modelIndex)->get_costs().at("gripperPosition")->weight = weight;
+  for (size_t node_index = 0; node_index < settings_.horizon_length;
+       node_index++) {
+    costs(node_index)->get_costs().at("gripperPosition")->weight = weight;
   }
 }
 void OCP::changePostureReference(

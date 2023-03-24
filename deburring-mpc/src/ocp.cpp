@@ -1,9 +1,9 @@
 #include "deburring_mpc/ocp.hpp"
 
 namespace deburring {
-OCP::OCP(const OCPSettings &OCPSettings,
+OCP::OCP(const OCPSettings &ocp_settings,
                      const RobotDesigner &designer)
-    : settings_(OCPSettings), designer_(designer) {}
+    : settings_(ocp_settings), designer_(designer) {}
 
 void OCP::initialize(const ConstVectorRef &x0,
                            const pinocchio::SE3 &oMtarget) {
@@ -14,7 +14,7 @@ void OCP::initialize(const ConstVectorRef &x0,
   buildSolver(x0, oMtarget);
   solveFirst(x0);
 
-  initialized_ = true;
+  is_initialized_ = true;
 }
 
 void OCP::solve(const ConstVectorRef &measured_x) {

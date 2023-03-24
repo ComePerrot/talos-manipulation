@@ -9,7 +9,7 @@ MPC::MPC(const MPCSettings &settings,
                      const RobotDesigner &designer)
     : settings_(settings), designer_(designer), OCP_(OCPSettings, designer_) {
   backwardOffset_.translation().z() = settings_.backwardOffset;
-  goal_weight_ = OCP_.get_settings().wGripperPos;
+  goal_weight_ = OCP_.get_settings().w_gripper_pos;
   for (auto offset : settings_.holes_offsets) {
     holes_offsets_.push_back(SE3(Matrix3d::Identity(), offset));
   }
@@ -204,7 +204,7 @@ void MPC::updateOCP() {
       if (iteration_ == 0) {
         std::cout << "Getting out of the hole" << std::endl;
         if (settings_.use_gainScheduling == 1) {
-          goal_weight_ = OCP_.get_settings().wGripperPos;
+          goal_weight_ = OCP_.get_settings().w_gripper_pos;
           OCP_.changeGoaleTrackingWeights(goal_weight_);
         }
         oMbackwardHole_ = list_oMhole_[current_hole_].act(backwardOffset_);

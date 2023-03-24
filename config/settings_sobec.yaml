@@ -31,16 +31,14 @@ robot:
 
 ocp-point:
   horizon_length: 100
-  wStateReg: 0.02
-  wControlReg: 0.001
-  wLimit: 1000
-  wPCoM: 500
-  wVCoM: 0
-  wWrenchCone: 0
-  wGripperPos: 5
-  wGripperRot: 30
-  wGripperVel: 2
-  scaleLimits: 1
+  w_state_reg: 0.02
+  w_control_reg: 0.001
+  w_limit: 1000
+  w_com_pos: 500
+  w_gripper_pos: 5
+  w_gripper_rot: 30
+  w_gripper_vel: 2
+  limit_scale: 1
   statePosWeights:
     base: [500, 500, 500, 1000, 1000, 1000]
     leftLeg: [500, 500, 500, 500, 1000, 1000]
@@ -55,7 +53,7 @@ ocp-point:
     torso: [10, 10]
     leftArm: [10, 10, 10, 10, 10, 10, 10]
     rightArm: [10, 10, 10, 10]
-  controlWeights:
+  control_weights:
     leftLeg: [1, 1, 1, 1, 1, 1]
     rightLeg: [1, 1, 1, 1, 1, 1]
     torso: [1, 1]

@@ -58,27 +58,24 @@ struct OCP_debugData {
 struct OCPSettings {
   size_t horizon_length;
   // Timing
-  double timeStep = 0.01;
+  double time_step = 0.01;
 
   // Croco configuration
-  double wStateReg = 0;
-  double wControlReg = 0;
-  double wLimit = 0;
-  double wPCoM = 0;
-  double wGripperPos = 0;
-  double wGripperRot = 0;
-  double wGripperVel = 0;
+  double w_state_reg = 0;
+  double w_control_reg = 0;
+  double w_limit = 0;
+  double w_com_pos = 0;
+  double w_gripper_pos = 0;
+  double w_gripper_rot = 0;
+  double w_gripper_vel = 0;
 
-  double scaleLimits = 1;
+  double limit_scale = 1;
 
-  Eigen::VectorXd stateWeights;
-  Eigen::VectorXd controlWeights;
+  Eigen::VectorXd state_weights;
+  Eigen::VectorXd control_weights;
 
-  double th_stop = 1e-6;  // threshold for stopping criterion
-  double th_grad = 1e-9;  // threshold for zero gradient.
-
-  void readParamsFromYamlString(std::string &StringToParse);
-  void readParamsFromYamlFile(const std::string &Filename);
+  void readParamsFromYamlString(const std::string &string_to_parse);
+  void readParamsFromYamlFile(const std::string &filename);
 };
 
 class OCP {
@@ -90,7 +87,7 @@ class OCP {
   boost::shared_ptr<crocoddyl::StateMultibody> state_;
   boost::shared_ptr<crocoddyl::ActuationModelFloatingBase> actuation_;
 
-  bool initialized_ = false;
+  bool is_initialized_ = false;
 
   // prealocated memory:
   std::vector<VectorXd> warm_xs_;
@@ -101,18 +98,18 @@ class OCP {
   ActionModel formulatePointingTask();
   ActionModel formulateTerminalPointingTask();
   void setArmature(DifferentialActionModel DAM);
-  void defineFeetContact(Contact &contactCollector);
-  void definePostureTask(CostModelSum &costCollector, const double wStateReg);
-  void defineActuationTask(CostModelSum &costCollector,
-                           const double wControlReg);
-  void defineJointLimits(CostModelSum &costCollector, const double wLimit,
-                         const double boundScale);
-  void defineCoMPosition(CostModelSum &costCollector, const double wPCoM);
-  void defineGripperPlacement(CostModelSum &costCollector,
-                              const double wGripperPos,
-                              const double wGripperRot);
-  void defineGripperVelocity(CostModelSum &costCollector,
-                             const double wGripperVel);
+  void defineFeetContact(Contact &contact_collector);
+  void definePostureTask(CostModelSum &cost_collector, const double w_state_reg);
+  void defineActuationTask(CostModelSum &cost_collector,
+                           const double w_control_reg);
+  void defineJointLimits(CostModelSum &cost_collector, const double w_limit,
+                         const double limit_scale);
+  void defineCoMPosition(CostModelSum &cost_collector, const double w_com_pos);
+  void defineGripperPlacement(CostModelSum &cost_collector,
+                              const double w_gripper_pos,
+                              const double w_gripper_rot);
+  void defineGripperVelocity(CostModelSum &cost_collector,
+                             const double w_gripper_vel);
 
   // OCP Problem Helper private functions
   ActionModel ama(const unsigned long time);
@@ -122,7 +119,7 @@ class OCP {
   ActionData ada(const unsigned long time);
 
  public:
-  OCP(const OCPSettings &OCPSettings,
+  OCP(const OCPSettings &ocp_settings,
             const RobotDesigner &designer);
 
   void initialize(const ConstVectorRef &x0, const SE3 &oMtarget);
@@ -163,7 +160,7 @@ class OCP {
 
   OCPSettings &get_settings() { return settings_; };
   DDP get_solver() { return (solver_); };
-  size_t get_initialized() { return (initialized_); };
+  size_t get_is_initialized() { return (is_initialized_); };
   size_t get_horizonLength() { return (settings_.horizon_length); };
 };
 
