@@ -1,5 +1,5 @@
-#ifndef ROS_MPC_INTERFACE
-#define ROS_MPC_INTERFACE
+#ifndef DEBURRING_ROS_INTERFACE
+#define DEBURRING_ROS_INTERFACE
 
 #include <eigen_conversions/eigen_msg.h>
 #include <geometry_msgs/TransformStamped.h>
@@ -13,9 +13,9 @@
 #include <map>
 #include <string>
 
-class ROS_MPC_Interface {
+class DeburringROSInterface {
  public:
-  ROS_MPC_Interface(ros::NodeHandle nh);
+  DeburringROSInterface(ros::NodeHandle nh);
   void update(const Eigen::VectorXd& u0, const Eigen::MatrixXd& K0);
 
   Eigen::VectorXd& get_robotState();
@@ -35,10 +35,10 @@ class ROS_MPC_Interface {
   linear_feedback_controller_msgs::Control control_msg_;
 
   // Robot state (with joints)
-  Eigen::VectorXd jointStates_;
+  Eigen::VectorXd joint_states_;
 
   // prealocated memory
   linear_feedback_controller_msgs::Eigen::Sensor sensor_eigen_;
 };
 
-#endif  // ROS_MPC_INTERFACE
+#endif  // DEBURRING_ROS_INTERFACE

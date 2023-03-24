@@ -1,12 +1,12 @@
 #include "deburring_ros_interface/ros-mpc-interface.h"
 
-ROS_MPC_Interface::ROS_MPC_Interface(ros::NodeHandle nh) {
+DeburringROSInterface::DeburringROSInterface(ros::NodeHandle nh) {
   ros::TransportHints hints;
   hints.tcpNoDelay(true);
 
   // Robot sensor subscriber
   sensor_sub_ = nh.subscribe<linear_feedback_controller_msgs::Sensor>(
-      "/linear_feedback_controller/sensor_state", 1, &ROS_MPC_Interface::SensorCb, this, hints);
+      "/linear_feedback_controller/sensor_state", 1, &DeburringROSInterface::SensorCb, this, hints);
 
   // Control publisher
   command_pub_.reset(
@@ -22,7 +22,7 @@ ROS_MPC_Interface::ROS_MPC_Interface(ros::NodeHandle nh) {
     r.sleep();
   }
 
-  jointStates_.resize(
+  joint_states_.resize(
       7                                                // Base pose
       + 6                                              // Base twist
       + (long)sensor_msg_.joint_state.position.size()  // Joint positions
@@ -30,7 +30,7 @@ ROS_MPC_Interface::ROS_MPC_Interface(ros::NodeHandle nh) {
   );
 }
 
-void ROS_MPC_Interface::update(const Eigen::VectorXd& u0,
+void DeburringROSInterface::update(const Eigen::VectorXd& u0,
                                const Eigen::MatrixXd& K0) {
   mapControlToMsg(u0, K0);
 
@@ -41,28 +41,28 @@ void ROS_MPC_Interface::update(const Eigen::VectorXd& u0,
   }
 }
 
-Eigen::VectorXd& ROS_MPC_Interface::get_robotState() {
+Eigen::VectorXd& DeburringROSInterface::get_robotState() {
   mapMsgToJointSates();
-  return (jointStates_);
+  return (joint_states_);
 }
 
-void ROS_MPC_Interface::SensorCb(
+void DeburringROSInterface::SensorCb(
     const linear_feedback_controller_msgs::SensorConstPtr& msg) {
   sensor_msg_ = *msg;
 }
 
-void ROS_MPC_Interface::mapMsgToJointSates() {
+void DeburringROSInterface::mapMsgToJointSates() {
   // Copying message to keep track of the initial state that is used to compute
   // control
   control_msg_.initial_state = sensor_msg_;
 
   // Converting from ros message to Eigen only when its necessary
   linear_feedback_controller_msgs::sensorMsgToEigen(sensor_msg_, sensor_eigen_);
-  jointStates_ << sensor_eigen_.base_pose, sensor_eigen_.joint_state.position,
+  joint_states_ << sensor_eigen_.base_pose, sensor_eigen_.joint_state.position,
       sensor_eigen_.base_twist, sensor_eigen_.joint_state.velocity;
 }
 
-void ROS_MPC_Interface::mapControlToMsg(const Eigen::VectorXd& u0,
+void DeburringROSInterface::mapControlToMsg(const Eigen::VectorXd& u0,
                                         const Eigen::MatrixXd& K0) {
   tf::matrixEigenToMsg(u0, control_msg_.feedforward);
   tf::matrixEigenToMsg(K0, control_msg_.feedback_gain);
