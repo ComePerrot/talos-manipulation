@@ -6,10 +6,10 @@ namespace deburring {
 
 void OCPSettings::readParamsFromYamlString(const std::string &string_to_parse) {
   YAML::Node root = YAML::Load(string_to_parse);
-  YAML::Node config = root["ocp-point"];
+  YAML::Node config = root["OCP"];
 
   if (!config) {
-    std::cerr << "No ocp-point section." << std::endl;
+    std::cerr << "No OCP section." << std::endl;
     return;
   }
 
@@ -47,13 +47,13 @@ void OCPSettings::readParamsFromYamlString(const std::string &string_to_parse) {
     }
   };
 
-  auto read_stateWeights = [&config, &read_vxd](VectorXd &aref_stateWeights) {
-    std::array<std::string, 2> nodeNames{"statePosWeights", "stateVelWeights"};
-    std::array<std::string, 6> limbs{"base",  "leftLeg", "rightLeg",
-                                     "torso", "leftArm", "rightArm"};
+  auto read_stateWeights = [&config, &read_vxd](VectorXd &aref_state_weights) {
+    std::array<std::string, 2> nodeNames{"state_pos_weights", "state_vel_weights"};
+    std::array<std::string, 6> limbs{"base",  "left_leg", "right_leg",
+                                     "torso", "left_arm", "right_arm"};
     VectorXd state_weights(36 * 2);  // Maximum size for the state with Talos
 
-    int sizeWeight = 0;
+    int size_weight = 0;
     for (auto nodeName : nodeNames) {
       YAML::Node node = config[nodeName];
       if (node) {
@@ -61,38 +61,38 @@ void OCPSettings::readParamsFromYamlString(const std::string &string_to_parse) {
           VectorXd buffer;
           read_vxd(buffer, node, limb);
 
-          state_weights.segment(sizeWeight, buffer.size()) = buffer;
-          sizeWeight += (int)buffer.size();
+          state_weights.segment(size_weight, buffer.size()) = buffer;
+          size_weight += (int)buffer.size();
         }
       } else {
         std::cout << "No state_weights" << std::endl;
       }
     }
-    aref_stateWeights.resize((Eigen::Index)sizeWeight);
-    aref_stateWeights = state_weights.head(sizeWeight);
+    aref_state_weights.resize((Eigen::Index)size_weight);
+    aref_state_weights = state_weights.head(size_weight);
   };
 
   auto read_controlWeights = [&config,
-                              &read_vxd](VectorXd &aref_controlWeights) {
-    std::array<std::string, 5> limbs{"leftLeg", "rightLeg", "torso", "leftArm",
-                                     "rightArm"};
+                              &read_vxd](VectorXd &aref_control_weights) {
+    std::array<std::string, 5> limbs{"left_leg", "right_leg", "torso", "left_arm",
+                                     "right_arm"};
     VectorXd control_weights(36);
 
-    int sizeWeight = 0;
+    int size_weight = 0;
     YAML::Node node = config["control_weights"];
     if (node) {
       for (auto limb : limbs) {
         VectorXd buffer;
         read_vxd(buffer, node, limb);
 
-        control_weights.segment(sizeWeight, buffer.size()) = buffer;
-        sizeWeight += (int)buffer.size();
+        control_weights.segment(size_weight, buffer.size()) = buffer;
+        size_weight += (int)buffer.size();
       }
     } else {
       std::cout << "No control_weights" << std::endl;
     }
-    aref_controlWeights.resize((Eigen::Index)sizeWeight);
-    aref_controlWeights = control_weights.head(sizeWeight);
+    aref_control_weights.resize((Eigen::Index)size_weight);
+    aref_control_weights = control_weights.head(size_weight);
   };
 
   read_size_t(horizon_length, "horizon_length");
