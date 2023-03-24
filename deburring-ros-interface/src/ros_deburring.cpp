@@ -6,7 +6,7 @@
 #include <ros/ros.h>
 #include <tf2_ros/transform_listener.h>
 
-#include "deburring_ros_interface/ros-mpc-interface.h"
+#include "deburring_ros_interface/ros_interface.h"
 
 deburring::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   // Settings

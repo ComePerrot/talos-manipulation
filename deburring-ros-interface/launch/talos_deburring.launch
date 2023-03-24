@@ -1,0 +1,4 @@
+<launch>
+    <rosparam command="load" file="$(find deburring_ros_interface)/config/ros_deburring_settings.yaml"/>
+    <node pkg="deburring_ros_interface" type="ros_deburring" name="ros_deburring" output="screen"/>
+</launch>

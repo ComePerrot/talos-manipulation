@@ -1,4 +1,4 @@
-#include "deburring_ros_interface/ros-mpc-interface.h"
+#include "deburring_ros_interface/ros_interface.h"
 
 DeburringROSInterface::DeburringROSInterface(ros::NodeHandle nh) {
   ros::TransportHints hints;

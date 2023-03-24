@@ -62,10 +62,10 @@ include_directories(SYSTEM
 )
 
 SET(${PROJECT_NAME}_SOURCES
-    src/ros-mpc-interface.cpp
+    src/ros_interface.cpp
 )
 SET(${PROJECT_NAME}_HEADERS
-    include/${PROJECT_NAME}/ros-mpc-interface.h
+    include/${PROJECT_NAME}/ros_interface.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
@@ -74,8 +74,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
 target_link_libraries(${PROJECT_NAME} PUBLIC deburring_mpc::deburring_mpc Eigen3::Eigen ${catkin_LIBRARIES})
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
-add_executable(ros_mpc_pointing src/ros-mpc-pointing.cpp)
-target_link_libraries(ros_mpc_pointing ${PROJECT_NAME} deburring_mpc::deburring_mpc Eigen3::Eigen ${catkin_LIBRARIES})
+add_executable(ros_deburring src/ros_deburring.cpp)
+target_link_libraries(ros_deburring ${PROJECT_NAME} deburring_mpc::deburring_mpc Eigen3::Eigen ${catkin_LIBRARIES})
 
 if(CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)
@@ -87,7 +87,7 @@ install(
   TARGETS ${PROJECT_NAME}
   EXPORT ${TARGETS_EXPORT_NAME}
   DESTINATION lib)
-install(TARGETS ros_mpc_pointing RUNTIME DESTINATION lib/${PROJECT_NAME})
+install(TARGETS ros_deburring RUNTIME DESTINATION lib/${PROJECT_NAME})
 install(FILES package.xml DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY ../config DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
