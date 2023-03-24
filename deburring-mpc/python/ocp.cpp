@@ -48,7 +48,7 @@ void exposeOCPClass() {
            bp::args("index", "value"))
       .def("change_target", &OCP::changeTarget,
            bp::args("index", "position"))
-      .def("change_goal_tracking_weights", &OCP::changeGoaleTrackingWeights,
+      .def("change_goal_tracking_weights", &OCP::changeGoalTrackingWeights,
            bp::args("weight"))
       .def("change_posture_reference", &OCP::changePostureReference,
            bp::args("index", "reference"))

@@ -134,7 +134,7 @@ class OCP {
   void updateGoalPosition(const Eigen::Ref<const Eigen::Vector3d> &position);
   void updateGoalRotation(const Eigen::Ref<const Eigen::Matrix3d> &rotation);
   void changeGoalCostActivation(const size_t index, const bool value);
-  void changeGoaleTrackingWeights(double weight);
+  void changeGoalTrackingWeights(double weight);
   void changePostureReference(const size_t index,
                               const Eigen::Ref<const VectorXd> reference);
   const VectorXd &getFinalPosture();
@@ -161,7 +161,7 @@ class OCP {
   OCPSettings &get_settings() { return settings_; };
   DDP get_solver() { return (solver_); };
   size_t get_is_initialized() { return (is_initialized_); };
-  size_t get_horizonLength() { return (settings_.horizon_length); };
+  size_t get_horizon_length() { return (settings_.horizon_length); };
 };
 
 }  // namespace deburring

@@ -143,7 +143,7 @@ int main(int argc, char** argv) {
                     &MPC.get_designer().get_end_effector_frame().translation().x(),
                     &registered_variables);
   REGISTER_VARIABLE("/introspection_data", "desiredCartesianPosition",
-                    &MPC.get_Target_frame().translation().x(),
+                    &MPC.get_target_frame().translation().x(),
                     &registered_variables);
 
   Eigen::VectorXd u0;

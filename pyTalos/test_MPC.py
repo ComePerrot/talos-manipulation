@@ -132,7 +132,7 @@ while T < T_total:
     targetPlacement = MPC.oMtarget
 
     # Log robot data
-    plotter.logDrillingState(T, MPC.drillingState)
+    plotter.logDrillingState(T, MPC.drilling_state)
     plotter.logState(T, x_measured)
     plotter.logTorques(T, torques)
     plotter.logEndEffectorPos(T, toolPlacement.translation, targetPlacement.translation)

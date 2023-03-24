@@ -123,7 +123,7 @@ class MPC {
   // getters and setters
   MPCSettings &get_settings() { return settings_; }
 
-  int get_drillingState() { return drilling_state_; }
+  int get_drilling_state() { return drilling_state_; }
 
   const VectorXd &get_x0() const { return x0_; }
 
@@ -131,7 +131,7 @@ class MPC {
 
   const MatrixXd &get_K0() const { return K0_; }
 
-  const SE3 &get_Target_frame() const {
+  const SE3 &get_target_frame() const {
     return list_oMhole_[current_hole_];
   }
 
