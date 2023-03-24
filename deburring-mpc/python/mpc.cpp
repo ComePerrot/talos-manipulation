@@ -37,20 +37,20 @@ void exposeMPCPointParams() {
       .add_property("use_mocap", bp::make_getter(&MPCSettings::use_mocap),
                     bp::make_setter(&MPCSettings::use_mocap),
                     "use_mocap.")
-      .add_property("use_gainScheduling",
-                    bp::make_getter(&MPCSettings::use_gainScheduling),
-                    bp::make_setter(&MPCSettings::use_gainScheduling),
-                    "use_gainScheduling.")
-      .add_property("gainSchedulig_slope",
-                    bp::make_getter(&MPCSettings::gainSchedulig_slope),
-                    bp::make_setter(&MPCSettings::gainSchedulig_slope),
-                    "gainSchedulig_slope.")
+      .add_property("use_gain_scheduling",
+                    bp::make_getter(&MPCSettings::use_gain_scheduling),
+                    bp::make_setter(&MPCSettings::use_gain_scheduling),
+                    "use_gain_scheduling.")
+      .add_property("gain_schedulig_slope",
+                    bp::make_getter(&MPCSettings::gain_schedulig_slope),
+                    bp::make_setter(&MPCSettings::gain_schedulig_slope),
+                    "gain_schedulig_slope.")
       .add_property(
-          "maxGoalWeight", bp::make_getter(&MPCSettings::maxGoalWeight),
-          bp::make_setter(&MPCSettings::maxGoalWeight), "maxGoalWeight.")
-      .add_property("targetPos", bp::make_getter(&MPCSettings::targetPos),
-                    bp::make_setter(&MPCSettings::targetPos),
-                    "targetPos.")
+          "gain_schedulig_max_weight", bp::make_getter(&MPCSettings::gain_schedulig_max_weight),
+          bp::make_setter(&MPCSettings::gain_schedulig_max_weight), "gain_schedulig_max_weight.")
+      .add_property("target_position", bp::make_getter(&MPCSettings::target_position),
+                    bp::make_setter(&MPCSettings::target_position),
+                    "target_position.")
       .add_property(
           "holes_offsets", bp::make_getter(&MPCSettings::holes_offsets),
           bp::make_setter(&MPCSettings::holes_offsets), "holes_offsets.")
@@ -58,9 +58,9 @@ void exposeMPCPointParams() {
                     bp::make_getter(&MPCSettings::backwardOffset),
                     bp::make_setter(&MPCSettings::backwardOffset),
                     "backwardOffset.")
-      .add_property("tolerance", bp::make_getter(&MPCSettings::tolerance),
-                    bp::make_setter(&MPCSettings::tolerance),
-                    "tolerance.");
+      .add_property("precision_threshold", bp::make_getter(&MPCSettings::precision_threshold),
+                    bp::make_setter(&MPCSettings::precision_threshold),
+                    "precision_threshold.");
 }
 
 void exposeMPCPointClass() {

@@ -114,8 +114,8 @@ void OCPSettings::readParamsFromYamlFile(const std::string &filename) {
   std::ifstream t(filename);
   std::stringstream buffer;
   buffer << t.rdbuf();
-  std::string StringToParse = buffer.str();
-  readParamsFromYamlString(StringToParse);
+  std::string string_to_parse = buffer.str();
+  readParamsFromYamlString(string_to_parse);
 }
 
 }  // namespace deburring
