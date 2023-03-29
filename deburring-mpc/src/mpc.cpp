@@ -119,6 +119,7 @@ void MPC::updateTarget(const SE3 &toolMtarget) {
       OCP_.updateGoalPosition(list_oMhole_[current_hole_].translation());
     }
   }
+  oMtarget_hole_ = list_oMhole_[current_hole_];
 }
 
 void MPC::updateOCP() {

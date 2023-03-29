@@ -6,6 +6,7 @@
 #include <ros/ros.h>
 #include <tf2_ros/transform_listener.h>
 
+#include "deburring_ros_interface/custom_registration_utils.h"
 #include "deburring_ros_interface/ros_interface.h"
 
 deburring::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
@@ -147,12 +148,11 @@ int main(int argc, char** argv) {
   MPC.initialize(x.head(MPC.get_designer().get_rmodel().nq),
                  x.tail(MPC.get_designer().get_rmodel().nv), toolMtarget);
 
-  REGISTER_VARIABLE(
-      "/introspection_data", "reachedCartesianPosition",
-      &MPC.get_designer().get_end_effector_frame().translation().x(),
-      &registered_variables);
-  REGISTER_VARIABLE("/introspection_data", "desiredCartesianPosition",
-                    &MPC.get_target_frame().translation().x(),
+  REGISTER_VARIABLE("/introspection_data", "end_effector_actual_position",
+                    &MPC.get_designer().get_end_effector_frame().translation(),
+                    &registered_variables);
+  REGISTER_VARIABLE("/introspection_data", "end_effector_desired_position",
+                    &MPC.get_target_frame().translation(),
                     &registered_variables);
 
   Eigen::VectorXd u0;

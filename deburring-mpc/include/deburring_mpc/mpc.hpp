@@ -85,6 +85,7 @@ class MPC {
   // Memory preallocations:
   SE3 oMtarget_;
   SE3 oMdisengaged_target_;
+  SE3 oMtarget_hole_;
   SE3 toolMhole_;
   double position_error_ = 0;
   std::vector<unsigned long> controlled_joints_ids_;
@@ -131,7 +132,7 @@ class MPC {
 
   const MatrixXd &get_K0() const { return K0_; }
 
-  const SE3 &get_target_frame() const { return list_oMhole_[current_hole_]; }
+  const SE3 &get_target_frame() const { return oMtarget_hole_; }
 
   OCP &get_OCP() { return OCP_; }
   void set_OCP(const OCP &OCP) { OCP_ = OCP; }
