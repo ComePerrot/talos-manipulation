@@ -11,7 +11,8 @@ void OCP::buildSolver(const VectorXd x0, SE3 oMtarget) {
 
   auto running_models = std::vector<ActionModel>(settings_.horizon_length);
 
-  for (size_t node_index = 0; node_index < settings_.horizon_length; node_index++) {
+  for (size_t node_index = 0; node_index < settings_.horizon_length;
+       node_index++) {
     running_models[node_index] = formulatePointingTask();
   }
 
@@ -81,7 +82,8 @@ ActionModel OCP::formulatePointingTask() {
   defineActuationTask(costs, settings_.w_control_reg);
 
   // End effector task
-  defineGripperPlacement(costs, settings_.w_gripper_pos, settings_.w_gripper_rot);
+  defineGripperPlacement(costs, settings_.w_gripper_pos,
+                         settings_.w_gripper_rot);
   defineGripperVelocity(costs, settings_.w_gripper_vel);
 
   DifferentialActionModel running_dam =
@@ -114,7 +116,8 @@ ActionModel OCP::formulateTerminalPointingTask() {
   definePostureTask(costs, settings_.w_state_reg);
 
   // End effector task
-  defineGripperPlacement(costs, settings_.w_gripper_pos, settings_.w_gripper_rot);
+  defineGripperPlacement(costs, settings_.w_gripper_pos,
+                         settings_.w_gripper_rot);
   defineGripperVelocity(costs, settings_.w_gripper_vel);
 
   DifferentialActionModel terminal_dam =
@@ -123,7 +126,8 @@ ActionModel OCP::formulateTerminalPointingTask() {
   setArmature(terminal_dam);
 
   ActionModel terminal_model =
-      boost::make_shared<crocoddyl::IntegratedActionModelEuler>(terminal_dam, 0);
+      boost::make_shared<crocoddyl::IntegratedActionModelEuler>(terminal_dam,
+                                                                0);
 
   return terminal_model;
 }

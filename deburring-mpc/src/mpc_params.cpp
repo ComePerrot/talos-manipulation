@@ -57,9 +57,8 @@ void MPCSettings::readParamsFromYamlString(std::string &string_to_parse) {
   };
 
   // Local lambda function to read std::vector<Eigen::Vector3d>
-  auto read_stdvect_v3d = [&config](
-                              std::vector<Vector3d> &aref_stdvect_v3d,
-                              std::string fieldname) {
+  auto read_stdvect_v3d = [&config](std::vector<Vector3d> &aref_stdvect_v3d,
+                                    std::string fieldname) {
     YAML::Node yn_astdvect_v3d = config[fieldname];
     if (yn_astdvect_v3d) {
       for (std::size_t i = 0; i < yn_astdvect_v3d.size(); i++) {

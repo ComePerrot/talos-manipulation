@@ -1,12 +1,10 @@
 #include "deburring_mpc/ocp.hpp"
 
 namespace deburring {
-OCP::OCP(const OCPSettings &ocp_settings,
-                     const RobotDesigner &designer)
+OCP::OCP(const OCPSettings &ocp_settings, const RobotDesigner &designer)
     : settings_(ocp_settings), designer_(designer) {}
 
-void OCP::initialize(const ConstVectorRef &x0,
-                           const pinocchio::SE3 &oMtarget) {
+void OCP::initialize(const ConstVectorRef &x0, const pinocchio::SE3 &oMtarget) {
   if (!designer_.get_is_initialized()) {
     throw std::runtime_error("The designer must be initialized.");
   }

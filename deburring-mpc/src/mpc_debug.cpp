@@ -5,8 +5,8 @@
 namespace deburring {
 
 void MPC::logData(const Eigen::Ref<const Eigen::VectorXd> x_input,
-                        const Eigen::Ref<const Eigen::VectorXd> us0,
-                        const Eigen::Ref<const Eigen::MatrixXd> K0) {
+                  const Eigen::Ref<const Eigen::VectorXd> us0,
+                  const Eigen::Ref<const Eigen::MatrixXd> K0) {
   MPC_debugData data;
   data.x_input = x_input;
 

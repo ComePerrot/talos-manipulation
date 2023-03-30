@@ -23,20 +23,16 @@ void exposeMPCParams() {
       bp::init<>(bp::args("self"), "Empty initialization of the MPC params"))
       .def("read_from_yaml", &MPCSettings::readParamsFromYamlFile,
            bp::args("filename"))
-      .add_property("T_initialization",
-                    bp::make_getter(&MPCSettings::T_initialization),
-                    bp::make_setter(&MPCSettings::T_initialization),
-                    "T_initialization.")
-      .add_property("T_stabilization",
-                    bp::make_getter(&MPCSettings::T_stabilization),
-                    bp::make_setter(&MPCSettings::T_stabilization),
-                    "T_stabilization.")
       .add_property(
-          "T_drilling", bp::make_getter(&MPCSettings::T_drilling),
-          bp::make_setter(&MPCSettings::T_drilling), "T_drilling.")
+          "T_initialization", bp::make_getter(&MPCSettings::T_initialization),
+          bp::make_setter(&MPCSettings::T_initialization), "T_initialization.")
+      .add_property(
+          "T_stabilization", bp::make_getter(&MPCSettings::T_stabilization),
+          bp::make_setter(&MPCSettings::T_stabilization), "T_stabilization.")
+      .add_property("T_drilling", bp::make_getter(&MPCSettings::T_drilling),
+                    bp::make_setter(&MPCSettings::T_drilling), "T_drilling.")
       .add_property("use_mocap", bp::make_getter(&MPCSettings::use_mocap),
-                    bp::make_setter(&MPCSettings::use_mocap),
-                    "use_mocap.")
+                    bp::make_setter(&MPCSettings::use_mocap), "use_mocap.")
       .add_property("use_gain_scheduling",
                     bp::make_getter(&MPCSettings::use_gain_scheduling),
                     bp::make_setter(&MPCSettings::use_gain_scheduling),
@@ -45,20 +41,21 @@ void exposeMPCParams() {
                     bp::make_getter(&MPCSettings::gain_schedulig_slope),
                     bp::make_setter(&MPCSettings::gain_schedulig_slope),
                     "gain_schedulig_slope.")
+      .add_property("gain_schedulig_max_weight",
+                    bp::make_getter(&MPCSettings::gain_schedulig_max_weight),
+                    bp::make_setter(&MPCSettings::gain_schedulig_max_weight),
+                    "gain_schedulig_max_weight.")
       .add_property(
-          "gain_schedulig_max_weight", bp::make_getter(&MPCSettings::gain_schedulig_max_weight),
-          bp::make_setter(&MPCSettings::gain_schedulig_max_weight), "gain_schedulig_max_weight.")
-      .add_property("target_position", bp::make_getter(&MPCSettings::target_position),
-                    bp::make_setter(&MPCSettings::target_position),
-                    "target_position.")
+          "target_position", bp::make_getter(&MPCSettings::target_position),
+          bp::make_setter(&MPCSettings::target_position), "target_position.")
       .add_property(
           "holes_offsets", bp::make_getter(&MPCSettings::holes_offsets),
           bp::make_setter(&MPCSettings::holes_offsets), "holes_offsets.")
-      .add_property("backward_offset",
-                    bp::make_getter(&MPCSettings::backward_offset),
-                    bp::make_setter(&MPCSettings::backward_offset),
-                    "backward_offset.")
-      .add_property("precision_threshold", bp::make_getter(&MPCSettings::precision_threshold),
+      .add_property(
+          "backward_offset", bp::make_getter(&MPCSettings::backward_offset),
+          bp::make_setter(&MPCSettings::backward_offset), "backward_offset.")
+      .add_property("precision_threshold",
+                    bp::make_getter(&MPCSettings::precision_threshold),
                     bp::make_setter(&MPCSettings::precision_threshold),
                     "precision_threshold.");
 }
@@ -67,16 +64,16 @@ void exposeMPCClass() {
   bp::register_ptr_to_python<boost::shared_ptr<MPC> >();
 
   bp::class_<MPC>(
-      "MPC", bp::init<const MPCSettings &,
-                            const OCPSettings &, const RobotDesigner &>(
-                       bp::args("self", "settings", "OCPSettings", "designer"),
-                       "Initialize the MPC (empty init)"))
+      "MPC",
+      bp::init<const MPCSettings &, const OCPSettings &, const RobotDesigner &>(
+          bp::args("self", "settings", "OCPSettings", "designer"),
+          "Initialize the MPC (empty init)"))
       .def<void (MPC::*)(const ConstVectorRef &, const ConstVectorRef &,
-                               const SE3 &)>(
+                         const SE3 &)>(
           "initialize", &MPC::initialize,
           bp::args("self", "q0", "v0", "toolMtarget"))
       .def<void (MPC::*)(const ConstVectorRef &, const ConstVectorRef &,
-                               const SE3 &)>(
+                         const SE3 &)>(
           "iterate", &MPC::iterate,
           bp::args("self", "q_current", "v_current", "toolMtarget"))
       .def<void (MPC::*)(const VectorXd &, const SE3 &)>(

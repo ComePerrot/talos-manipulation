@@ -4,10 +4,11 @@ namespace deburring {
 
 #define PI 3.14159265
 
-MPC::MPC(const MPCSettings &mpc_settings,
-                     const OCPSettings &ocp_settings,
-                     const RobotDesigner &designer)
-    : settings_(mpc_settings), designer_(designer), OCP_(ocp_settings, designer_) {
+MPC::MPC(const MPCSettings &mpc_settings, const OCPSettings &ocp_settings,
+         const RobotDesigner &designer)
+    : settings_(mpc_settings),
+      designer_(designer),
+      OCP_(ocp_settings, designer_) {
   backward_offset_.translation().z() = settings_.backward_offset;
   goal_weight_ = OCP_.get_settings().w_gripper_pos;
   for (auto offset : settings_.holes_offsets) {
@@ -16,7 +17,7 @@ MPC::MPC(const MPCSettings &mpc_settings,
 }
 
 void MPC::initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
-                           const SE3 &toolMtarget) {
+                     const SE3 &toolMtarget) {
   controlled_joints_ids_ = designer_.get_controlled_joints_ids();
   x_internal_.resize(designer_.get_rmodel().nq + designer_.get_rmodel().nv);
 
@@ -37,8 +38,7 @@ void MPC::initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
 }
 
 void MPC::iterate(const ConstVectorRef &q_current,
-                        const ConstVectorRef &v_current,
-                        const SE3 &toolMtarget) {
+                  const ConstVectorRef &v_current, const SE3 &toolMtarget) {
   iterate(shapeState(q_current, v_current), toolMtarget);
 }
 
@@ -207,7 +207,8 @@ void MPC::updateOCP() {
           goal_weight_ = OCP_.get_settings().w_gripper_pos;
           OCP_.changeGoalTrackingWeights(goal_weight_);
         }
-        oMdisengaged_target_ = list_oMhole_[current_hole_].act(backward_offset_);
+        oMdisengaged_target_ =
+            list_oMhole_[current_hole_].act(backward_offset_);
       }
       if (iteration_ <= OCP_.get_horizon_length()) {
         OCP_.changeTarget(OCP_.get_horizon_length() - iteration_,
@@ -257,7 +258,7 @@ void MPC::updateOCP() {
 }
 
 const VectorXd &MPC::shapeState(const ConstVectorRef &q,
-                                      const ConstVectorRef &v) {
+                                const ConstVectorRef &v) {
   if (q.size() == designer_.get_rmodel_complete().nq &&
       v.size() == designer_.get_rmodel_complete().nv) {
     x_internal_.head<7>() = q.head<7>();

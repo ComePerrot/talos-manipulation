@@ -48,7 +48,8 @@ void OCPSettings::readParamsFromYamlString(const std::string &string_to_parse) {
   };
 
   auto read_stateWeights = [&config, &read_vxd](VectorXd &aref_state_weights) {
-    std::array<std::string, 2> nodeNames{"state_pos_weights", "state_vel_weights"};
+    std::array<std::string, 2> nodeNames{"state_pos_weights",
+                                         "state_vel_weights"};
     std::array<std::string, 6> limbs{"base",  "left_leg", "right_leg",
                                      "torso", "left_arm", "right_arm"};
     VectorXd state_weights(36 * 2);  // Maximum size for the state with Talos
@@ -74,8 +75,8 @@ void OCPSettings::readParamsFromYamlString(const std::string &string_to_parse) {
 
   auto read_controlWeights = [&config,
                               &read_vxd](VectorXd &aref_control_weights) {
-    std::array<std::string, 5> limbs{"left_leg", "right_leg", "torso", "left_arm",
-                                     "right_arm"};
+    std::array<std::string, 5> limbs{"left_leg", "right_leg", "torso",
+                                     "left_arm", "right_arm"};
     VectorXd control_weights(36);
 
     int size_weight = 0;

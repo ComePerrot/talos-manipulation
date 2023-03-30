@@ -24,8 +24,9 @@ void RobotDesigner::initialize(const RobotDesignerSettings &settings) {
     std::cout << "### Build pinocchio model from rosparam robot_description."
               << std::endl;
   } else if (settings_.urdf_path.size() > 0) {
-    pinocchio::urdf::buildModel(
-        settings_.urdf_path, pinocchio::JointModelFreeFlyer(), rmodel_complete_);
+    pinocchio::urdf::buildModel(settings_.urdf_path,
+                                pinocchio::JointModelFreeFlyer(),
+                                rmodel_complete_);
     std::cout << "### Build pinocchio model from urdf file." << std::endl;
   } else {
     throw std::invalid_argument(
@@ -150,13 +151,9 @@ void RobotDesigner::addEndEffectorFrame(std::string end_effector_name,
   rdata_ = pinocchio::Data(rmodel_);
 }
 
-const SE3 &RobotDesigner::get_lf_frame() {
-  return rdata_.oMf[left_foot_id_];
-}
+const SE3 &RobotDesigner::get_lf_frame() { return rdata_.oMf[left_foot_id_]; }
 
-const SE3 &RobotDesigner::get_rf_frame() {
-  return rdata_.oMf[right_foot_id_];
-}
+const SE3 &RobotDesigner::get_rf_frame() { return rdata_.oMf[right_foot_id_]; }
 
 const SE3 &RobotDesigner::get_end_effector_frame() {
   return rdata_.oMf[end_effector_id_];

@@ -2,8 +2,8 @@
 #define DEBURRING_MPC
 
 #include "deburring_mpc/fwd.hpp"
-#include "deburring_mpc/robot_designer.hpp"
 #include "deburring_mpc/ocp.hpp"
+#include "deburring_mpc/robot_designer.hpp"
 
 namespace deburring {
 
@@ -97,8 +97,8 @@ class MPC {
   void updateOCP();
 
  public:
-  MPC(const MPCSettings &mpc_settings,
-            const OCPSettings &ocp_settings, const RobotDesigner &designer);
+  MPC(const MPCSettings &mpc_settings, const OCPSettings &ocp_settings,
+      const RobotDesigner &designer);
 
   void initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
                   const SE3 &toolMtarget);
@@ -131,9 +131,7 @@ class MPC {
 
   const MatrixXd &get_K0() const { return K0_; }
 
-  const SE3 &get_target_frame() const {
-    return list_oMhole_[current_hole_];
-  }
+  const SE3 &get_target_frame() const { return list_oMhole_[current_hole_]; }
 
   OCP &get_OCP() { return OCP_; }
   void set_OCP(const OCP &OCP) { OCP_ = OCP; }

@@ -4,8 +4,8 @@
 #include <eigenpy/eigenpy.hpp>
 #include <pinocchio/algorithm/model.hpp>
 
-#include "pinocchio/multibody/model.hpp"
 #include "deburring_mpc/robot_designer.hpp"
+#include "pinocchio/multibody/model.hpp"
 
 namespace deburring {
 namespace python {
