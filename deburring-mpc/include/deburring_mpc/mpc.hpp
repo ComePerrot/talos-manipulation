@@ -57,6 +57,19 @@ struct MPCSettings {
   void readParamsFromYamlFile(const std::string &filename);
 };
 
+enum class Status {
+  kInitialization,
+  kStabilization,
+  kDrilling,
+  kDisengagement,
+  kFirstHole,
+  kHoleTransition,
+  kReturnHome,
+  kIncreaseGain,
+  kUpdatePosture,
+  kDeburringDone
+};
+
 class MPC {
  private:
   MPCSettings settings_;
@@ -69,7 +82,7 @@ class MPC {
 
   // MPC State
   size_t current_hole_ = 0;
-  int drilling_state_ = 0;
+  Status drilling_state_ = Status::kInitialization;
   size_t iteration_ = 0;
   double goal_weight_ = 0;
 
@@ -124,7 +137,7 @@ class MPC {
   // getters and setters
   MPCSettings &get_settings() { return settings_; }
 
-  int get_drilling_state() { return drilling_state_; }
+  int get_drilling_state() { return static_cast<int>(drilling_state_); }
 
   const VectorXd &get_x0() const { return x0_; }
 
