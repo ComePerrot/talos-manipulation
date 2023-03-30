@@ -6,12 +6,13 @@ DeburringROSInterface::DeburringROSInterface(ros::NodeHandle nh) {
 
   // Robot sensor subscriber
   sensor_sub_ = nh.subscribe<linear_feedback_controller_msgs::Sensor>(
-      "/linear_feedback_controller/sensor_state", 1, &DeburringROSInterface::SensorCb, this, hints);
+      "/linear_feedback_controller/sensor_state", 1,
+      &DeburringROSInterface::SensorCb, this, hints);
 
   // Control publisher
-  command_pub_.reset(
-      new realtime_tools::RealtimePublisher<
-          linear_feedback_controller_msgs::Control>(nh, "/linear_feedback_controller/desired_control", 1));
+  command_pub_.reset(new realtime_tools::RealtimePublisher<
+                     linear_feedback_controller_msgs::Control>(
+      nh, "/linear_feedback_controller/desired_control", 1));
 
   ros::Rate r(1);  // Rate for reading inital state from the robot
   while (sensor_msg_.header.stamp.toNSec() == 0) {
@@ -31,7 +32,7 @@ DeburringROSInterface::DeburringROSInterface(ros::NodeHandle nh) {
 }
 
 void DeburringROSInterface::update(const Eigen::VectorXd& u0,
-                               const Eigen::MatrixXd& K0) {
+                                   const Eigen::MatrixXd& K0) {
   mapControlToMsg(u0, K0);
 
   if (command_pub_->trylock()) {
@@ -63,7 +64,7 @@ void DeburringROSInterface::mapMsgToJointSates() {
 }
 
 void DeburringROSInterface::mapControlToMsg(const Eigen::VectorXd& u0,
-                                        const Eigen::MatrixXd& K0) {
+                                            const Eigen::MatrixXd& K0) {
   tf::matrixEigenToMsg(u0, control_msg_.feedforward);
   tf::matrixEigenToMsg(K0, control_msg_.feedback_gain);
 }

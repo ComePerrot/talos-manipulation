@@ -26,7 +26,8 @@ deburring::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   gripperMtool.translation().z() = gripperTtool[2];
 
   ROS_INFO_STREAM("Building robot designer");
-  deburring::RobotDesigner designer = deburring::RobotDesigner(designer_settings);
+  deburring::RobotDesigner designer =
+      deburring::RobotDesigner(designer_settings);
 
   ROS_INFO_STREAM("Adding end effector frame to the robot model");
   designer.addEndEffectorFrame("deburring_tool",
@@ -45,17 +46,18 @@ deburring::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
 
     std::vector<double>::size_type size_limit = lower_position_limits.size();
 
-    designer.updateModelLimits(Eigen::VectorXd::Map(lower_position_limits.data(),
-                                                    (Eigen::Index)size_limit),
-                               Eigen::VectorXd::Map(upper_position_limits.data(),
-                                                    (Eigen::Index)size_limit));
+    designer.updateModelLimits(
+        Eigen::VectorXd::Map(lower_position_limits.data(),
+                             (Eigen::Index)size_limit),
+        Eigen::VectorXd::Map(upper_position_limits.data(),
+                             (Eigen::Index)size_limit));
   }
 
   return (designer);
 }
 
 deburring::MPC buildMPC(ros::NodeHandle nh,
-                          const deburring::RobotDesigner& pinWrapper) {
+                        const deburring::RobotDesigner& pinWrapper) {
   std::string parameterFileName;
   nh.getParam("settings_file", parameterFileName);
   std::string parameterFilePath =
@@ -100,10 +102,10 @@ class MoCapInterface {
       ROS_WARN("%s", ex.what());
     }
     tf::transformMsgToEigen(transform_stamped_.transform, eigen_transform_);
-    toolMtarget_ =
-        pinocchio::SE3(eigen_transform_.rotation(), eigen_transform_.translation());
+    toolMtarget_ = pinocchio::SE3(eigen_transform_.rotation(),
+                                  eigen_transform_.translation());
   }
-  
+
   // TF variables
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
@@ -145,9 +147,10 @@ int main(int argc, char** argv) {
   MPC.initialize(x.head(MPC.get_designer().get_rmodel().nq),
                  x.tail(MPC.get_designer().get_rmodel().nv), toolMtarget);
 
-  REGISTER_VARIABLE("/introspection_data", "reachedCartesianPosition",
-                    &MPC.get_designer().get_end_effector_frame().translation().x(),
-                    &registered_variables);
+  REGISTER_VARIABLE(
+      "/introspection_data", "reachedCartesianPosition",
+      &MPC.get_designer().get_end_effector_frame().translation().x(),
+      &registered_variables);
   REGISTER_VARIABLE("/introspection_data", "desiredCartesianPosition",
                     &MPC.get_target_frame().translation().x(),
                     &registered_variables);

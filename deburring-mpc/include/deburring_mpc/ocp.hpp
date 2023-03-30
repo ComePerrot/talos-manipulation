@@ -30,8 +30,8 @@
 #include <crocoddyl/multibody/residuals/state.hpp>
 #include <crocoddyl/multibody/states/multibody.hpp>
 
-#include "deburring_mpc/robot_designer.hpp"
 #include "deburring_mpc/fwd.hpp"
+#include "deburring_mpc/robot_designer.hpp"
 
 namespace deburring {
 
@@ -99,7 +99,8 @@ class OCP {
   ActionModel formulateTerminalPointingTask();
   void setArmature(DifferentialActionModel DAM);
   void defineFeetContact(Contact &contact_collector);
-  void definePostureTask(CostModelSum &cost_collector, const double w_state_reg);
+  void definePostureTask(CostModelSum &cost_collector,
+                         const double w_state_reg);
   void defineActuationTask(CostModelSum &cost_collector,
                            const double w_control_reg);
   void defineJointLimits(CostModelSum &cost_collector, const double w_limit,
@@ -119,8 +120,7 @@ class OCP {
   ActionData ada(const unsigned long time);
 
  public:
-  OCP(const OCPSettings &ocp_settings,
-            const RobotDesigner &designer);
+  OCP(const OCPSettings &ocp_settings, const RobotDesigner &designer);
 
   void initialize(const ConstVectorRef &x0, const SE3 &oMtarget);
   void solveFirst(const VectorXd x);

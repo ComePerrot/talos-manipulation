@@ -60,8 +60,8 @@ class RobotDesigner {
 
   void updateModelLimits(const Eigen::VectorXd lower_position_limit,
                          const Eigen::VectorXd upper_Position_limit);
-  void addEndEffectorFrame(std::string end_effector_name, std::string parent_name,
-                           SE3 end_effector_placement);
+  void addEndEffectorFrame(std::string end_effector_name,
+                           std::string parent_name, SE3 end_effector_placement);
 
   // accessors
   double get_robot_mass();
@@ -86,7 +86,9 @@ class RobotDesigner {
   const std::string &get_rf_name() { return settings_.right_foot_name; }
   const pinocchio::FrameIndex &get_lf_id() { return left_foot_id_; }
   const pinocchio::FrameIndex &get_rf_id() { return right_foot_id_; }
-  const pinocchio::FrameIndex &get_end_effector_id() { return end_effector_id_; }
+  const pinocchio::FrameIndex &get_end_effector_id() {
+    return end_effector_id_;
+  }
   const RobotDesignerSettings &get_settings() { return settings_; }
   const std::vector<unsigned long> &get_controlled_joints_ids() {
     return controlled_joints_ids_;

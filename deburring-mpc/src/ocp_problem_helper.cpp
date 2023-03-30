@@ -8,7 +8,7 @@ void OCP::recede() {
       solver_->get_problem()->get_runningDatas()[0]);
 }
 void OCP::changeTarget(const size_t index,
-                             const Eigen::Ref<const Vector3d> &position) {
+                       const Eigen::Ref<const Vector3d> &position) {
   boost::static_pointer_cast<crocoddyl::ResidualModelFrameTranslation>(
       costs(index)->get_costs().at("gripperPosition")->cost->get_residual())
       ->set_reference(position);
@@ -67,16 +67,14 @@ void OCP::changeGoalTrackingWeights(double weight) {
     costs(node_index)->get_costs().at("gripperPosition")->weight = weight;
   }
 }
-void OCP::changePostureReference(
-    const size_t index, const Eigen::Ref<const VectorXd> reference) {
+void OCP::changePostureReference(const size_t index,
+                                 const Eigen::Ref<const VectorXd> reference) {
   boost::static_pointer_cast<crocoddyl::ResidualModelState>(
       costs(index)->get_costs().at("postureTask")->cost->get_residual())
       ->set_reference(reference);
 }
 
-const VectorXd& OCP::getFinalPosture(){
-  return (solver_->get_xs().back());
-}
+const VectorXd &OCP::getFinalPosture() { return (solver_->get_xs().back()); }
 
 ActionModel OCP::ama(const unsigned long time) {
   if (time == settings_.horizon_length) {

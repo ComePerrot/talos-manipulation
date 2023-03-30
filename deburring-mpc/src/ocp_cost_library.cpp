@@ -13,22 +13,23 @@ void OCP::defineFeetContact(Contact &contact_collector) {
           actuation_->get_nu(), Vector2d(0., 4.));
 
   contact_collector->addContact(designer_.get_lf_name(), contact_model_left,
-                               false);
+                                false);
   contact_collector->addContact(designer_.get_rf_name(), Contact_model_right,
-                               false);
+                                false);
 
   contact_collector->changeContactStatus(designer_.get_lf_name(), true);
   contact_collector->changeContactStatus(designer_.get_rf_name(), true);
 }
 
 void OCP::definePostureTask(CostModelSum &cost_collector,
-                                  const double w_state_reg) {
+                            const double w_state_reg) {
   if (settings_.state_weights.size() != designer_.get_rmodel().nv * 2) {
     throw std::invalid_argument("State weight size is wrong ");
   }
-  boost::shared_ptr<crocoddyl::ActivationModelWeightedQuad> activation_weighted_quad =
-      boost::make_shared<crocoddyl::ActivationModelWeightedQuad>(
-          settings_.state_weights);
+  boost::shared_ptr<crocoddyl::ActivationModelWeightedQuad>
+      activation_weighted_quad =
+          boost::make_shared<crocoddyl::ActivationModelWeightedQuad>(
+              settings_.state_weights);
 
   boost::shared_ptr<crocoddyl::CostModelAbstract> posture_cost =
       boost::make_shared<crocoddyl::CostModelResidual>(
@@ -40,13 +41,14 @@ void OCP::definePostureTask(CostModelSum &cost_collector,
 }
 
 void OCP::defineActuationTask(CostModelSum &cost_collector,
-                                    const double w_control_reg) {
+                              const double w_control_reg) {
   if (settings_.control_weights.size() != (int)actuation_->get_nu()) {
     throw std::invalid_argument("Control weight size is wrong ");
   }
-  boost::shared_ptr<crocoddyl::ActivationModelWeightedQuad> activation_weighted_quad =
-      boost::make_shared<crocoddyl::ActivationModelWeightedQuad>(
-          settings_.control_weights);  //.tail(actuation->get_nu())
+  boost::shared_ptr<crocoddyl::ActivationModelWeightedQuad>
+      activation_weighted_quad =
+          boost::make_shared<crocoddyl::ActivationModelWeightedQuad>(
+              settings_.control_weights);  //.tail(actuation->get_nu())
 
   boost::shared_ptr<crocoddyl::CostModelAbstract> actuation_cost =
       boost::make_shared<crocoddyl::CostModelResidual>(
@@ -54,12 +56,11 @@ void OCP::defineActuationTask(CostModelSum &cost_collector,
           boost::make_shared<crocoddyl::ResidualModelControl>(
               state_, actuation_->get_nu()));
   cost_collector.get()->addCost("actuationTask", actuation_cost, w_control_reg,
-                               true);
+                                true);
 }
 
-void OCP::defineJointLimits(CostModelSum &cost_collector,
-                                  const double w_limit,
-                                  const double limit_scale) {
+void OCP::defineJointLimits(CostModelSum &cost_collector, const double w_limit,
+                            const double limit_scale) {
   Eigen::VectorXd lower_bound(2 * state_->get_nv()),
       upper_bound(2 * state_->get_nv());
   double inf = 9999.0;
@@ -78,8 +79,10 @@ void OCP::defineJointLimits(CostModelSum &cost_collector,
   crocoddyl::ActivationBounds bounds =
       crocoddyl::ActivationBounds(lower_bound, upper_bound, limit_scale);
 
-  boost::shared_ptr<crocoddyl::ActivationModelQuadraticBarrier> activation_quad_barrier =
-      boost::make_shared<crocoddyl::ActivationModelQuadraticBarrier>(bounds);
+  boost::shared_ptr<crocoddyl::ActivationModelQuadraticBarrier>
+      activation_quad_barrier =
+          boost::make_shared<crocoddyl::ActivationModelQuadraticBarrier>(
+              bounds);
   boost::shared_ptr<crocoddyl::CostModelAbstract> joint_limit_cost =
       boost::make_shared<crocoddyl::CostModelResidual>(
           state_, activation_quad_barrier,
@@ -90,19 +93,20 @@ void OCP::defineJointLimits(CostModelSum &cost_collector,
 }
 
 void OCP::defineCoMPosition(CostModelSum &cost_collector,
-                                  const double w_com_pos) {
+                            const double w_com_pos) {
   Vector3d com_ref_position = designer_.get_com_position();
   boost::shared_ptr<crocoddyl::CostModelAbstract> com_posistion_cost =
       boost::make_shared<crocoddyl::CostModelResidual>(
           state_, boost::make_shared<crocoddyl::ResidualModelCoMPosition>(
                       state_, com_ref_position, actuation_->get_nu()));
 
-  cost_collector.get()->addCost("comPosition", com_posistion_cost, w_com_pos, true);
+  cost_collector.get()->addCost("comPosition", com_posistion_cost, w_com_pos,
+                                true);
 }
 
 void OCP::defineGripperPlacement(CostModelSum &cost_collector,
-                                       const double w_gripper_pos,
-                                       const double w_gripper_rot) {
+                                 const double w_gripper_pos,
+                                 const double w_gripper_rot) {
   pinocchio::SE3 goal_placement = pinocchio::SE3::Identity();
 
   // Position
@@ -111,11 +115,11 @@ void OCP::defineGripperPlacement(CostModelSum &cost_collector,
           state_,
           boost::make_shared<crocoddyl::ActivationModelQuadFlatLog>(3, 0.02),
           boost::make_shared<crocoddyl::ResidualModelFrameTranslation>(
-              state_, designer_.get_end_effector_id(), goal_placement.translation(),
-              actuation_->get_nu()));
+              state_, designer_.get_end_effector_id(),
+              goal_placement.translation(), actuation_->get_nu()));
 
   cost_collector.get()->addCost("gripperPosition", gripper_position_cost,
-                               w_gripper_pos, true);
+                                w_gripper_pos, true);
 
   // Orientation
   boost::shared_ptr<crocoddyl::CostModelAbstract> gripper_rotation_cost =
@@ -125,11 +129,11 @@ void OCP::defineGripperPlacement(CostModelSum &cost_collector,
                       goal_placement.rotation(), actuation_->get_nu()));
 
   cost_collector.get()->addCost("gripperRotation", gripper_rotation_cost,
-                               w_gripper_rot, true);
+                                w_gripper_rot, true);
 }
 
 void OCP::defineGripperVelocity(CostModelSum &cost_collector,
-                                      const double w_gripper_vel) {
+                                const double w_gripper_vel) {
   pinocchio::Motion goal_motion = pinocchio::Motion(Eigen::VectorXd::Zero(6));
   boost::shared_ptr<crocoddyl::CostModelAbstract> gripper_velocity_cost =
       boost::make_shared<crocoddyl::CostModelResidual>(
@@ -138,7 +142,7 @@ void OCP::defineGripperVelocity(CostModelSum &cost_collector,
                       pinocchio::WORLD, actuation_->get_nu()));
 
   cost_collector.get()->addCost("gripperVelocity", gripper_velocity_cost,
-                               w_gripper_vel, true);
+                                w_gripper_vel, true);
 }
 
 }  // namespace deburring

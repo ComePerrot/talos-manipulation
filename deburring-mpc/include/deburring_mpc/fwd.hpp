@@ -1,14 +1,12 @@
 #ifndef DEBURRING_FWD
 #define DEBURRING_FWD
 
-
 #include <pinocchio/fwd.hpp>
 // include pinocchio first
 #include <crocoddyl/core/fwd.hpp>
-#include <crocoddyl/multibody/fwd.hpp>
 #include <crocoddyl/core/solvers/fddp.hpp>
+#include <crocoddyl/multibody/fwd.hpp>
 #include <pinocchio/spatial/fwd.hpp>
-
 
 namespace deburring {
 // Eigen

@@ -25,7 +25,8 @@ int main() {
       "/opt/openrobots/share/example-robot-data/robots/talos_data/srdf/"
       "talos.srdf";
 
-  deburring::RobotDesigner pinWrapper = deburring::RobotDesigner(designerSettings);
+  deburring::RobotDesigner pinWrapper =
+      deburring::RobotDesigner(designerSettings);
 
   pinocchio::SE3 gripperMtool = pinocchio::SE3::Identity();
   gripperMtool.translation().x() = 0;
