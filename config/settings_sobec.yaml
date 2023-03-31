@@ -78,5 +78,11 @@ MPC:
   # use_gain_scheduling: 1
   gain_schedulig_slope: 0.5
   gain_schedulig_max_weight: 100
+  custom_arm_ref: [
+    -0.08419471,
+    0.425144,
+    0.00556666,
+    -1.50516856,
+  ]
 
 
