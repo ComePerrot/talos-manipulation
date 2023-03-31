@@ -76,14 +76,16 @@ void MPCSettings::readParamsFromYamlString(std::string &string_to_parse) {
   read_size_t(T_initialization, "T_initialization");
   read_size_t(T_stabilization, "T_stabilization");
   read_size_t(T_drilling, "T_drilling");
-  read_int(use_mocap, "use_mocap");
-  read_int(use_gain_scheduling, "use_gain_scheduling");
-  read_double(gain_schedulig_slope, "gain_schedulig_slope");
-  read_double(gain_schedulig_max_weight, "gain_schedulig_max_weight");
   read_v3d(target_position, "target_position");
   read_stdvect_v3d(holes_offsets, "holes_offsets");
   read_double(precision_threshold, "precision_threshold");
   read_double(backward_offset, "backward_offset");
+  read_int(precision_strategy,"precision_strategy");
+  read_int(use_mocap, "use_mocap");
+  // read_int(use_gain_scheduling, "use_gain_scheduling");
+  read_double(gain_schedulig_slope, "gain_schedulig_slope");
+  read_double(gain_schedulig_max_weight, "gain_schedulig_max_weight");
+ 
 }
 
 void MPCSettings::readParamsFromYamlFile(const std::string &filename) {

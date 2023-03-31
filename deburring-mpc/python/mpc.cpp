@@ -33,10 +33,10 @@ void exposeMPCParams() {
                     bp::make_setter(&MPCSettings::T_drilling), "T_drilling.")
       .add_property("use_mocap", bp::make_getter(&MPCSettings::use_mocap),
                     bp::make_setter(&MPCSettings::use_mocap), "use_mocap.")
-      .add_property("use_gain_scheduling",
-                    bp::make_getter(&MPCSettings::use_gain_scheduling),
-                    bp::make_setter(&MPCSettings::use_gain_scheduling),
-                    "use_gain_scheduling.")
+    //   .add_property("use_gain_scheduling",
+    //                 bp::make_getter(&MPCSettings::use_gain_scheduling),
+    //                 bp::make_setter(&MPCSettings::use_gain_scheduling),
+    //                 "use_gain_scheduling.")
       .add_property("gain_schedulig_slope",
                     bp::make_getter(&MPCSettings::gain_schedulig_slope),
                     bp::make_setter(&MPCSettings::gain_schedulig_slope),

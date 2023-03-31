@@ -39,12 +39,17 @@ void MPC::updateOCP() {
         if (position_error_ > 0.05) {
           drilling_state_ = Status::kHoleTransition;
         } else {
-          if (settings_.use_gain_scheduling == 1) {
-            drilling_state_ = Status::kIncreaseGain;
-          } else {
-            drilling_state_ = Status::kDrilling;
+          switch (settings_.precision_strategy) {
+            case 0:
+              drilling_state_ = Status::kDrilling;
+              break;
+            case 1:
+              drilling_state_ = Status::kIncreaseGain;
+              break;
+            case 2:
+              drilling_state_ = Status::kUpdatePosture;
+              break;
           }
-          // drilling_state_ = Status::kUpdatePosture;
         }
       }
       break;
@@ -73,8 +78,8 @@ void MPC::updateOCP() {
         std::cout << "Updating reference posture" << std::endl;
       }
       if (iteration_ <= OCP_.get_horizon_length()) {
-        OCP_.changePostureReference(OCP_.get_horizon_length() - iteration_,
-                                    Eigen::VectorXd::Zero(1));
+        // OCP_.changePostureReference(OCP_.get_horizon_length() - iteration_,
+        //                             Eigen::VectorXd::Zero(1));
         iteration_++;
       } else {
         iteration_ = 0;
@@ -99,7 +104,7 @@ void MPC::updateOCP() {
     case Status::kDisengagement:  // Getting out of hole
       if (iteration_ == 0) {
         std::cout << "Getting out of the hole" << std::endl;
-        if (settings_.use_gain_scheduling == 1) {
+        if (settings_.precision_strategy == 1) {
           goal_weight_ = OCP_.get_settings().w_gripper_pos;
           OCP_.changeGoalTrackingWeights(goal_weight_);
         }
@@ -109,6 +114,10 @@ void MPC::updateOCP() {
       if (iteration_ <= OCP_.get_horizon_length()) {
         OCP_.changeTarget(OCP_.get_horizon_length() - iteration_,
                           oMdisengaged_target_.translation());
+        if (settings_.precision_strategy == 2) {
+          // OCP_.changePostureReference(OCP_.get_horizon_length() - iteration_,
+          //                             Eigen::VectorXd::Zero(1));
+        }
         iteration_++;
       } else {
         iteration_ = 0;

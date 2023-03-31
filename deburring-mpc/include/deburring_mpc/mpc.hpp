@@ -39,19 +39,23 @@ struct MPCSettings {
   size_t T_stabilization;
   size_t T_drilling;
 
-  // Mocap
-  int use_mocap;
-
-  // GainScheduling
-  int use_gain_scheduling;
-  double gain_schedulig_slope;
-  double gain_schedulig_max_weight;
-
-  // Target
+  // Target parameters
   Vector3d target_position;
   std::vector<Vector3d> holes_offsets;
   double backward_offset;
   double precision_threshold;
+  int precision_strategy;
+  
+  // Gain Scheduling
+  // int use_gain_scheduling;
+  double gain_schedulig_slope;
+  double gain_schedulig_max_weight;
+
+  // Variable Posture
+  VectorXd custom_arm_ref;
+
+  // Mocap
+  int use_mocap;
 
   void readParamsFromYamlString(std::string &string_to_parse);
   void readParamsFromYamlFile(const std::string &filename);
