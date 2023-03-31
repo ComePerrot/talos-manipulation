@@ -73,6 +73,19 @@ void MPCSettings::readParamsFromYamlString(std::string &string_to_parse) {
     }
   };
 
+  // Local lambda function to read VectorXd
+  auto read_vxd = [&config](VectorXd &aref_vxd, std::string fieldname) {
+    YAML::Node yn_avxd = config[fieldname];
+    if (yn_avxd) {
+      aref_vxd.resize((Eigen::Index)yn_avxd.size());
+      for (std::size_t id = 0; id < yn_avxd.size(); id++) {
+        aref_vxd[(Eigen::Index)id] = yn_avxd[id].as<double>();
+      }
+    } else {
+      std::cout << "No " << fieldname << std::endl;
+    }
+  };
+
   read_size_t(T_initialization, "T_initialization");
   read_size_t(T_stabilization, "T_stabilization");
   read_size_t(T_drilling, "T_drilling");
@@ -80,12 +93,12 @@ void MPCSettings::readParamsFromYamlString(std::string &string_to_parse) {
   read_stdvect_v3d(holes_offsets, "holes_offsets");
   read_double(precision_threshold, "precision_threshold");
   read_double(backward_offset, "backward_offset");
-  read_int(precision_strategy,"precision_strategy");
+  read_int(precision_strategy, "precision_strategy");
   read_int(use_mocap, "use_mocap");
   // read_int(use_gain_scheduling, "use_gain_scheduling");
   read_double(gain_schedulig_slope, "gain_schedulig_slope");
   read_double(gain_schedulig_max_weight, "gain_schedulig_max_weight");
- 
+  read_vxd(custom_arm_ref, "custom_arm_ref");
 }
 
 void MPCSettings::readParamsFromYamlFile(const std::string &filename) {
