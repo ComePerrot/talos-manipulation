@@ -78,8 +78,8 @@ void MPC::updateOCP() {
         std::cout << "Updating reference posture" << std::endl;
       }
       if (iteration_ <= OCP_.get_horizon_length()) {
-        // OCP_.changePostureReference(OCP_.get_horizon_length() - iteration_,
-        //                             Eigen::VectorXd::Zero(1));
+        OCP_.changePostureReference(OCP_.get_horizon_length() - iteration_,
+                                    updated_posture_ref_);
         iteration_++;
       } else {
         iteration_ = 0;
@@ -115,8 +115,8 @@ void MPC::updateOCP() {
         OCP_.changeTarget(OCP_.get_horizon_length() - iteration_,
                           oMdisengaged_target_.translation());
         if (settings_.precision_strategy == 2) {
-          // OCP_.changePostureReference(OCP_.get_horizon_length() - iteration_,
-          //                             Eigen::VectorXd::Zero(1));
+          OCP_.changePostureReference(OCP_.get_horizon_length() - iteration_,
+                                      initial_posture_ref_);
         }
         iteration_++;
       } else {

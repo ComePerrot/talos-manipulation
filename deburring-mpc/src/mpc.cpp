@@ -28,6 +28,7 @@ void MPC::initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
 
   // Setup target
   setTarget(toolMtarget);
+  setPostureReferences(x0_);
 
   // Init OCP
   OCP_.initialize(x0_, oMtarget_);
@@ -120,6 +121,26 @@ void MPC::updateTarget(const SE3 &toolMtarget) {
     }
   }
   oMtarget_hole_ = list_oMhole_[current_hole_];
+}
+
+void MPC::setPostureReferences(const ConstVectorRef &x0) {
+  initial_posture_ref_ = x0;
+  initial_posture_ref_.tail(designer_.get_rmodel().nv) =
+      VectorXd::Zero(designer_.get_rmodel().nv);
+
+  settings_.custom_arm_ref = VectorXd(4);
+  settings_.custom_arm_ref << -0.08419471, 0.425144, 0.00556666, -1.50516856;
+
+  std::cout << "Custom arm reference:" << settings_.custom_arm_ref.transpose()
+            << std::endl;
+
+  updated_posture_ref_ = initial_posture_ref_;
+  updated_posture_ref_.segment(21, 4) = settings_.custom_arm_ref;
+
+  std::cout << "Initial posture reference:" << initial_posture_ref_.transpose()
+            << std::endl;
+  std::cout << "Updated posture reference:" << updated_posture_ref_.transpose()
+            << std::endl;
 }
 
 const VectorXd &MPC::shapeState(const ConstVectorRef &q,

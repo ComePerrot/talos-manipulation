@@ -96,6 +96,9 @@ class MPC {
   std::vector<SE3> list_oMhole_;  // Holes position in the robot frame
   SE3 backward_offset_ = SE3::Identity();
 
+  VectorXd initial_posture_ref_;
+  VectorXd updated_posture_ref_;
+
   // Security management
   bool initialized_ = false;
 
@@ -112,6 +115,7 @@ class MPC {
   void setTarget(const SE3 &toolMtarget);
   void setHolesPlacement();
   void updateTarget(const SE3 &toolMtarget);
+  void setPostureReferences(const ConstVectorRef &x0);
   void updateOCP();
 
  public:
