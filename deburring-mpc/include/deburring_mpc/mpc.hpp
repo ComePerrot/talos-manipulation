@@ -45,7 +45,7 @@ struct MPCSettings {
   double backward_offset;
   double precision_threshold;
   int precision_strategy;
-  
+
   // Gain Scheduling
   // int use_gain_scheduling;
   double gain_schedulig_slope;
@@ -145,7 +145,7 @@ class MPC {
   // getters and setters
   MPCSettings &get_settings() { return settings_; }
 
-  int get_drilling_state() { return static_cast<int>(drilling_state_); }
+  int get_drilling_state() const { return static_cast<int>(drilling_state_); }
 
   const VectorXd &get_x0() const { return x0_; }
 
@@ -154,6 +154,10 @@ class MPC {
   const MatrixXd &get_K0() const { return K0_; }
 
   const SE3 &get_target_frame() const { return oMtarget_hole_; }
+
+  const double &get_position_error() const { return position_error_; }
+
+  const double &get_goal_weight() const { return goal_weight_; }
 
   OCP &get_OCP() { return OCP_; }
   void set_OCP(const OCP &OCP) { OCP_ = OCP; }
