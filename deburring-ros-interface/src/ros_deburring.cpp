@@ -154,6 +154,10 @@ int main(int argc, char** argv) {
   REGISTER_VARIABLE("/introspection_data", "end_effector_desired_position",
                     &MPC.get_target_frame().translation(),
                     &registered_variables);
+  REGISTER_VARIABLE("/introspection_data", "end_effector_position_error",
+                    &MPC.get_position_error(), &registered_variables);
+  REGISTER_VARIABLE("/introspection_data", "end_effector_position_task_weight",
+                    &MPC.get_goal_weight(), &registered_variables);
 
   Eigen::VectorXd u0;
   Eigen::MatrixXd K0;
