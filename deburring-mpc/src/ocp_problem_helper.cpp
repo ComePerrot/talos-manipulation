@@ -62,7 +62,7 @@ void OCP::changeGoalCostActivation(const size_t index, const bool value) {
   costs(index)->get_costs().at("gripperRotation")->active = value;
 }
 void OCP::changeGoalTrackingWeights(double weight) {
-  for (size_t node_index = 0; node_index < settings_.horizon_length;
+  for (size_t node_index = 0; node_index <= settings_.horizon_length;
        node_index++) {
     costs(node_index)->get_costs().at("gripperPosition")->weight = weight;
   }
