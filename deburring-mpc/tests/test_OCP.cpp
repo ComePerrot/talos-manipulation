@@ -1,8 +1,15 @@
+#define BOOST_TEST_NO_MAIN
+#define BOOST_TEST_ALTERNATIVE_INIT_API
+
+#include <boost/function.hpp>
+#include <boost/test/execution_monitor.hpp>
+#include <boost/test/included/unit_test.hpp>
+
 #include "deburring_mpc/ocp.hpp"
 
-#define PI 3.14159265
+using namespace boost::unit_test;
 
-int main() {
+void testOCP() {
   // Create OCP from configuration files
   //  Robot designer
   deburring::RobotDesignerSettings designerSettings =
@@ -70,18 +77,19 @@ int main() {
                            (Eigen::Index)size_limit));
 
   //  OCP
-  std::string parameterFileOCP =
-      "/home/cperrot/workspaces/wbDeburring/src/talos-manipulation/config/"
-      "settings_sobec.yaml";
+  std::string parameterFileOCP(PROJECT_SOURCE_DIR
+                               "/../config/"
+                               "settings_sobec.yaml");
   deburring::OCPSettings ocpSettings = deburring::OCPSettings();
   ocpSettings.readParamsFromYamlFile(parameterFileOCP);
   deburring::OCP OCP = deburring::OCP(ocpSettings, pinWrapper);
 
   // Load data from serialized file
   std::vector<deburring::OCP_debugData>::size_type testCase = 0;
-  std::vector<deburring::OCP_debugData> debugData = OCP.fetchFromFile(
-      "/home/cperrot/workspaces/archives/"
-      "test.txt");
+  std::vector<deburring::OCP_debugData> debugData =
+      OCP.fetchFromFile(PROJECT_SOURCE_DIR
+                        "/tests/archive/"
+                        "data_OCP.txt");
 
   // Initialize OCP with the same initial state
 
@@ -94,6 +102,7 @@ int main() {
   // need :
   //   90° around the y axis
   //   180° around the z axis
+  double PI = boost::math::constants::pi<double>();
   double beta = -PI * 0.5;
   double gamma = PI;
 
@@ -130,42 +139,29 @@ int main() {
   auto K_Data = data.K;
 
   for (std::vector<Eigen::VectorXd>::size_type i = 0; i < xs_OCP.size(); i++) {
-    auto error = xs_OCP[i] - xs_Data[i];
-    auto error_norm = error.norm();
-    if (error_norm > 1e-10) {
-      std::cout << "xs[" << i << "]"
-                << "=";
-      std::cout << error_norm << std::endl;
-      std::cout << "Failure" << std::endl;
-      return 1;
-    }
+    BOOST_CHECK((xs_OCP[i] - xs_Data[i]).isZero(1e-10));
   }
 
   for (std::vector<Eigen::VectorXd>::size_type i = 0; i < us_OCP.size(); i++) {
-    auto error = us_OCP[i] - us_Data[i];
-    auto error_norm = error.norm();
-    if (error_norm > 1e-10) {
-      std::cout << "us[" << i << "]"
-                << "=";
-      std::cout << error_norm << std::endl;
-      std::cout << "Failure" << std::endl;
-      return 1;
-    }
+    BOOST_CHECK((us_OCP[i] - us_Data[i]).isZero(1e-10));
   }
 
   for (std::vector<Eigen::VectorXd>::size_type i = 0; i < K_OCP.size(); i++) {
-    auto error = K_OCP[i] - K_Data[i];
-    auto error_norm = error.norm();
-    if (error_norm > 1e-8) {
-      std::cout << "K[" << i << "]"
-                << "=";
-      std::cout << error_norm << std::endl;
-      std::cout << "Failure" << std::endl;
-      return 1;
-    }
+    BOOST_CHECK((K_OCP[i] - K_Data[i]).isZero(1e-8));
   }
+}
 
-  std::cout << "Success" << std::endl;
+void registerOCPUnitTest() {
+  test_suite* ts = BOOST_TEST_SUITE("test_MPC");
+  ts->add(BOOST_TEST_CASE(testOCP));
+  framework::master_test_suite().add(ts);
+}
 
-  return 0;
+bool init_function() {
+  registerOCPUnitTest();
+  return true;
+}
+
+int main(int argc, char** argv) {
+  return ::boost::unit_test::unit_test_main(&init_function, argc, argv);
 }
