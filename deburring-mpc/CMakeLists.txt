@@ -83,11 +83,11 @@ if(BUILD_PYTHON_INTERFACE)
   add_subdirectory(python)
 endif()
 
-add_executable(testOCP tests/test_OCP.cpp )
-target_link_libraries(testOCP ${PROJECT_NAME})
-
-add_executable(testMPC tests/test_MPC.cpp )
-target_link_libraries(testMPC ${PROJECT_NAME})
+# Unit tests
+if(BUILD_TESTING)
+  find_package(Boost REQUIRED COMPONENTS unit_test_framework)
+  add_subdirectory(tests)
+endif()
 
 # Installation
 install(
