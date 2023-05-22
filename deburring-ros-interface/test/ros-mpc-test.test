@@ -1,11 +1,12 @@
+<?xml version="1.0"?>
 <launch>
-    <include file="$(find deburring_ros_interface)/launch/ros-mpc-basic.launch"/>
+    <include file="$(find deburring_ros_interface)/launch/talos_deburring.launch"/>
     <!-- <test test-name="controlled_joints_nonempty" pkg="rostest" type="paramtest" name="paramtest_nonempty">
         <param name="param_name_target" value="/controlled_joints" />
     </test> -->
     <test test-name="ROSInterfaceBasic" 
         pkg="deburring_ros_interface"
         type="test_mpc_interface.py"
-        time-limit="100.0"
+        time-limit="30.0"
         required="true"/>
 </launch>

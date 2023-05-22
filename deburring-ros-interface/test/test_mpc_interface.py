@@ -20,12 +20,14 @@ class TestMPCInterface(unittest.TestCase):
 
         self.sensorMsg = self._define_sensor_msg()
 
-        pub = rospy.Publisher("sensor_state", Sensor, queue_size=10)
+        print("Publishing message")
+        pub = rospy.Publisher("/linear_feedback_controller/sensor_state", Sensor, queue_size=10)
         for _ in range(5):
             pub.publish(self.sensorMsg)
             sleep(1)
 
-        msg = rospy.wait_for_message("command", Control, timeout=30)
+        print("Waiting for answer")
+        msg = rospy.wait_for_message("/linear_feedback_controller/desired_control", Control, timeout=30)
         self.assertEquals(
             msg.initial_state.base_pose,
             self.sensorMsg.base_pose,
@@ -61,6 +63,5 @@ class TestMPCInterface(unittest.TestCase):
 
 if __name__ == "__main__":
     import rostest
-    rostest.rosrun(PKG, NAME, TestMPCInterface)
 
-    rospy.init_node(NAME, anonymous=True)
+    rostest.rosrun(PKG, NAME, TestMPCInterface)
