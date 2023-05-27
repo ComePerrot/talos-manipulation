@@ -19,11 +19,11 @@ deburring::RobotDesigner RobotDesignerFactory::createRobotDesigner() {
       "arm_right_3_joint", "arm_right_4_joint"};
   designerSettings.left_foot_name = "left_sole_link";
   designerSettings.right_foot_name = "right_sole_link";
-  designerSettings.urdf_path =
-      "/opt/openrobots/share/example-robot-data/robots/talos_data/robots/"
+  designerSettings.urdf_path = PROJECT_SOURCE_DIR
+      "/tests/archive/"
       "talos_reduced.urdf";
-  designerSettings.srdf_path =
-      "/opt/openrobots/share/example-robot-data/robots/talos_data/srdf/"
+  designerSettings.srdf_path = PROJECT_SOURCE_DIR
+      "/tests/archive/"
       "talos.srdf";
 
   deburring::RobotDesigner pinWrapper =
