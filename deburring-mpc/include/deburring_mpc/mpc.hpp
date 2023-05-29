@@ -1,3 +1,11 @@
+///////////////////////////////////////////////////////////////////////////////
+// BSD 2-Clause License
+//
+// Copyright (C) 2022-2023, LAAS-CNRS
+// Copyright note valid unless otherwise stated in individual files.
+// All rights reserved.
+///////////////////////////////////////////////////////////////////////////////
+
 #ifndef DEBURRING_MPC
 #define DEBURRING_MPC
 
@@ -61,6 +69,9 @@ struct MPCSettings {
   void readParamsFromYamlFile(const std::string &filename);
 };
 
+/**
+ * @brief Status of the MPC
+ */
 enum class Status {
   kInitialization,
   kStabilization,
@@ -74,6 +85,13 @@ enum class Status {
   kDeburringDone
 };
 
+/**
+ * @brief Model Predictive Controller
+ *
+ * This class handles the calls to the OCP.
+ * A state machine is used to manage the transition between the variouses phases
+ * of the movement
+ */
 class MPC {
  private:
   MPCSettings settings_;
@@ -119,17 +137,61 @@ class MPC {
   void updateOCP();
 
  public:
+  /**
+   * @brief Construct a new MPC object
+   *
+   * The object is created but the problem is not initialized yet.
+   *
+   * @param mpc_settings Settings which affect the behavior of the state machine
+   * @param ocp_settings Settings necessary for the creation of the OCP
+   * @param designer RobotDesigner object which handles the calls to pinocchio
+   */
   MPC(const MPCSettings &mpc_settings, const OCPSettings &ocp_settings,
       const RobotDesigner &designer);
 
+  /**
+   * @brief Initialize the MPC
+   *
+   * Runs the OCP to convergence on to solve the first formulation of the
+   * problem. This resolution is used as a warm-start for subsequent iterations
+   * of the MPC.
+   *
+   * @param q0 Initial joint position (including state of the base)
+   * @param v0 Initial joint velocity (including state of the base)
+   * @param toolMtarget Position of the target wrt the tool frame
+   */
   void initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
                   const SE3 &toolMtarget);
 
+  /**
+   * @brief Do one iteration of the OCP
+   * 
+   * State of the robot is used to update pinocchio data.
+   * The formulation of the OCP is updated.
+   * The OCP is solved to provide a new control to the robot.
+   * 
+   * @param x0 Initial state of the robot (position and velocity)
+   * @param toolMtarget Position of the target wrt the tool frame
+   */
   void iterate(const VectorXd &x0, const SE3 &toolMtarget);
 
+  /**
+   * @brief Do one iteration of the OCP
+   * 
+   * @param q_current Joint position (including state of the base)
+   * @param v_current Joint velocity (including state of the base)
+   * @param toolMtarget Position of the target wrt the tool frame
+   */
   void iterate(const ConstVectorRef &q_current, const ConstVectorRef &v_current,
                const SE3 &toolMtarget);
 
+  /**
+   * @brief Shape the state of the robot according to the OCP definition
+   * 
+   * @param q Joint position (including state of the base)
+   * @param v Joint velocity (including state of the base)
+   * @return The shaped state vector
+   */
   const VectorXd &shapeState(const ConstVectorRef &q, const ConstVectorRef &v);
 
   // Debug

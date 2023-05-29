@@ -1,3 +1,11 @@
+///////////////////////////////////////////////////////////////////////////////
+// BSD 2-Clause License
+//
+// Copyright (C) 2022-2023, LAAS-CNRS
+// Copyright note valid unless otherwise stated in individual files.
+// All rights reserved.
+///////////////////////////////////////////////////////////////////////////////
+
 #ifndef DEBURRING_OCP
 #define DEBURRING_OCP
 
@@ -78,6 +86,11 @@ struct OCPSettings {
   void readParamsFromYamlFile(const std::string &filename);
 };
 
+/**
+ * @brief Interface with Crocoddyl
+ *
+ * This class handles the calls to Crocoddyl to manage the OCP.
+ */
 class OCP {
  private:
   OCPSettings settings_;

@@ -1,3 +1,11 @@
+///////////////////////////////////////////////////////////////////////////////
+// BSD 2-Clause License
+//
+// Copyright (C) 2022-2023, LAAS-CNRS
+// Copyright note valid unless otherwise stated in individual files.
+// All rights reserved.
+///////////////////////////////////////////////////////////////////////////////
+
 #ifndef DEBURRING_DESIGNER
 #define DEBURRING_DESIGNER
 
@@ -26,6 +34,12 @@ struct RobotDesignerSettings {
   std::string right_foot_name = "";
 };
 
+/**
+ * @brief Interface with Pinocchio
+ *
+ * This class handles manages the model of the robot and handles the calls to
+ * pinocchio
+ */
 class RobotDesigner {
  private:
   RobotDesignerSettings settings_;
