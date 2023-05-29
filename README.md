@@ -2,8 +2,9 @@
 
 Set of tools to work on manipulation tasks with the robot Talos.
 
-This repo contains several package:
+This repo is built around two packages:
 
-- deburring_mpc: an implementation of a Model Predictive Controller based on Crocoddyl
-- deburring_ros_interface: the interface to allow the use of the MPC within a ROS architecture
-- python: a python example of the use of the MPC with the PyBullet simulator
+- [deburring_mpc](./deburring-mpc/README.md): an implementation of a Model Predictive Controller based on Crocoddyl
+- [deburring_ros_interface](./deburring-ros-interface/README.md): the interface to allow the use of the MPC within a ROS architecture
+
+As well as some python examples (which can be found in pyTalos)
