@@ -26,6 +26,8 @@ deburring::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   gripperMtool.translation().y() = gripperTtool[1];
   gripperMtool.translation().z() = gripperTtool[2];
 
+  ROS_INFO_STREAM(designer_settings.urdf_path);
+
   ROS_INFO_STREAM("Building robot designer");
   deburring::RobotDesigner designer =
       deburring::RobotDesigner(designer_settings);
@@ -60,7 +62,7 @@ deburring::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
 deburring::MPC buildMPC(ros::NodeHandle nh,
                         const deburring::RobotDesigner& pinWrapper) {
   std::string parameterFileName;
-  nh.getParam("settings_file", parameterFileName);
+  nh.getParam("controller_settings_file", parameterFileName);
   std::string parameterFilePath =
       ros::package::getPath("deburring_ros_interface") + "/config/";
   std::string parameterFile = parameterFilePath + parameterFileName;

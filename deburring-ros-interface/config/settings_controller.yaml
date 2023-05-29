@@ -1,0 +1,57 @@
+OCP:
+  horizon_length: 100
+  w_state_reg: 0.02
+  w_control_reg: 0.001
+  w_limit: 1000
+  w_com_pos: 500
+  w_gripper_pos: 5
+  w_gripper_rot: 30
+  w_gripper_vel: 2
+  limit_scale: 1
+  state_pos_weights:
+    base: [500, 500, 500, 1000, 1000, 1000]
+    left_leg: [500, 500, 500, 500, 1000, 1000]
+    right_leg: [500, 500, 500, 500, 1000, 1000]
+    torso: [100, 200]
+    left_arm: [100, 100, 100, 100, 1, 1, 1]
+    right_arm: [500, 500, 500, 500]
+  state_vel_weights:
+    base: [1, 1, 1, 1, 1, 1]
+    left_leg: [1, 1, 1, 1, 1, 1]
+    right_leg: [1, 1, 1, 1, 1, 1]
+    torso: [10, 10]
+    left_arm: [10, 10, 10, 10, 10, 10, 10]
+    right_arm: [10, 10, 10, 10]
+  control_weights:
+    left_leg: [1, 1, 1, 1, 1, 1]
+    right_leg: [1, 1, 1, 1, 1, 1]
+    torso: [1, 1]
+    left_arm: [1, 1, 1, 1, 1, 1, 1]
+    right_arm: [1, 1, 1, 1]
+
+MPC:
+  T_initialization: 100
+  T_stabilization: 200
+  T_drilling: 100
+  target_position: [0.6,0.4,1.1]
+  holes_offsets: [
+    [0,0,0],
+  #   [-0.078,0,0],
+  #   [-0.078,-0.045,0],
+  #   [0,-0.045,0]
+  ]
+  backward_offset: 0.05
+  precision_threshold: 0.005
+  precision_strategy: 2
+  use_mocap: 0
+  # use_gain_scheduling: 1
+  gain_schedulig_slope: 0.5
+  gain_schedulig_max_weight: 100
+  custom_arm_ref: [
+    -0.08419471,
+    0.425144,
+    0.00556666,
+    -1.50516856,
+  ]
+
+

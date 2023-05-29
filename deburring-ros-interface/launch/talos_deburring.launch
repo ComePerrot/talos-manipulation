@@ -1,4 +1,10 @@
 <launch>
-    <rosparam command="load" file="$(find deburring_ros_interface)/config/ros_deburring_settings.yaml"/>
+
+    <!-- Loading deburring parameter file -->
+    <rosparam command="load" file="$(find deburring_ros_interface)/config/settings_ros_deburring.yaml"/>
+    <!-- Loading URDF and SRDF from example-robot-data -->
+    <param name="urdf" value="$(find example-robot-data)/robots/talos_data/robots/talos_reduced.urdf"/>
+    <param name="srdf" value="$(find example-robot-data)/robots/talos_data/srdf/talos.srdf"/>
+
     <node pkg="deburring_ros_interface" type="ros_deburring" name="ros_deburring" output="screen"/>
 </launch>

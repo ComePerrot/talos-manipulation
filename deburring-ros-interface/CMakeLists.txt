@@ -89,7 +89,7 @@ install(
   DESTINATION lib)
 install(TARGETS ros_deburring RUNTIME DESTINATION lib/${PROJECT_NAME})
 install(FILES package.xml DESTINATION share/${PROJECT_NAME})
-install(DIRECTORY ../config DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY test DESTINATION share/${PROJECT_NAME})
   
