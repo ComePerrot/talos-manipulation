@@ -24,7 +24,7 @@ if(NOT EXISTS "${CMAKE_SOURCE_DIR}/cmake/base.cmake")
     include(FetchContent)
     FetchContent_Declare(
       "jrl-cmakemodules"
-      GIT_REPOSITORY "https://github.com/jrl-umi3218/jrl-cmakemodules.git")
+      GIT_REPOSITORY "https://github.com/nim65s/jrl-cmakemodules.git")
     FetchContent_MakeAvailable("jrl-cmakemodules")
     FetchContent_GetProperties("jrl-cmakemodules" SOURCE_DIR JRL_CMAKE_MODULES)
   endif()
@@ -48,6 +48,7 @@ if(BUILD_PYTHON_INTERFACE)
 endif()
 add_project_dependency(crocoddyl REQUIRED)
 add_project_dependency(yaml-cpp REQUIRED)
+include("${JRL_CMAKE_MODULES}/python.cmake")
 
 SET(${PROJECT_NAME}_HEADERS
     include/${PROJECT_NAME}/robot_designer.hpp
