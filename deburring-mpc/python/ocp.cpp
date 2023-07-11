@@ -42,6 +42,7 @@ void exposeOCPClass() {
                                           bp::args("self", "x"))
       .def<void (OCP::*)(const ConstVectorRef &)>(
           "solve", &OCP::solve, bp::args("self", "x_measured"))
+      .def("recede", &OCP::recede)
       .def("change_goal_cost_activation", &OCP::changeGoalCostActivation,
            bp::args("index", "value"))
       .def("change_target", &OCP::changeTarget, bp::args("index", "position"))
