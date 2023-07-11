@@ -24,6 +24,10 @@ void OCP::buildSolver(const VectorXd x0, SE3 oMtarget) {
                                                      terminal_model);
   solver_ = boost::make_shared<crocoddyl::SolverFDDP>(shooting_problem);
 
+  reset(x0, oMtarget);
+}
+
+void OCP::reset(const ConstVectorRef &x0, const SE3 &oMtarget) {
   // Change References
   VectorXd posture_reference = x0;
   posture_reference.tail(designer_.get_rmodel().nv) =
@@ -43,6 +47,8 @@ void OCP::buildSolver(const VectorXd x0, SE3 oMtarget) {
        node_index++) {
     changeGoalCostActivation(node_index, false);
   }
+
+  solveFirst(x0);
 }
 
 void OCP::solveFirst(const VectorXd x) {

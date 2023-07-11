@@ -136,6 +136,7 @@ class OCP {
   OCP(const OCPSettings &ocp_settings, const RobotDesigner &designer);
 
   void initialize(const ConstVectorRef &x0, const SE3 &oMtarget);
+  void reset(const ConstVectorRef &x0, const SE3 &oMtarget);
   void solveFirst(const VectorXd x);
   void solve(const ConstVectorRef &measured_x);
 
