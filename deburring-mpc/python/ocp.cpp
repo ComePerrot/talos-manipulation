@@ -15,27 +15,34 @@ namespace python {
 using namespace crocoddyl;
 namespace bp = boost::python;
 
-void exposeOCPParams() {
-  bp::register_ptr_to_python<boost::shared_ptr<OCPSettings>>();
+static boost::shared_ptr<OCP> constructor(bp::dict settings,
+                                          const RobotDesigner &designer) {
+  OCPSettings conf;
+  conf.horizon_length = bp::extract<size_t>(settings["horizon_length"]);
+  conf.time_step = bp::extract<double>(settings["time_step"]);
 
-  bp::class_<OCPSettings>(
-      "OCPSettings",
-      bp::init<>(bp::args("self"), "Empty initialization of the OCP params"))
-      .def("read_from_yaml", &OCPSettings::readParamsFromYamlFile,
-           bp::args("filename"))
-      .add_property("horizon_length",
-                    bp::make_getter(&OCPSettings::horizon_length),
-                    bp::make_setter(&OCPSettings::horizon_length),
-                    "Number of nodes in the horizon");
+  conf.w_state_reg = bp::extract<double>(settings["w_state_reg"]);
+  conf.w_control_reg = bp::extract<double>(settings["w_control_reg"]);
+  conf.w_limit = bp::extract<double>(settings["w_limit"]);
+  conf.w_com_pos = bp::extract<double>(settings["w_com_pos"]);
+  conf.w_gripper_pos = bp::extract<double>(settings["w_gripper_pos"]);
+  conf.w_gripper_rot = bp::extract<double>(settings["w_gripper_rot"]);
+  conf.w_gripper_vel = bp::extract<double>(settings["w_gripper_vel"]);
+
+  conf.limit_scale = bp::extract<double>(settings["limit_scale"]);
+
+  conf.state_weights = bp::extract<Eigen::VectorXd>(settings["state_weights"]);
+  conf.control_weights =
+      bp::extract<Eigen::VectorXd>(settings["control_weights"]);
+
+  return (boost::shared_ptr<OCP>(new OCP(conf, designer)));
 }
 
 void exposeOCPClass() {
   bp::register_ptr_to_python<boost::shared_ptr<OCP>>();
 
-  bp::class_<OCP>(
-      "OCP", bp::init<const OCPSettings &, const RobotDesigner &>(
-                 bp::args("self", "OCPSettings", "designer"),
-                 "Initialize the OCP from parameter list and a robot designer"))
+  bp::class_<OCP>("OCP", bp::no_init)
+      .def("__init__", bp::make_constructor(&constructor))
       .def<void (OCP::*)(const ConstVectorRef &, const SE3 &)>(
           "initialize", &OCP::initialize, bp::args("self", "x0", "oMtarget"))
       .def<void (OCP::*)(const VectorXd)>("solve_first", &OCP::solveFirst,
@@ -58,7 +65,6 @@ void exposeOCPClass() {
 }
 
 void exposeOCP() {
-  exposeOCPParams();
   exposeOCPClass();
 }
 
