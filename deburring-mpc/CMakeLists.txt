@@ -45,6 +45,8 @@ if(BUILD_PYTHON_INTERFACE)
   add_project_dependency(eigenpy 2.7.10 REQUIRED)
   string(REGEX REPLACE "-" "_" PY_NAME ${PROJECT_NAME})
   set(${PY_NAME}_INSTALL_DIR ${PYTHON_SITELIB}/${PY_NAME})
+  # workaround eigenpy v3.1.0 cmake issue
+  include("${JRL_CMAKE_MODULES}/python.cmake")
 endif()
 add_project_dependency(crocoddyl REQUIRED)
 add_project_dependency(yaml-cpp REQUIRED)
