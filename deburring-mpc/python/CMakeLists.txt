@@ -1,5 +1,3 @@
-include("${JRL_CMAKE_MODULES}/python.cmake")
-
 set(${PY_NAME}_SOURCES
     main.cpp
     robot_designer.cpp
