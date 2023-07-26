@@ -45,6 +45,9 @@ void exposeOCPClass() {
       .def("__init__", bp::make_constructor(&constructor))
       .def<void (OCP::*)(const ConstVectorRef &, const SE3 &)>(
           "initialize", &OCP::initialize, bp::args("self", "x0", "oMtarget"))
+      .def<void (OCP::*)(const ConstVectorRef &, const SE3 &)>(
+          "reset", &OCP::reset,
+          bp::args("self", "x0", "oMtarget", "warm_xs", "warm_us"))
       .def<void (OCP::*)(const VectorXd)>("solve_first", &OCP::solveFirst,
                                           bp::args("self", "x"))
       .def<void (OCP::*)(const ConstVectorRef &)>(
@@ -64,9 +67,7 @@ void exposeOCPClass() {
       .add_property("gain", &OCP::get_gain, "Gains computed by the OCP");
 }
 
-void exposeOCP() {
-  exposeOCPClass();
-}
+void exposeOCP() { exposeOCPClass(); }
 
 }  // namespace python
 }  // namespace deburring
