@@ -128,13 +128,13 @@ void RobotDesigner::updateCompleteModel(const ConstVectorRef &x) {
 
 void RobotDesigner::updateModelLimits(
     const Eigen::VectorXd lower_position_limit,
-    const Eigen::VectorXd upper_Position_limit) {
+    const Eigen::VectorXd upper_position_limit) {
   if ((rmodel_.lowerPositionLimit.size() != lower_position_limit.size()) ||
-      (rmodel_.upperPositionLimit.size() != upper_Position_limit.size())) {
+      (rmodel_.upperPositionLimit.size() != upper_position_limit.size())) {
     throw std::runtime_error("Provided limit vector size does not match");
   }
   rmodel_.lowerPositionLimit = lower_position_limit;
-  rmodel_.upperPositionLimit = upper_Position_limit;
+  rmodel_.upperPositionLimit = upper_position_limit;
 }
 
 void RobotDesigner::addEndEffectorFrame(std::string end_effector_name,

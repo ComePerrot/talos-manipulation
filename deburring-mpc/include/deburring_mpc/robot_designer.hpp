@@ -73,7 +73,7 @@ class RobotDesigner {
   void updateCompleteModel(const ConstVectorRef &x);
 
   void updateModelLimits(const Eigen::VectorXd lower_position_limit,
-                         const Eigen::VectorXd upper_Position_limit);
+                         const Eigen::VectorXd upper_position_limit);
   void addEndEffectorFrame(std::string end_effector_name,
                            std::string parent_name, SE3 end_effector_placement);
 
