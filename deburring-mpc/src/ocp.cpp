@@ -10,6 +10,7 @@ void OCP::initialize(const ConstVectorRef &x0, const pinocchio::SE3 &oMtarget) {
   }
 
   buildSolver(x0, oMtarget);
+  solveFirst(x0);
 
   is_initialized_ = true;
 }

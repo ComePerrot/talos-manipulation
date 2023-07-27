@@ -141,6 +141,8 @@ class OCP {
   void solve(const ConstVectorRef &measured_x);
 
   // OCP Problem Helper public functions
+  void setWarmStart(const std::vector<VectorXd> &warm_xs,
+                    const std::vector<VectorXd> &warm_us);
   void recede();
   void setBalancingTorques();
   void changeTarget(const size_t index,

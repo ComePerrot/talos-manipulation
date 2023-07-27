@@ -2,6 +2,11 @@
 
 namespace deburring {
 // Functions to interact with ddp
+void OCP::setWarmStart(const std::vector<VectorXd> &warm_xs,
+                       const std::vector<VectorXd> &warm_us) {
+  solver_->set_xs(warm_xs);
+  solver_->set_us(warm_us);
+}
 void OCP::recede() {
   solver_->get_problem()->circularAppend(
       solver_->get_problem()->get_runningModels()[0],

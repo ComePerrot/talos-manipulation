@@ -46,12 +46,14 @@ void exposeOCPClass() {
       .def<void (OCP::*)(const ConstVectorRef &, const SE3 &)>(
           "initialize", &OCP::initialize, bp::args("self", "x0", "oMtarget"))
       .def<void (OCP::*)(const ConstVectorRef &, const SE3 &)>(
-          "reset", &OCP::reset,
-          bp::args("self", "x0", "oMtarget", "warm_xs", "warm_us"))
+          "reset", &OCP::reset, bp::args("self", "x0", "oMtarget"))
       .def<void (OCP::*)(const VectorXd)>("solve_first", &OCP::solveFirst,
                                           bp::args("self", "x"))
       .def<void (OCP::*)(const ConstVectorRef &)>(
           "solve", &OCP::solve, bp::args("self", "x_measured"))
+      .def<void (OCP::*)(const std::vector<VectorXd> &,
+                         const std::vector<VectorXd> &)>(
+          "set_warm_start", &OCP::setWarmStart, bp::args("warm_xs", "warm_us"))
       .def("recede", &OCP::recede)
       .def("change_goal_cost_activation", &OCP::changeGoalCostActivation,
            bp::args("index", "value"))

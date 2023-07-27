@@ -47,8 +47,6 @@ void OCP::reset(const ConstVectorRef &x0, const SE3 &oMtarget) {
        node_index++) {
     changeGoalCostActivation(node_index, false);
   }
-
-  solveFirst(x0);
 }
 
 void OCP::solveFirst(const VectorXd x) {
