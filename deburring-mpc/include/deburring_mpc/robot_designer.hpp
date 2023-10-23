@@ -32,6 +32,8 @@ struct RobotDesignerSettings {
 
   std::string left_foot_name = "";
   std::string right_foot_name = "";
+
+  Vector3d end_effector_position = Eigen::Vector3d::Zero();
 };
 
 /**

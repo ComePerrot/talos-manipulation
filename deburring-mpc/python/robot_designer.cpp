@@ -29,6 +29,13 @@ void initialize(RobotDesigner &self, bp::dict settings) {
   py_list_to_std_vector(settings["controlled_joints_names"],
                         conf.controlled_joints_names);
 
+  if (settings.has_key("end_effector_position")) {
+    // If the end effector frame is initialized separately, no value will be
+    // provided here
+    conf.end_effector_position =
+        bp::extract<Eigen::Vector3d>(settings["end_effector_position"]);
+  }
+
   self.initialize(conf);
 }
 
@@ -40,6 +47,7 @@ bp::dict get_settings(RobotDesigner &self) {
   settings["left_foot_name"] = conf.left_foot_name;
   settings["right_foot_name"] = conf.right_foot_name;
   settings["robot_description"] = conf.robot_description;
+  settings["end_effector_position"] = conf.end_effector_position;
 
   return settings;
 }

@@ -99,6 +99,15 @@ void RobotDesigner::initialize(const RobotDesignerSettings &settings) {
   left_foot_id_ = rmodel_.getFrameId(settings_.left_foot_name);
   right_foot_id_ = rmodel_.getFrameId(settings_.right_foot_name);
 
+  if (settings_.end_effector_position.norm() > 0) {
+    // If end_effector_position is default is default, no additional frame is
+    // added, this maintains compatibility with old code
+    SE3 gripper_SE3_tool = SE3::Identity();
+    gripper_SE3_tool.translation() = settings_.end_effector_position;
+    addEndEffectorFrame("deburring_tool", "gripper_left_fingertip_3_link",
+                        gripper_SE3_tool);
+  }
+
   updateReducedModel(q0_);
   is_initialized_ = true;
 }
