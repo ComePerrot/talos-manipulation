@@ -144,10 +144,7 @@ void exposeRobotDesigner() {
            bp::make_function(
                &RobotDesigner::get_end_effector_id,
                bp::return_value_policy<bp::copy_const_reference>()))
-      .def("get_settings",
-           bp::make_function(
-               &RobotDesigner::get_settings,
-               bp::return_value_policy<bp::reference_existing_object>()))
+      .def("get_settings", &get_settings)
       .def("get_controlled_joints_ids",
            bp::make_function(
                &RobotDesigner::get_controlled_joints_ids,
