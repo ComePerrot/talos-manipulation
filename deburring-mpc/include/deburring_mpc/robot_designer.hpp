@@ -69,7 +69,7 @@ class RobotDesigner {
  public:
   RobotDesigner();
   RobotDesigner(const RobotDesignerSettings &settings);
-  void initialize(const RobotDesignerSettings &settings);
+  void initialize(const RobotDesignerSettings &settings, const int verbose = 0);
 
   void updateReducedModel(const ConstVectorRef &x);
   void updateCompleteModel(const ConstVectorRef &x);

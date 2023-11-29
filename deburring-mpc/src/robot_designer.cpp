@@ -13,7 +13,8 @@ RobotDesigner::RobotDesigner(const RobotDesignerSettings &settings) {
   initialize(settings);
 }
 
-void RobotDesigner::initialize(const RobotDesignerSettings &settings) {
+void RobotDesigner::initialize(const RobotDesignerSettings &settings,
+                               const int verbose) {
   settings_ = settings;
 
   // COMPLETE MODEL //
@@ -21,13 +22,18 @@ void RobotDesigner::initialize(const RobotDesignerSettings &settings) {
     pinocchio::urdf::buildModelFromXML(settings_.robot_description,
                                        pinocchio::JointModelFreeFlyer(),
                                        rmodel_complete_);
-    std::cout << "### Build pinocchio model from rosparam robot_description."
-              << std::endl;
+    if (verbose == 1) {
+      std::cout << "Build pinocchio model from rosparam robot_description."
+                << std::endl;
+    }
+
   } else if (settings_.urdf_path.size() > 0) {
     pinocchio::urdf::buildModel(settings_.urdf_path,
                                 pinocchio::JointModelFreeFlyer(),
                                 rmodel_complete_);
-    std::cout << "### Build pinocchio model from urdf file." << std::endl;
+    if (verbose == 1) {
+      std::cout << "Build pinocchio model from urdf file." << std::endl;
+    }
   } else {
     throw std::invalid_argument(
         "the urdf file, or robot_description must be specified.");
@@ -53,8 +59,10 @@ void RobotDesigner::initialize(const RobotDesignerSettings &settings) {
            settings_.controlled_joints_names.begin();
        it != settings_.controlled_joints_names.end(); ++it) {
     const std::string &joint_name = *it;
-    std::cout << joint_name << std::endl;
-    std::cout << rmodel_complete_.getJointId(joint_name) << std::endl;
+    if (verbose == 1) {
+      std::cout << joint_name << std::endl;
+      std::cout << rmodel_complete_.getJointId(joint_name) << std::endl;
+    }
     if (not(rmodel_complete_.existJointName(joint_name))) {
       std::cout << "joint: " << joint_name << " does not belong to the model"
                 << std::endl;
