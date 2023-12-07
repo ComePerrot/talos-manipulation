@@ -92,6 +92,33 @@ void OCP::defineJointLimits(CostModelSum &cost_collector, const double w_limit,
   cost_collector.get()->addCost("jointLimits", joint_limit_cost, w_limit, true);
 }
 
+void OCP::defineCommandLimits(CostModelSum &cost_collector,
+                              const double w_limit, const double limit_scale) {
+  Eigen::VectorXd lower_bound(actuation_->get_nu()),
+      upper_bound(actuation_->get_nu());
+
+  lower_bound << -designer_.get_rmodel().effortLimit.tail(
+      static_cast<Eigen::Index>(actuation_->get_nu()));
+  upper_bound << designer_.get_rmodel().effortLimit.tail(
+      static_cast<Eigen::Index>(actuation_->get_nu()));
+
+  crocoddyl::ActivationBounds bounds =
+      crocoddyl::ActivationBounds(lower_bound, upper_bound, limit_scale);
+
+  boost::shared_ptr<crocoddyl::ActivationModelQuadraticBarrier>
+      activation_quad_barrier =
+          boost::make_shared<crocoddyl::ActivationModelQuadraticBarrier>(
+              bounds);
+  boost::shared_ptr<crocoddyl::CostModelAbstract> control_limit_cost =
+      boost::make_shared<crocoddyl::CostModelResidual>(
+          state_, activation_quad_barrier,
+          boost::make_shared<crocoddyl::ResidualModelControl>(
+              state_, actuation_->get_nu()));
+
+  cost_collector.get()->addCost("commandLimits", control_limit_cost, w_limit,
+                                true);
+}
+
 void OCP::defineCoMPosition(CostModelSum &cost_collector,
                             const double w_com_pos) {
   Vector3d com_ref_position = designer_.get_com_position();

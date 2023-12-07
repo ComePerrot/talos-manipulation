@@ -77,6 +77,7 @@ ActionModel OCP::formulatePointingTask() {
 
   // Safety constraints
   defineJointLimits(costs, settings_.w_limit, settings_.limit_scale);
+  defineCommandLimits(costs, 0, settings_.limit_scale);
 
   // Equilibrium constraints
   defineCoMPosition(costs, settings_.w_com_pos);

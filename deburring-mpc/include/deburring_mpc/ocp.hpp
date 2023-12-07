@@ -118,6 +118,8 @@ class OCP {
                            const double w_control_reg);
   void defineJointLimits(CostModelSum &cost_collector, const double w_limit,
                          const double limit_scale);
+  void defineCommandLimits(CostModelSum &cost_collector,
+                                const double w_limit, const double limit_scale);
   void defineCoMPosition(CostModelSum &cost_collector, const double w_com_pos);
   void defineGripperPlacement(CostModelSum &cost_collector,
                               const double w_gripper_pos,
