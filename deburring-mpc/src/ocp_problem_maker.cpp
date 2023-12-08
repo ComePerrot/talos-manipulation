@@ -59,7 +59,10 @@ void OCP::solveFirst(const VectorXd x) {
     // Gravity compensation torques
     us_init.push_back(
         boost::static_pointer_cast<crocoddyl::ResidualModelControl>(
-            costs(i)->get_costs().at("actuationTask")->cost->get_residual())
+            costs(i)
+                ->get_costs()
+                .at("controlRegularization")
+                ->cost->get_residual())
             ->get_reference());
   }
   xs_init.push_back(x);
@@ -77,14 +80,14 @@ ActionModel OCP::formulatePointingTask() {
 
   // Safety constraints
   defineJointLimits(costs, settings_.w_limit, settings_.limit_scale);
-  defineCommandLimits(costs, 0, settings_.limit_scale);
+  defineControlLimits(costs, 0, settings_.limit_scale);
 
   // Equilibrium constraints
   defineCoMPosition(costs, settings_.w_com_pos);
 
   // Regulation task
-  definePostureTask(costs, settings_.w_state_reg);
-  defineActuationTask(costs, settings_.w_control_reg);
+  defineStateRegularization(costs, settings_.w_state_reg);
+  defineControlRegularization(costs, settings_.w_control_reg);
 
   // End effector task
   defineGripperPlacement(costs, settings_.w_gripper_pos,
@@ -118,7 +121,7 @@ ActionModel OCP::formulateTerminalPointingTask() {
   defineCoMPosition(costs, settings_.w_com_pos);
 
   // Regulation task
-  definePostureTask(costs, settings_.w_state_reg);
+  defineStateRegularization(costs, settings_.w_state_reg);
 
   // End effector task
   defineGripperPlacement(costs, settings_.w_gripper_pos,

@@ -24,7 +24,7 @@ void OCP::setBalancingTorques() {
     VectorXd x_ref = boost::static_pointer_cast<crocoddyl::ResidualModelState>(
                          costs(node_index)
                              ->get_costs()
-                             .at("postureTask")
+                             .at("stateRegularization")
                              ->cost->get_residual())
                          ->get_reference();
 
@@ -35,7 +35,7 @@ void OCP::setBalancingTorques() {
     boost::static_pointer_cast<crocoddyl::ResidualModelControl>(
         costs(node_index)
             ->get_costs()
-            .at("actuationTask")
+            .at("controlRegularization")
             ->cost->get_residual())
         ->set_reference(balancing_torques);
   }
@@ -75,7 +75,7 @@ void OCP::changeGoalTrackingWeights(double weight) {
 void OCP::changePostureReference(const size_t index,
                                  const Eigen::Ref<const VectorXd> reference) {
   boost::static_pointer_cast<crocoddyl::ResidualModelState>(
-      costs(index)->get_costs().at("postureTask")->cost->get_residual())
+      costs(index)->get_costs().at("stateRegularization")->cost->get_residual())
       ->set_reference(reference);
 }
 

@@ -112,14 +112,14 @@ class OCP {
   ActionModel formulateTerminalPointingTask();
   void setArmature(DifferentialActionModel DAM);
   void defineFeetContact(Contact &contact_collector);
-  void definePostureTask(CostModelSum &cost_collector,
-                         const double w_state_reg);
-  void defineActuationTask(CostModelSum &cost_collector,
-                           const double w_control_reg);
+  void defineStateRegularization(CostModelSum &cost_collector,
+                                 const double w_state_reg);
+  void defineControlRegularization(CostModelSum &cost_collector,
+                                   const double w_control_reg);
   void defineJointLimits(CostModelSum &cost_collector, const double w_limit,
                          const double limit_scale);
-  void defineCommandLimits(CostModelSum &cost_collector,
-                                const double w_limit, const double limit_scale);
+  void defineControlLimits(CostModelSum &cost_collector, const double w_limit,
+                           const double limit_scale);
   void defineCoMPosition(CostModelSum &cost_collector, const double w_com_pos);
   void defineGripperPlacement(CostModelSum &cost_collector,
                               const double w_gripper_pos,

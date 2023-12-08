@@ -7,22 +7,22 @@ void OCP::defineFeetContact(Contact &contact_collector) {
           state_, designer_.get_lf_id(), designer_.get_lf_frame(),
           pinocchio::LOCAL, actuation_->get_nu(), Eigen::Vector2d(0., 4.));
 
-  boost::shared_ptr<crocoddyl::ContactModelAbstract> Contact_model_right =
+  boost::shared_ptr<crocoddyl::ContactModelAbstract> contact_model_right =
       boost::make_shared<crocoddyl::ContactModel6D>(
           state_, designer_.get_rf_id(), designer_.get_rf_frame(),
           pinocchio::LOCAL, actuation_->get_nu(), Vector2d(0., 4.));
 
   contact_collector->addContact(designer_.get_lf_name(), contact_model_left,
                                 false);
-  contact_collector->addContact(designer_.get_rf_name(), Contact_model_right,
+  contact_collector->addContact(designer_.get_rf_name(), contact_model_right,
                                 false);
 
   contact_collector->changeContactStatus(designer_.get_lf_name(), true);
   contact_collector->changeContactStatus(designer_.get_rf_name(), true);
 }
 
-void OCP::definePostureTask(CostModelSum &cost_collector,
-                            const double w_state_reg) {
+void OCP::defineStateRegularization(CostModelSum &cost_collector,
+                                    const double w_state_reg) {
   if (settings_.state_weights.size() != designer_.get_rmodel().nv * 2) {
     throw std::invalid_argument("State weight size is wrong ");
   }
@@ -31,17 +31,18 @@ void OCP::definePostureTask(CostModelSum &cost_collector,
           boost::make_shared<crocoddyl::ActivationModelWeightedQuad>(
               settings_.state_weights);
 
-  boost::shared_ptr<crocoddyl::CostModelAbstract> posture_cost =
+  boost::shared_ptr<crocoddyl::CostModelAbstract> state_regularization_cost =
       boost::make_shared<crocoddyl::CostModelResidual>(
           state_, activation_weighted_quad,
           boost::make_shared<crocoddyl::ResidualModelState>(
               state_, designer_.get_x0(), actuation_->get_nu()));
 
-  cost_collector.get()->addCost("postureTask", posture_cost, w_state_reg, true);
+  cost_collector.get()->addCost("stateRegularization",
+                                state_regularization_cost, w_state_reg, true);
 }
 
-void OCP::defineActuationTask(CostModelSum &cost_collector,
-                              const double w_control_reg) {
+void OCP::defineControlRegularization(CostModelSum &cost_collector,
+                                      const double w_control_reg) {
   if (settings_.control_weights.size() != (int)actuation_->get_nu()) {
     throw std::invalid_argument("Control weight size is wrong ");
   }
@@ -50,12 +51,13 @@ void OCP::defineActuationTask(CostModelSum &cost_collector,
           boost::make_shared<crocoddyl::ActivationModelWeightedQuad>(
               settings_.control_weights);  //.tail(actuation->get_nu())
 
-  boost::shared_ptr<crocoddyl::CostModelAbstract> actuation_cost =
+  boost::shared_ptr<crocoddyl::CostModelAbstract> control_regularization_cost =
       boost::make_shared<crocoddyl::CostModelResidual>(
           state_, activation_weighted_quad,
           boost::make_shared<crocoddyl::ResidualModelControl>(
               state_, actuation_->get_nu()));
-  cost_collector.get()->addCost("actuationTask", actuation_cost, w_control_reg,
+  cost_collector.get()->addCost("controlRegularization",
+                                control_regularization_cost, w_control_reg,
                                 true);
 }
 
@@ -92,7 +94,7 @@ void OCP::defineJointLimits(CostModelSum &cost_collector, const double w_limit,
   cost_collector.get()->addCost("jointLimits", joint_limit_cost, w_limit, true);
 }
 
-void OCP::defineCommandLimits(CostModelSum &cost_collector,
+void OCP::defineControlLimits(CostModelSum &cost_collector,
                               const double w_limit, const double limit_scale) {
   Eigen::VectorXd lower_bound(actuation_->get_nu()),
       upper_bound(actuation_->get_nu());
@@ -115,7 +117,7 @@ void OCP::defineCommandLimits(CostModelSum &cost_collector,
           boost::make_shared<crocoddyl::ResidualModelControl>(
               state_, actuation_->get_nu()));
 
-  cost_collector.get()->addCost("commandLimits", control_limit_cost, w_limit,
+  cost_collector.get()->addCost("controlLimits", control_limit_cost, w_limit,
                                 true);
 }
 
