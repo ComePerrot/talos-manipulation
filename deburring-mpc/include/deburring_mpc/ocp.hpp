@@ -118,7 +118,7 @@ class OCP {
                                  const double w_state_reg);
   void defineControlRegularization(CostModelSum &cost_collector,
                                    const double w_control_reg);
-  void defineJointLimits(CostModelSum &cost_collector,
+  void defineStateLimits(CostModelSum &cost_collector,
                          const double w_state_limits, const double limit_scale,
                          const bool limit_speed);
   void defineControlLimits(CostModelSum &cost_collector,

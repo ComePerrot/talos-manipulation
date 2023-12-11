@@ -61,7 +61,7 @@ void OCP::defineControlRegularization(CostModelSum &cost_collector,
                                 true);
 }
 
-void OCP::defineJointLimits(CostModelSum &cost_collector,
+void OCP::defineStateLimits(CostModelSum &cost_collector,
                             const double w_state_limits,
                             const double limit_scale, const bool limit_speed) {
   Eigen::VectorXd lower_bound(2 * state_->get_nv()),
