@@ -13,6 +13,16 @@ void OCPSettings::readParamsFromYamlString(const std::string &string_to_parse) {
     return;
   }
 
+  // Local lambda function to read bool
+  auto read_bool = [&config](bool &aref_bool, std::string fieldname) {
+    YAML::Node yn_bool = config[fieldname];
+    if (yn_bool) {
+      aref_bool = yn_bool.as<bool>();
+    } else {
+      std::cout << "No " << fieldname << std::endl;
+    }
+  };
+
   // Local lambda function to read size_t
   auto read_size_t = [&config](size_t &aref_size_t, std::string fieldname) {
     YAML::Node yn_asize_t = config[fieldname];
@@ -100,12 +110,14 @@ void OCPSettings::readParamsFromYamlString(const std::string &string_to_parse) {
 
   read_double(w_state_reg, "w_state_reg");
   read_double(w_control_reg, "w_control_reg");
-  read_double(w_state_limits, "w_limit");
+  read_double(w_state_limits, "w_state_limits");
+  read_double(w_control_limit, "w_control_limit");
   read_double(w_com_pos, "w_com_pos");
   read_double(w_gripper_pos, "w_gripper_pos");
   read_double(w_gripper_rot, "w_gripper_rot");
   read_double(w_gripper_vel, "w_gripper_vel");
   read_double(limit_scale, "limit_scale");
+  read_bool(limit_speed, "limit_speed");
 
   read_stateWeights(state_weights);
   read_controlWeights(control_weights);

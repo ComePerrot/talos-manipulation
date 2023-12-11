@@ -33,12 +33,14 @@ OCP:
   horizon_length: 100
   w_state_reg: 0.02
   w_control_reg: 0.001
-  w_limit: 1000
+  w_state_limits: 1000
+  w_control_limit: 0
   w_com_pos: 500
   w_gripper_pos: 5
   w_gripper_rot: 30
   w_gripper_vel: 2
   limit_scale: 1
+  limit_speed: false
   state_pos_weights:
     base: [500, 500, 500, 1000, 1000, 1000]
     left_leg: [500, 500, 500, 500, 1000, 1000]

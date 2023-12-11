@@ -23,13 +23,15 @@ static boost::shared_ptr<OCP> constructor(bp::dict settings,
 
   conf.w_state_reg = bp::extract<double>(settings["w_state_reg"]);
   conf.w_control_reg = bp::extract<double>(settings["w_control_reg"]);
-  conf.w_state_limits = bp::extract<double>(settings["w_limit"]);
+  conf.w_state_limits = bp::extract<double>(settings["w_state_limits"]);
+  conf.w_control_limit = bp::extract<double>(settings["w_control_limit"]);
   conf.w_com_pos = bp::extract<double>(settings["w_com_pos"]);
   conf.w_gripper_pos = bp::extract<double>(settings["w_gripper_pos"]);
   conf.w_gripper_rot = bp::extract<double>(settings["w_gripper_rot"]);
   conf.w_gripper_vel = bp::extract<double>(settings["w_gripper_vel"]);
 
   conf.limit_scale = bp::extract<double>(settings["limit_scale"]);
+  conf.limit_speed = bp::extract<bool>(settings["limit_speed"]);
 
   conf.state_weights = bp::extract<Eigen::VectorXd>(settings["state_weights"]);
   conf.control_weights =
