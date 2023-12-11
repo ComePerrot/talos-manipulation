@@ -62,21 +62,38 @@ void OCP::defineControlRegularization(CostModelSum &cost_collector,
 }
 
 void OCP::defineJointLimits(CostModelSum &cost_collector, const double w_limit,
-                            const double limit_scale) {
+                            const double limit_scale, const bool limit_speed) {
   Eigen::VectorXd lower_bound(2 * state_->get_nv()),
       upper_bound(2 * state_->get_nv());
   double inf = 9999.0;
-  lower_bound << Eigen::VectorXd::Constant(6, -inf),
-      designer_.get_rmodel().lowerPositionLimit.tail(
-          static_cast<Eigen::Index>(state_->get_nq() - 7)),
-      Eigen::VectorXd::Constant(static_cast<Eigen::Index>(state_->get_nv()),
-                                -inf);
 
-  upper_bound << Eigen::VectorXd::Constant(6, inf),
-      designer_.get_rmodel().upperPositionLimit.tail(
-          static_cast<Eigen::Index>(state_->get_nq() - 7)),
-      Eigen::VectorXd::Constant(static_cast<Eigen::Index>(state_->get_nv()),
-                                inf);
+  if (limit_speed) {
+    lower_bound << Eigen::VectorXd::Constant(6, -inf),
+        designer_.get_rmodel().lowerPositionLimit.tail(
+            static_cast<Eigen::Index>(state_->get_nq() - 7)),
+        Eigen::VectorXd::Constant(6, -inf),
+        -designer_.get_rmodel().velocityLimit.tail(
+            static_cast<Eigen::Index>(state_->get_nv() - 6));
+
+    upper_bound << Eigen::VectorXd::Constant(6, inf),
+        designer_.get_rmodel().upperPositionLimit.tail(
+            static_cast<Eigen::Index>(state_->get_nq() - 7)),
+        Eigen::VectorXd::Constant(6, inf),
+        -designer_.get_rmodel().velocityLimit.tail(
+            static_cast<Eigen::Index>(state_->get_nv() - 6));
+  } else {
+    lower_bound << Eigen::VectorXd::Constant(6, -inf),
+        designer_.get_rmodel().lowerPositionLimit.tail(
+            static_cast<Eigen::Index>(state_->get_nq() - 7)),
+        Eigen::VectorXd::Constant(static_cast<Eigen::Index>(state_->get_nv()),
+                                  -inf);
+
+    upper_bound << Eigen::VectorXd::Constant(6, inf),
+        designer_.get_rmodel().upperPositionLimit.tail(
+            static_cast<Eigen::Index>(state_->get_nq() - 7)),
+        Eigen::VectorXd::Constant(static_cast<Eigen::Index>(state_->get_nv()),
+                                  inf);
+  }
 
   crocoddyl::ActivationBounds bounds =
       crocoddyl::ActivationBounds(lower_bound, upper_bound, limit_scale);
