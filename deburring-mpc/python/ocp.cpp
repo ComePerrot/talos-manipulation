@@ -23,7 +23,7 @@ static boost::shared_ptr<OCP> constructor(bp::dict settings,
 
   conf.w_state_reg = bp::extract<double>(settings["w_state_reg"]);
   conf.w_control_reg = bp::extract<double>(settings["w_control_reg"]);
-  conf.w_limit = bp::extract<double>(settings["w_limit"]);
+  conf.w_state_limits = bp::extract<double>(settings["w_limit"]);
   conf.w_com_pos = bp::extract<double>(settings["w_com_pos"]);
   conf.w_gripper_pos = bp::extract<double>(settings["w_gripper_pos"]);
   conf.w_gripper_rot = bp::extract<double>(settings["w_gripper_rot"]);

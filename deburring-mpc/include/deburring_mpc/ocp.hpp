@@ -71,13 +71,15 @@ struct OCPSettings {
   // Croco configuration
   double w_state_reg = 0;
   double w_control_reg = 0;
-  double w_limit = 0;
+  double w_state_limits = 0;
+  double w_control_limit = 0;
   double w_com_pos = 0;
   double w_gripper_pos = 0;
   double w_gripper_rot = 0;
   double w_gripper_vel = 0;
 
   double limit_scale = 1;
+  bool limit_speed = false;
 
   Eigen::VectorXd state_weights;
   Eigen::VectorXd control_weights;
@@ -116,10 +118,11 @@ class OCP {
                                  const double w_state_reg);
   void defineControlRegularization(CostModelSum &cost_collector,
                                    const double w_control_reg);
-  void defineJointLimits(CostModelSum &cost_collector, const double w_limit,
-                         const double limit_scale,
-                         const bool limit_speed = false);
-  void defineControlLimits(CostModelSum &cost_collector, const double w_limit,
+  void defineJointLimits(CostModelSum &cost_collector,
+                         const double w_state_limits, const double limit_scale,
+                         const bool limit_speed);
+  void defineControlLimits(CostModelSum &cost_collector,
+                           const double w_control_limit,
                            const double limit_scale);
   void defineCoMPosition(CostModelSum &cost_collector, const double w_com_pos);
   void defineGripperPlacement(CostModelSum &cost_collector,

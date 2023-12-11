@@ -100,7 +100,7 @@ void OCPSettings::readParamsFromYamlString(const std::string &string_to_parse) {
 
   read_double(w_state_reg, "w_state_reg");
   read_double(w_control_reg, "w_control_reg");
-  read_double(w_limit, "w_limit");
+  read_double(w_state_limits, "w_limit");
   read_double(w_com_pos, "w_com_pos");
   read_double(w_gripper_pos, "w_gripper_pos");
   read_double(w_gripper_rot, "w_gripper_rot");

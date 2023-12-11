@@ -61,7 +61,8 @@ void OCP::defineControlRegularization(CostModelSum &cost_collector,
                                 true);
 }
 
-void OCP::defineJointLimits(CostModelSum &cost_collector, const double w_limit,
+void OCP::defineJointLimits(CostModelSum &cost_collector,
+                            const double w_state_limits,
                             const double limit_scale, const bool limit_speed) {
   Eigen::VectorXd lower_bound(2 * state_->get_nv()),
       upper_bound(2 * state_->get_nv());
@@ -108,11 +109,13 @@ void OCP::defineJointLimits(CostModelSum &cost_collector, const double w_limit,
           boost::make_shared<crocoddyl::ResidualModelState>(
               state_, actuation_->get_nu()));
 
-  cost_collector.get()->addCost("jointLimits", joint_limit_cost, w_limit, true);
+  cost_collector.get()->addCost("jointLimits", joint_limit_cost, w_state_limits,
+                                true);
 }
 
 void OCP::defineControlLimits(CostModelSum &cost_collector,
-                              const double w_limit, const double limit_scale) {
+                              const double w_control_limit,
+                              const double limit_scale) {
   Eigen::VectorXd lower_bound(actuation_->get_nu()),
       upper_bound(actuation_->get_nu());
 
@@ -134,8 +137,8 @@ void OCP::defineControlLimits(CostModelSum &cost_collector,
           boost::make_shared<crocoddyl::ResidualModelControl>(
               state_, actuation_->get_nu()));
 
-  cost_collector.get()->addCost("controlLimits", control_limit_cost, w_limit,
-                                true);
+  cost_collector.get()->addCost("controlLimits", control_limit_cost,
+                                w_control_limit, true);
 }
 
 void OCP::defineCoMPosition(CostModelSum &cost_collector,

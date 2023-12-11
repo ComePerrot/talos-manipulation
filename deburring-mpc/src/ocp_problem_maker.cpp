@@ -79,8 +79,9 @@ ActionModel OCP::formulatePointingTask() {
   defineFeetContact(contacts);
 
   // Safety constraints
-  defineJointLimits(costs, settings_.w_limit, settings_.limit_scale);
-  defineControlLimits(costs, 0, settings_.limit_scale);
+  defineJointLimits(costs, settings_.w_state_limits, settings_.limit_scale,
+                    settings_.limit_speed);
+  defineControlLimits(costs, settings_.w_control_limit, settings_.limit_scale);
 
   // Equilibrium constraints
   defineCoMPosition(costs, settings_.w_com_pos);
@@ -115,7 +116,8 @@ ActionModel OCP::formulateTerminalPointingTask() {
   defineFeetContact(contacts);
 
   // Safety constraints
-  defineJointLimits(costs, settings_.w_limit, settings_.limit_scale);
+  defineJointLimits(costs, settings_.w_state_limits, settings_.limit_scale,
+                    settings_.limit_speed);
 
   // Equilibrium constraints
   defineCoMPosition(costs, settings_.w_com_pos);
