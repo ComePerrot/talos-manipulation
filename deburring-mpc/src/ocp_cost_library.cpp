@@ -80,7 +80,7 @@ void OCP::defineStateLimits(CostModelSum &cost_collector,
         designer_.get_rmodel().upperPositionLimit.tail(
             static_cast<Eigen::Index>(state_->get_nq() - 7)),
         Eigen::VectorXd::Constant(6, inf),
-        -designer_.get_rmodel().velocityLimit.tail(
+        designer_.get_rmodel().velocityLimit.tail(
             static_cast<Eigen::Index>(state_->get_nv() - 6));
   } else {
     lower_bound << Eigen::VectorXd::Constant(6, -inf),
