@@ -145,8 +145,6 @@ OCPparams["control_weights"] = np.array(
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 )
 
-print(OCPparams)
-
 horizonLength = OCPparams["horizon_length"]
 
 # Robot model

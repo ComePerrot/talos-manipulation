@@ -5,9 +5,10 @@
 #####################
 
 import pinocchio as pin
+import numpy as np
 import yaml
 
-from deburring_mpc import MPC, MPCSettings, OCPSettings, RobotDesigner
+from deburring_mpc import MPC, RobotDesigner
 
 from bullet_Talos import TalosDeburringSimulator
 from plotter import TalosPlotter
@@ -45,13 +46,84 @@ with open(filename, "r") as paramFile:
 
 controlledJoints = params["robot"]["controlledJoints"]
 toolFramePos = params["robot"]["toolFramePos"]
+OCPparams = params["OCP"]
 
-MPCparams = MPCSettings()
-OCPparams = OCPSettings()
+OCPparams["time_step"] = 0.01
+OCPparams["state_weights"] = np.array(
+    [
+        500,
+        500,
+        500,
+        1000,
+        1000,
+        1000,
+        500,
+        500,
+        500,
+        500,
+        1000,
+        1000,
+        500,
+        500,
+        500,
+        500,
+        1000,
+        1000,
+        100,
+        200,
+        100,
+        100,
+        100,
+        100,
+        1,
+        1,
+        1,
+        500,
+        500,
+        500,
+        500,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+    ]
+)
+OCPparams["control_weights"] = np.array(
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+)
 
-print("Loading data from file: \n" + filename)
-OCPparams.read_from_yaml(filename)
-MPCparams.read_from_yaml(filename)
+
+MPCparams = params["MPC"]
+MPCparams["target_position"] = np.array(MPCparams["target_position"])
+MPCparams["holes_offsets"] = [np.array(offset) for offset in MPCparams["holes_offsets"]]
+MPCparams["custom_arm_ref"] = np.array(MPCparams["custom_arm_ref"])
 
 # Robot model
 design_conf = dict(

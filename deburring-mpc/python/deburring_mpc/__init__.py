@@ -3,6 +3,5 @@
 from .deburring_mpc_pywrap import (
     RobotDesigner,
     OCP,
-    MPCSettings,
     MPC
 )
