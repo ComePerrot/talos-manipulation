@@ -127,6 +127,11 @@ int main(int argc, char** argv) {
   ros::NodeHandle nh;
   pal_statistics::RegistrationsRAII registered_variables;
 
+  // Timing variables
+  ros::Time OCP_start_time = ros::Time::now();
+  ros::Time OCP_end_time = ros::Time::now();
+  double OCP_solve_time;
+
   // Robot Desginer & MPC
   deburring::RobotDesigner pin_wrapper = buildRobotDesigner(nh);
   deburring::MPC MPC = buildMPC(nh, pin_wrapper);
@@ -161,6 +166,8 @@ int main(int argc, char** argv) {
                     &MPC.get_position_error(), &registered_variables);
   REGISTER_VARIABLE("/introspection_data", "end_effector_position_task_weight",
                     &MPC.get_goal_weight(), &registered_variables);
+  REGISTER_VARIABLE("/introspection_data", "OCP_solve_time", &OCP_solve_time,
+                    &registered_variables);
 
   Eigen::VectorXd u0;
   Eigen::MatrixXd K0;
@@ -177,7 +184,10 @@ int main(int argc, char** argv) {
     x = Robot.get_robotState();
 
     // Solving MPC iteration
+    OCP_start_time = ros::Time::now();
     MPC.iterate(x, toolMtarget);
+    OCP_end_time = ros::Time::now();
+    OCP_solve_time = (OCP_end_time - OCP_start_time).toSec();
 
     // Sending command to robot
     u0 = MPC.get_u0();
