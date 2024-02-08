@@ -17,6 +17,7 @@ deburring::RobotDesigner buildRobotDesigner(ros::NodeHandle nh) {
   nh.getParam("right_foot_name", designer_settings.right_foot_name);
   nh.getParam("urdf", designer_settings.urdf_path);
   nh.getParam("srdf", designer_settings.srdf_path);
+  nh.getParam("robot_description", designer_settings.robot_description);
   nh.getParam("controlled_joints", designer_settings.controlled_joints_names);
 
   std::vector<double> gripperTtool;
