@@ -133,8 +133,10 @@ class MPC {
   void setTarget(const SE3 &toolMtarget);
   void setHolesPlacement();
   void updateTarget(const SE3 &toolMtarget);
-  void setPostureReferences(const ConstVectorRef &x0);
+  void setPostureReference(const ConstVectorRef &x0);
+  void updatePostureReference(const ConstVectorRef &x);
   void updateOCP();
+  void updateOCP_variablePosture(const VectorXd &x_meas);
 
  public:
   /**

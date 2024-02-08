@@ -28,7 +28,7 @@ void MPC::initialize(const ConstVectorRef &q0, const ConstVectorRef &v0,
 
   // Setup target
   setTarget(toolMtarget);
-  setPostureReferences(x0_);
+  setPostureReference(x0_);
 
   // Init OCP
   OCP_.initialize(x0_, oMtarget_);
@@ -49,7 +49,11 @@ void MPC::iterate(const VectorXd &x0, const SE3 &toolMtarget) {
   designer_.updateReducedModel(x0_);
 
   updateTarget(toolMtarget);
-  updateOCP();
+  if (settings_.precision_strategy == 3) {
+    updateOCP_variablePosture(x0_);
+  } else {
+    updateOCP();
+  }
 
   OCP_.solve(x0_);
 
@@ -123,13 +127,17 @@ void MPC::updateTarget(const SE3 &toolMtarget) {
   oMtarget_hole_ = list_oMhole_[current_hole_];
 }
 
-void MPC::setPostureReferences(const ConstVectorRef &x0) {
+void MPC::setPostureReference(const ConstVectorRef &x0) {
   initial_posture_ref_ = x0;
   initial_posture_ref_.tail(designer_.get_rmodel().nv) =
       VectorXd::Zero(designer_.get_rmodel().nv);
 
   updated_posture_ref_ = initial_posture_ref_;
   updated_posture_ref_.segment(21, 4) = settings_.custom_arm_ref;
+}
+
+void MPC::updatePostureReference(const ConstVectorRef &x) {
+  updated_posture_ref_.segment(21, 4) = x.segment(21, 4);
 }
 
 const VectorXd &MPC::shapeState(const ConstVectorRef &q,

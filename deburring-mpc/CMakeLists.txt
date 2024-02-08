@@ -72,6 +72,7 @@ SET(${PROJECT_NAME}_SOURCES
     src/mpc_debug.cpp
     src/mpc_params.cpp
     src/mpc_state_machine.cpp
+    src/mpc_variable_posture.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
