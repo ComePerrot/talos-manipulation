@@ -13,8 +13,8 @@ option(BUILD_PYTHON_INTERFACE "Build the python binding" ON)
 set(PROJECT_USE_CMAKE_EXPORT TRUE)
 
 # Check if the submodule cmake have been initialized
-set(JRL_CMAKE_MODULES "${CMAKE_CURRENT_LIST_DIR}/cmake")
-if(NOT EXISTS "${CMAKE_SOURCE_DIR}/cmake/base.cmake")
+set(JRL_CMAKE_MODULES "${CMAKE_CURRENT_LIST_DIR}/../cmake")
+if(NOT EXISTS "${CMAKE_SOURCE_DIR}/../cmake/base.cmake")
   if(${CMAKE_VERSION} VERSION_LESS "3.14.0")
     message(
       FATAL_ERROR
