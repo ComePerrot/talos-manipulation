@@ -98,7 +98,7 @@ ActionModel OCP::formulatePointingTask() {
   DifferentialActionModel running_dam =
       boost::make_shared<crocoddyl::DifferentialActionModelContactFwdDynamics>(
           state_, actuation_, contacts, costs, 0., true);
-  setArmature(running_dam);
+  setWristArmature(running_dam);
 
   ActionModel running_model =
       boost::make_shared<crocoddyl::IntegratedActionModelEuler>(
@@ -133,7 +133,7 @@ ActionModel OCP::formulateTerminalPointingTask() {
   DifferentialActionModel terminal_dam =
       boost::make_shared<crocoddyl::DifferentialActionModelContactFwdDynamics>(
           state_, actuation_, contacts, costs, 0., true);
-  setArmature(terminal_dam);
+  setWristArmature(terminal_dam);
 
   ActionModel terminal_model =
       boost::make_shared<crocoddyl::IntegratedActionModelEuler>(terminal_dam,
@@ -142,12 +142,23 @@ ActionModel OCP::formulateTerminalPointingTask() {
   return terminal_model;
 }
 
-void OCP::setArmature(DifferentialActionModel DAM) {
+void OCP::setWristArmature(DifferentialActionModel DAM) {
   auto pin_model_ = designer_.get_rmodel();
   VectorXd armature = Eigen::VectorXd::Zero(pin_model_.nv);
-  armature[(long)pin_model_.getJointId("arm_left_5_joint") + 4] = 0.1;  // 0.7
-  armature[(long)pin_model_.getJointId("arm_left_6_joint") + 4] = 0.1;  // 0.7
-  armature[(long)pin_model_.getJointId("arm_left_7_joint") + 4] = 0.1;  // 1
+
+  const std::vector<std::string> joint_names = {
+      "arm_left_5_joint", "arm_left_6_joint", "arm_left_7_joint"};
+  const VectorXd armature_values =
+      (Eigen::Matrix<double, 3, 1, Eigen::DontAlign>() << 0.1, 0.1, 0.1)
+          .finished();  // Values corresponding to each joint name
+
+  for (size_t i = 0; i < joint_names.size(); ++i) {
+    if (pin_model_.existJointName(joint_names[i])) {
+      armature[static_cast<long>(pin_model_.getJointId(joint_names[i])) + 4] =
+          armature_values[static_cast<Eigen::Index>(i)];
+    }
+  }
+
   DAM->set_armature(armature);
 }
 

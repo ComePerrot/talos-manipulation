@@ -112,7 +112,7 @@ class OCP {
   void buildSolver(const VectorXd x0, SE3 oMtarget);
   ActionModel formulatePointingTask();
   ActionModel formulateTerminalPointingTask();
-  void setArmature(DifferentialActionModel DAM);
+  void setWristArmature(DifferentialActionModel DAM);
   void defineFeetContact(Contact &contact_collector);
   void defineStateRegularization(CostModelSum &cost_collector,
                                  const double w_state_reg);
