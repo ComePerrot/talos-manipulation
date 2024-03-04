@@ -21,6 +21,37 @@ void OCP::defineFeetContact(Contact &contact_collector) {
   contact_collector->changeContactStatus(designer_.get_rf_name(), true);
 }
 
+void OCP::defineFeetWrenchCost(CostModelSum &costCollector,
+                               const double w_wrench) {
+  crocoddyl::WrenchCone wrenchCone_LF =
+      crocoddyl::WrenchCone(Eigen::Matrix3d::Identity(), 0.3,
+                            Eigen::Vector2d(0.1, 0.05), 4, true, 200.0, 1200);
+  crocoddyl::WrenchCone wrenchCone_RF =
+      crocoddyl::WrenchCone(Eigen::Matrix3d::Identity(), 0.3,
+                            Eigen::Vector2d(0.1, 0.05), 4, true, 200.0, 1200);
+
+  boost::shared_ptr<crocoddyl::ResidualModelContactWrenchCone>
+      residual_LF_Wrench =
+          boost::make_shared<crocoddyl::ResidualModelContactWrenchCone>(
+              state_, designer_.get_lf_id(), wrenchCone_LF,
+              actuation_->get_nu());
+  boost::shared_ptr<crocoddyl::CostModelAbstract> wrenchModel_LF =
+      boost::make_shared<crocoddyl::CostModelResidual>(state_,
+                                                       residual_LF_Wrench);
+
+  boost::shared_ptr<crocoddyl::ResidualModelContactWrenchCone>
+      residual_RF_Wrench =
+          boost::make_shared<crocoddyl::ResidualModelContactWrenchCone>(
+              state_, designer_.get_rf_id(), wrenchCone_RF,
+              actuation_->get_nu());
+  boost::shared_ptr<crocoddyl::CostModelAbstract> wrenchModel_RF =
+      boost::make_shared<crocoddyl::CostModelResidual>(state_,
+                                                       residual_RF_Wrench);
+
+  costCollector.get()->addCost("wrench_LF", wrenchModel_LF, w_wrench, true);
+  costCollector.get()->addCost("wrench_RF", wrenchModel_RF, w_wrench, true);
+}
+
 void OCP::defineStateRegularization(CostModelSum &cost_collector,
                                     const double w_state_reg) {
   if (settings_.state_weights.size() != designer_.get_rmodel().nv * 2) {

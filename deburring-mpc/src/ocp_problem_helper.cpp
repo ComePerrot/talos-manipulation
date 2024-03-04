@@ -79,6 +79,32 @@ void OCP::changePostureReference(const size_t index,
       ->set_reference(reference);
 }
 
+const Vector3d &OCP::getFootForce(const unsigned long index,
+                                  const std::string &nameFootForceCost) {
+  foot_force_ =
+      boost::static_pointer_cast<crocoddyl::ResidualDataContactWrenchCone>(
+          boost::static_pointer_cast<
+              crocoddyl::DifferentialActionDataContactFwdDynamics>(
+              iad(index)->differential)
+              ->costs->costs.find(nameFootForceCost)
+              ->second->residual)
+          ->contact->f.linear();
+  return foot_force_;
+}
+
+const Vector3d &OCP::getFootTorque(const unsigned long index,
+                                   const std::string &nameFootForceCost) {
+  foot_torque_ =
+      boost::static_pointer_cast<crocoddyl::ResidualDataContactWrenchCone>(
+          boost::static_pointer_cast<
+              crocoddyl::DifferentialActionDataContactFwdDynamics>(
+              iad(index)->differential)
+              ->costs->costs.find(nameFootForceCost)
+              ->second->residual)
+          ->contact->f.angular();
+  return foot_torque_;
+}
+
 const VectorXd &OCP::getFinalPosture() { return (solver_->get_xs().back()); }
 
 ActionModel OCP::ama(const unsigned long time) {
@@ -106,5 +132,10 @@ CostModelSum OCP::costs(const unsigned long time) {
 
 ActionData OCP::ada(const unsigned long time) {
   return solver_->get_problem()->get_runningDatas()[time];
+}
+
+IntegratedActionData OCP::iad(const unsigned long time) {
+  return boost::static_pointer_cast<crocoddyl::IntegratedActionDataEuler>(
+      ada(time));
 }
 }  // namespace deburring

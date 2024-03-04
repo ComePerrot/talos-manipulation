@@ -77,6 +77,7 @@ ActionModel OCP::formulatePointingTask() {
       boost::make_shared<crocoddyl::CostModelSum>(state_, actuation_->get_nu());
 
   defineFeetContact(contacts);
+  defineFeetWrenchCost(costs, 0);
 
   // Safety constraints
   defineStateLimits(costs, settings_.w_state_limits, settings_.limit_scale,
@@ -114,6 +115,7 @@ ActionModel OCP::formulateTerminalPointingTask() {
       boost::make_shared<crocoddyl::CostModelSum>(state_, actuation_->get_nu());
 
   defineFeetContact(contacts);
+  defineFeetWrenchCost(costs, 0);
 
   // Safety constraints
   defineStateLimits(costs, settings_.w_state_limits, settings_.limit_scale,

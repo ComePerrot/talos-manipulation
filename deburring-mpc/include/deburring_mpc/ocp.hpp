@@ -31,6 +31,7 @@
 // #include <crocoddyl/multibody/frames.hpp>
 #include <crocoddyl/multibody/fwd.hpp>
 #include <crocoddyl/multibody/residuals/com-position.hpp>
+#include <crocoddyl/multibody/residuals/contact-wrench-cone.hpp>
 #include <crocoddyl/multibody/residuals/frame-placement.hpp>
 #include <crocoddyl/multibody/residuals/frame-rotation.hpp>
 #include <crocoddyl/multibody/residuals/frame-translation.hpp>
@@ -105,6 +106,7 @@ class OCP {
   bool is_initialized_ = false;
 
   // prealocated memory:
+  Vector3d foot_torque_, foot_force_;
   std::vector<VectorXd> warm_xs_;
   std::vector<VectorXd> warm_us_;
 
@@ -114,6 +116,7 @@ class OCP {
   ActionModel formulateTerminalPointingTask();
   void setWristArmature(DifferentialActionModel DAM);
   void defineFeetContact(Contact &contact_collector);
+  void defineFeetWrenchCost(CostModelSum &costCollector, const double w_wrench);
   void defineStateRegularization(CostModelSum &cost_collector,
                                  const double w_state_reg);
   void defineControlRegularization(CostModelSum &cost_collector,
@@ -137,6 +140,7 @@ class OCP {
   DifferentialActionModel dam(const unsigned long time);
   CostModelSum costs(const unsigned long time);
   ActionData ada(const unsigned long time);
+  IntegratedActionData iad(const unsigned long time);
 
  public:
   OCP(const OCPSettings &ocp_settings, const RobotDesigner &designer);
@@ -159,6 +163,10 @@ class OCP {
   void changeGoalTrackingWeights(double weight);
   void changePostureReference(const size_t index,
                               const Eigen::Ref<const VectorXd> reference);
+  const Vector3d &getFootForce(const unsigned long index,
+                               const std::string &nameFootForceCost);
+  const Vector3d &getFootTorque(const unsigned long index,
+                                const std::string &nameFootForceCost);
   const VectorXd &getFinalPosture();
 
   // Debug
