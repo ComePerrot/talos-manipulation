@@ -164,6 +164,10 @@ int main(int argc, char** argv) {
 
   Eigen::VectorXd u0;
   Eigen::MatrixXd K0;
+  Eigen::VectorXd croco_contact_left_;
+  croco_contact_left_.resize(6);
+  Eigen::VectorXd croco_contact_right_;
+  croco_contact_right_.resize(6);
 
   ros::Rate r(static_cast<double>(1 / MPC.get_OCP().get_settings().time_step));
   while (ros::ok()) {
@@ -178,8 +182,12 @@ int main(int argc, char** argv) {
     // Sending command to robot
     u0 = MPC.get_u0();
     K0 = MPC.get_K0();
+    croco_contact_left_ << MPC.get_OCP().getFootForce(0, "wrench_LF"),
+        MPC.get_OCP().getFootTorque(0, "wrench_LF");
+    croco_contact_right_ << MPC.get_OCP().getFootForce(0, "wrench_RF"),
+        MPC.get_OCP().getFootTorque(0, "wrench_RF");
 
-    Robot.update(u0, K0);
+    Robot.update(u0, K0, croco_contact_left_, croco_contact_right_);
 
     PUBLISH_STATISTICS("/introspection_data");
 

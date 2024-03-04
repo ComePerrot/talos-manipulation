@@ -32,8 +32,13 @@ DeburringROSInterface::DeburringROSInterface(ros::NodeHandle nh) {
 }
 
 void DeburringROSInterface::update(const Eigen::VectorXd& u0,
-                                   const Eigen::MatrixXd& K0) {
+                                   const Eigen::MatrixXd& K0,
+                                   const Eigen::VectorXd& wrench_left,
+                                   const Eigen::VectorXd& wrench_right) {
   mapControlToMsg(u0, K0);
+  if (!(wrench_left.isZero() && wrench_right.isZero())) {
+    mapWrenchesToMsg(wrench_left, wrench_right);
+  }
 
   if (command_pub_->trylock()) {
     control_msg_.header.stamp = ros::Time::now();
@@ -67,4 +72,12 @@ void DeburringROSInterface::mapControlToMsg(const Eigen::VectorXd& u0,
                                             const Eigen::MatrixXd& K0) {
   tf::matrixEigenToMsg(u0, control_msg_.feedforward);
   tf::matrixEigenToMsg(K0, control_msg_.feedback_gain);
+}
+
+void DeburringROSInterface::mapWrenchesToMsg(
+    const Eigen::VectorXd& wrench_left, const Eigen::VectorXd& wrench_right) {
+  tf::wrenchEigenToMsg(wrench_left,
+                       control_msg_.initial_state.contacts[0].wrench);
+  tf::wrenchEigenToMsg(wrench_right,
+                       control_msg_.initial_state.contacts[1].wrench);
 }

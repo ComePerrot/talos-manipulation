@@ -16,7 +16,9 @@
 class DeburringROSInterface {
  public:
   DeburringROSInterface(ros::NodeHandle nh);
-  void update(const Eigen::VectorXd& u0, const Eigen::MatrixXd& K0);
+  void update(const Eigen::VectorXd& u0, const Eigen::MatrixXd& K0,
+              const Eigen::VectorXd& wrench_left = Eigen::VectorXd::Zero(6),
+              const Eigen::VectorXd& wrench_right = Eigen::VectorXd::Zero(6));
 
   Eigen::VectorXd& get_robotState();
 
@@ -24,6 +26,8 @@ class DeburringROSInterface {
   void SensorCb(const linear_feedback_controller_msgs::SensorConstPtr& msg);
   void mapMsgToJointSates();
   void mapControlToMsg(const Eigen::VectorXd& u0, const Eigen::MatrixXd& K0);
+  void mapWrenchesToMsg(const Eigen::VectorXd& wrench_left,
+                        const Eigen::VectorXd& wrench_right);
 
   ros::Subscriber sensor_sub_;
   boost::shared_ptr<realtime_tools::RealtimePublisher<

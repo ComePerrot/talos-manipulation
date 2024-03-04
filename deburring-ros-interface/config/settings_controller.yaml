@@ -6,7 +6,7 @@ OCP:
   w_control_limit: 0
   w_com_pos: 500
   w_gripper_pos: 5
-  w_gripper_rot: 30
+  w_gripper_rot: 0
   w_gripper_vel: 2
   limit_scale: 1
   limit_speed: false
